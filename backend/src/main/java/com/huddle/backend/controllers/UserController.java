@@ -2,6 +2,7 @@ package com.huddle.backend.controllers;
 
 import javax.validation.Valid;
 
+import com.huddle.backend.payload.response.UsersResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,11 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.huddle.backend.models.User;
 import com.huddle.backend.payload.request.LoginRequest;
@@ -24,9 +21,11 @@ import com.huddle.backend.repository.UserRepository;
 import com.huddle.backend.security.jwt.JwtUtils;
 import com.huddle.backend.security.services.UserDetailsImpl;
 
+import java.util.List;
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
     @Autowired
     AuthenticationManager authenticationManager;
@@ -62,5 +61,12 @@ public class UserController {
         userRepository.save(user);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> getUsers() {
+        List<User> users = userRepository.findAll();
+
+        return ResponseEntity.ok(new UsersResponse(users));
     }
 }
