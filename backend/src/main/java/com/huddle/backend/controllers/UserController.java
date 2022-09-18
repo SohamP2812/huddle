@@ -2,7 +2,9 @@ package com.huddle.backend.controllers;
 
 import javax.validation.Valid;
 
-import com.huddle.backend.payload.response.UsersResponse;
+import com.huddle.backend.models.Team;
+import com.huddle.backend.models.TeamMember;
+import com.huddle.backend.payload.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,13 +17,14 @@ import org.springframework.web.bind.annotation.*;
 import com.huddle.backend.models.User;
 import com.huddle.backend.payload.request.LoginRequest;
 import com.huddle.backend.payload.request.SignupRequest;
-import com.huddle.backend.payload.response.JwtResponse;
-import com.huddle.backend.payload.response.MessageResponse;
 import com.huddle.backend.repository.UserRepository;
+import com.huddle.backend.repository.TeamMemberRepository;
+import com.huddle.backend.repository.TeamRepository;
 import com.huddle.backend.security.jwt.JwtUtils;
 import com.huddle.backend.security.services.UserDetailsImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -32,6 +35,12 @@ public class UserController {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    TeamMemberRepository teamMemberRepository;
+
+    @Autowired
+    TeamRepository teamRepository;
 
     @Autowired
     PasswordEncoder encoder;
@@ -67,6 +76,41 @@ public class UserController {
     public ResponseEntity<?> getUsers() {
         List<User> users = userRepository.findAll();
 
-        return ResponseEntity.ok(new UsersResponse(users));
+        List<UserResponse> responseUsers = users.stream().map(user -> new UserResponse(user.getId(), user.getUsername(), user.getEmail())).toList();
+
+        return ResponseEntity.ok(new UsersResponse(responseUsers));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUser(@PathVariable Long id) {
+        Optional<User> user = userRepository.findById(id);
+
+        if(user.isEmpty()) return ResponseEntity.ok(new MessageResponse("No user exists with this id."));
+
+        return ResponseEntity.ok(new UserResponse(user.get().getId(), user.get().getUsername(), user.get().getEmail()));
+    }
+
+    @GetMapping("/{id}/teams")
+    public ResponseEntity<?> getTeams(@PathVariable Long id) {
+        Optional<User> user = userRepository.findById(id);
+
+        if(user.isEmpty()) return ResponseEntity.ok(new MessageResponse("No user exists with this id."));
+
+        List<TeamMember> memberTeams = teamMemberRepository.findAllById(id);
+
+        List<Team> teams = memberTeams.stream().map(memberTeam -> memberTeam.getTeam()).toList();
+
+        List<TeamResponse> responseTeams = teams.stream().map(team ->
+                new TeamResponse(
+                        team.getId(),
+                        team.getName(),
+                        new UserResponse(
+                                team.getManager().getId(),
+                                team.getManager().getUsername(),
+                                team.getManager().getEmail()
+                        )))
+                .toList();
+
+        return ResponseEntity.ok(new TeamsResponse(responseTeams));
     }
 }

@@ -41,4 +41,16 @@ public class TeamMember {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public Team getTeam() { return team; }
+
+    public void setTeam(Team team) { this.team = team; }
+
+    public User getMember() { return member; }
+
+    public void setMember(User member) { this.member = member; }
+
+    public ERole getRole() { return role; }
+
+    public void setRole(ERole role) { this.role = role; }
 }

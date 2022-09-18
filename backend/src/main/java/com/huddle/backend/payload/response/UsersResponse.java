@@ -1,21 +1,21 @@
 package com.huddle.backend.payload.response;
 
-import com.huddle.backend.models.User;
+import com.huddle.backend.payload.response.UserResponse;
 
 import java.util.List;
 
 public class UsersResponse {
-    private List<User> users;
+    private List<UserResponse> users;
 
-    public UsersResponse(List<User> users) {
+    public UsersResponse(List<UserResponse> users) {
         this.users = users;
     }
 
-    public List<User> getUsers() {
+    public List<UserResponse> getUsers() {
         return users;
     }
 
-    public void setUsers(List<User> users) {
+    public void setUsers(List<UserResponse> users) {
         this.users = users;
     }
 }
