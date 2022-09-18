@@ -11,4 +11,6 @@ import com.huddle.backend.models.TeamMember;
 @Repository
 public interface TeamMemberRepository extends JpaRepository<TeamMember, Long> {
     List<TeamMember> findAllById(Long id);
+
+    List<TeamMember> findAllByMemberId(Long id);
 }

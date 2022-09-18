@@ -96,7 +96,7 @@ public class UserController {
 
         if(user.isEmpty()) return ResponseEntity.ok(new MessageResponse("No user exists with this id."));
 
-        List<TeamMember> memberTeams = teamMemberRepository.findAllById(id);
+        List<TeamMember> memberTeams = teamMemberRepository.findAllByMemberId(id);
 
         List<Team> teams = memberTeams.stream().map(memberTeam -> memberTeam.getTeam()).toList();
 
