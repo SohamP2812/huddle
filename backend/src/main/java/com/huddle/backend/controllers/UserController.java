@@ -31,22 +31,13 @@ import java.util.Optional;
 @RequestMapping("/users")
 public class UserController {
     @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
     UserRepository userRepository;
 
     @Autowired
     TeamMemberRepository teamMemberRepository;
 
     @Autowired
-    TeamRepository teamRepository;
-
-    @Autowired
     PasswordEncoder encoder;
-
-    @Autowired
-    JwtUtils jwtUtils;
 
     @PostMapping("")
     public ResponseEntity<?> createUser(@Valid @RequestBody SignupRequest signUpRequest) {
@@ -91,7 +82,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/teams")
-    public ResponseEntity<?> getTeams(@PathVariable Long id) {
+    public ResponseEntity<?> getTeams(Authentication authentication, @PathVariable Long id) {
         Optional<User> user = userRepository.findById(id);
 
         if(user.isEmpty()) return ResponseEntity.ok(new MessageResponse("No user exists with this id."));

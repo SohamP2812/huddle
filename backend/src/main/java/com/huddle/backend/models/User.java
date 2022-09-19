@@ -32,7 +32,7 @@ public class User {
     @Size(max = 120)
     private String password;
 
-    @OneToMany(mappedBy = "teamMembers")
+    @OneToMany(mappedBy = "manager")
     private Set<Team> teams = new HashSet<>();
 
     @OneToMany(mappedBy = "member")

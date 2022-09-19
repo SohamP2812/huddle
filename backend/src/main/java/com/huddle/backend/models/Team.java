@@ -29,8 +29,9 @@ public class Team {
     public Team() {
     }
 
-    public Team(String name) {
+    public Team(String name, User manager) {
         this.name = name;
+        this.manager = manager;
     }
 
     public Long getId() {
