@@ -133,4 +133,20 @@ public class TeamController {
 
         return ResponseEntity.ok(new MessageResponse("Member added successfully!"));
     }
+
+    @DeleteMapping("/{id}/members/{user_id}")
+    @Transactional
+    public ResponseEntity<?> addMember(@PathVariable Long id, @PathVariable Long user_id) {
+        Optional<Team> team = teamRepository.findById(id);
+
+        if(team.isEmpty()) return ResponseEntity.ok(new MessageResponse("No team exists with this id."));
+
+        Optional<User> user = userRepository.findById(user_id);
+
+        if(user.isEmpty()) return ResponseEntity.ok(new MessageResponse("No user exists with this id."));
+
+        teamMemberRepository.deleteByTeamIdAndMemberId(id, user_id); // Should I first get member teams from user then filter by team id?
+
+        return ResponseEntity.ok(new MessageResponse("Member deleted successfully!"));
+    }
 }

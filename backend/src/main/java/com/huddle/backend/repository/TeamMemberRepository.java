@@ -12,5 +12,7 @@ import com.huddle.backend.models.TeamMember;
 public interface TeamMemberRepository extends JpaRepository<TeamMember, Long> {
     void deleteAllByTeamId(Long id);
 
+    void deleteByTeamIdAndMemberId(Long team_id, Long member_id);
+
     List<TeamMember> findAllByMemberId(Long id);
 }
