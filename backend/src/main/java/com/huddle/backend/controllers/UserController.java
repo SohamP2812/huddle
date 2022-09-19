@@ -25,6 +25,7 @@ import com.huddle.backend.security.services.UserDetailsImpl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -87,7 +88,10 @@ public class UserController {
 
         if(user.isEmpty()) return ResponseEntity.ok(new MessageResponse("No user exists with this id."));
 
-        List<TeamMember> memberTeams = teamMemberRepository.findAllByMemberId(id);
+        // Which method is better?
+        Set<TeamMember> memberTeams = user.get().getMemberTeams();
+
+//      List<TeamMember> memberTeams = teamMemberRepository.findAllByMemberId(id);
 
         List<Team> teams = memberTeams.stream().map(memberTeam -> memberTeam.getTeam()).toList();
 

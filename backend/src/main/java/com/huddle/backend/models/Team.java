@@ -53,4 +53,8 @@ public class Team {
     public User getManager() { return manager; }
 
     public void setManager(User manager) { this.manager = manager; }
+
+    public Set<TeamMember> getTeamMembers() { return teamMembers; }
+
+    public void setTeamMembers(Set<TeamMember> teamMembers) { this.teamMembers = teamMembers; }
 }

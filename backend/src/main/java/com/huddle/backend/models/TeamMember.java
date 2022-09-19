@@ -30,8 +30,10 @@ public class TeamMember {
     public TeamMember() {
     }
 
-    public TeamMember(ERole role) {
+    public TeamMember(ERole role, User member, Team team) {
         this.role = role;
+        this.member = member;
+        this.team = team;
     }
 
     public Long getId() {
