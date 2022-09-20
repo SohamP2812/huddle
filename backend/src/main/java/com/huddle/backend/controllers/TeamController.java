@@ -2,12 +2,11 @@ package com.huddle.backend.controllers;
 
 import javax.validation.Valid;
 
-import com.huddle.backend.models.ERole;
-import com.huddle.backend.models.Team;
-import com.huddle.backend.models.TeamMember;
+import com.huddle.backend.models.*;
 import com.huddle.backend.payload.request.MemberRequest;
 import com.huddle.backend.payload.request.TeamRequest;
 import com.huddle.backend.payload.response.*;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import com.huddle.backend.models.User;
 import com.huddle.backend.payload.request.LoginRequest;
 import com.huddle.backend.payload.request.SignupRequest;
 import com.huddle.backend.repository.UserRepository;
@@ -155,6 +153,12 @@ public class TeamController {
         Optional<User> user = userRepository.findById(user_id);
 
         if(user.isEmpty()) return ResponseEntity.badRequest().body("No user exists with this id.");
+
+        Optional<TeamMember> teamMember = teamMemberRepository.findByTeamIdAndMemberId(id, user_id);
+
+        if(teamMember.isEmpty()) return ResponseEntity.badRequest().body("This user is not a member of that team.");
+
+        if(teamMember.get().getRole() == ERole.ROLE_MANAGER) return ResponseEntity.badRequest().body("You cannot delete the manager from a team.");
 
         teamMemberRepository.deleteByTeamIdAndMemberId(id, user_id); // Should I first get member teams from user then filter by team id?
 
