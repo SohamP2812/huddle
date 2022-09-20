@@ -1,8 +1,5 @@
 package com.huddle.backend.models;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.persistence.*;
 
 @Entity

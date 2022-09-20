@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -25,6 +24,9 @@ public class Team {
 
     @OneToMany(mappedBy = "team")
     private Set<TeamMember> teamMembers = new HashSet<>();
+
+    @OneToMany(mappedBy = "team")
+    private Set<Event> events = new HashSet<>();
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -62,6 +64,10 @@ public class Team {
     public Set<TeamMember> getTeamMembers() { return teamMembers; }
 
     public void setTeamMembers(Set<TeamMember> teamMembers) { this.teamMembers = teamMembers; }
+
+    public Set<Event> getEvents() { return events; }
+
+    public void setEvents(Set<Event> events) { this.events = events; }
 
     public ESport getSport() { return sport; }
 

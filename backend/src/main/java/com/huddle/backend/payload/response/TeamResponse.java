@@ -10,6 +10,7 @@ public class TeamResponse {
     private UserResponse manager;
 
     private ESport sport;
+
     public TeamResponse(Long id, String name, UserResponse manager, ESport sport) {
         this.id = id;
         this.name = name;
