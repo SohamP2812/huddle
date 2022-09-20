@@ -15,11 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.huddle.backend.models.User;
 import com.huddle.backend.payload.request.LoginRequest;
-import com.huddle.backend.payload.request.SignupRequest;
 import com.huddle.backend.payload.response.JwtResponse;
-import com.huddle.backend.payload.response.MessageResponse;
 import com.huddle.backend.repository.UserRepository;
 import com.huddle.backend.security.jwt.JwtUtils;
 import com.huddle.backend.security.services.UserDetailsImpl;
@@ -52,6 +49,8 @@ public class SessionController {
 
         return ResponseEntity.ok(new JwtResponse(jwt,
                 userDetails.getId(),
+                userDetails.getFirstName(),
+                userDetails.getLastName(),
                 userDetails.getUsername(),
                 userDetails.getEmail()));
     }

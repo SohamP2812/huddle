@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import com.huddle.backend.models.User;
@@ -59,7 +60,7 @@ public class UserController {
                     .body(new MessageResponse("Email is already in use!"));
         }
 
-        User user = new User(signUpRequest.getUsername(),
+        User user = new User(signUpRequest.getFirstName(), signUpRequest.getLastName(), signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()));
 
@@ -75,6 +76,8 @@ public class UserController {
 
         return ResponseEntity.ok(new JwtResponse(jwt,
                 userDetails.getId(),
+                userDetails.getFirstName(),
+                userDetails.getLastName(),
                 userDetails.getUsername(),
                 userDetails.getEmail()));
     }
@@ -83,7 +86,11 @@ public class UserController {
     public ResponseEntity<?> getUsers() {
         List<User> users = userRepository.findAll();
 
-        List<UserResponse> responseUsers = users.stream().map(user -> new UserResponse(user.getId(), user.getUsername(), user.getEmail())).toList();
+        List<UserResponse> responseUsers = users.stream().map(user -> new UserResponse(user.getId(),
+                                                                                        user.getFirstName(),
+                                                                                        user.getLastName(),
+                                                                                        user.getUsername(),
+                                                                                        user.getEmail())).toList();
 
         return ResponseEntity.ok(new UsersResponse(responseUsers));
     }
@@ -94,7 +101,23 @@ public class UserController {
 
         if(user.isEmpty()) return ResponseEntity.badRequest().body("No user exists with this id.");
 
-        return ResponseEntity.ok(new UserResponse(user.get().getId(), user.get().getUsername(), user.get().getEmail()));
+        return ResponseEntity.ok(new UserResponse(user.get().getId(),
+                                                    user.get().getFirstName(),
+                                                    user.get().getLastName(),
+                                                    user.get().getUsername(),
+                                                    user.get().getEmail()));
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        Optional<User> user = userRepository.findById(id);
+
+        if(user.isEmpty()) return ResponseEntity.badRequest().body("No user exists with this id.");
+
+        userRepository.delete(user.get());
+
+        return ResponseEntity.ok(new MessageResponse("User deleted successfully!"));
     }
 
     @GetMapping("/{id}/teams")
@@ -116,6 +139,8 @@ public class UserController {
                         team.getName(),
                         new UserResponse(
                                 team.getManager().getId(),
+                                team.getManager().getFirstName(),
+                                team.getManager().getLastName(),
                                 team.getManager().getUsername(),
                                 team.getManager().getEmail()
                         ),

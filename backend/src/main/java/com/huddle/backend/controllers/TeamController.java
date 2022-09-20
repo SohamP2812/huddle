@@ -62,6 +62,8 @@ public class TeamController {
                 team.getName(),
                 new UserResponse(
                         team.getManager().getId(),
+                        team.getManager().getFirstName(),
+                        team.getManager().getLastName(),
                         team.getManager().getUsername(),
                         team.getManager().getEmail()
                 ),
@@ -79,6 +81,8 @@ public class TeamController {
                 team.get().getName(),
                 new UserResponse(
                         team.get().getManager().getId(),
+                        team.get().getManager().getFirstName(),
+                        team.get().getManager().getLastName(),
                         team.get().getManager().getUsername(),
                         team.get().getManager().getEmail()
                 ),
@@ -112,6 +116,8 @@ public class TeamController {
         List<MemberResponse> responseMembers = members.stream().map(member ->
                 new MemberResponse(
                         member.getId(),
+                        member.getFirstName(),
+                        member.getLastName(),
                         member.getUsername(),
                         member.getEmail()
                         ))
@@ -158,7 +164,7 @@ public class TeamController {
 
         if(teamMember.isEmpty()) return ResponseEntity.badRequest().body("This user is not a member of that team.");
 
-        if(teamMember.get().getRole() == ERole.ROLE_MANAGER) return ResponseEntity.badRequest().body("You cannot delete the manager from a team.");
+        if(teamMember.get().isManager()) return ResponseEntity.badRequest().body("You cannot delete the manager from a team.");
 
         teamMemberRepository.deleteByTeamIdAndMemberId(id, user_id); // Should I first get member teams from user then filter by team id?
 

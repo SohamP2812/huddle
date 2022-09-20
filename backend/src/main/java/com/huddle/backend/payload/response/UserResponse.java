@@ -1,12 +1,20 @@
 package com.huddle.backend.payload.response;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 public class UserResponse {
     private Long id;
     private String username;
+    private String firstName;
+
+    private String lastName;
     private String email;
 
-    public UserResponse(Long id, String username, String email) {
+    public UserResponse(Long id, String firstName, String lastName, String username, String email) {
         this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.username = username;
         this.email = email;
     }
@@ -33,5 +41,21 @@ public class UserResponse {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }

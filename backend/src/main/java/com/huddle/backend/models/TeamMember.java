@@ -52,4 +52,6 @@ public class TeamMember {
     public ERole getRole() { return role; }
 
     public void setRole(ERole role) { this.role = role; }
+
+    public Boolean isManager() { return role == ERole.ROLE_MANAGER; }
 }
