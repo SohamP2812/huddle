@@ -55,6 +55,10 @@ public class TeamController {
 
         teamRepository.save(team);
 
+        TeamMember teamMember = new TeamMember(ERole.ROLE_MANAGER, user.get(), team);
+
+        teamMemberRepository.save(teamMember);
+
         return ResponseEntity.ok(new TeamResponse(
                 team.getId(),
                 team.getName(),
