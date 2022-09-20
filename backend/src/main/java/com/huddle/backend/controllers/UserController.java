@@ -32,6 +32,8 @@ import java.util.Set;
 @RequestMapping("/users")
 public class UserController {
     @Autowired
+    AuthenticationManager authenticationManager;
+    @Autowired
     UserRepository userRepository;
 
     @Autowired
@@ -39,6 +41,9 @@ public class UserController {
 
     @Autowired
     PasswordEncoder encoder;
+
+    @Autowired
+    JwtUtils jwtUtils;
 
     @PostMapping("")
     public ResponseEntity<?> createUser(@Valid @RequestBody SignupRequest signUpRequest) {
@@ -54,14 +59,24 @@ public class UserController {
                     .body(new MessageResponse("Email is already in use!"));
         }
 
-        // Create new user's account
         User user = new User(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()));
 
         userRepository.save(user);
 
-        return ResponseEntity.ok(new UserResponse(user.getId(), user.getUsername(), user.getEmail()));
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(signUpRequest.getUsername(), signUpRequest.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtils.generateJwtToken(authentication);
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        return ResponseEntity.ok(new JwtResponse(jwt,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail()));
     }
 
     @GetMapping("")
@@ -103,7 +118,8 @@ public class UserController {
                                 team.getManager().getId(),
                                 team.getManager().getUsername(),
                                 team.getManager().getEmail()
-                        )))
+                        ),
+                        team.getSport()))
                 .toList();
 
         return ResponseEntity.ok(new TeamsResponse(responseTeams));

@@ -51,7 +51,7 @@ public class TeamController {
 
         if(user.isEmpty()) return ResponseEntity.badRequest().body("No user exists with this id.");
 
-        Team team = new Team(teamRequest.getName(), user.get());
+        Team team = new Team(teamRequest.getName(), user.get(), teamRequest.getSport());
 
         teamRepository.save(team);
 
@@ -62,7 +62,8 @@ public class TeamController {
                         team.getManager().getId(),
                         team.getManager().getUsername(),
                         team.getManager().getEmail()
-                )));
+                ),
+                team.getSport()));
     }
 
     @GetMapping("/{id}")
@@ -78,7 +79,8 @@ public class TeamController {
                         team.get().getManager().getId(),
                         team.get().getManager().getUsername(),
                         team.get().getManager().getEmail()
-                )));
+                ),
+                team.get().getSport()));
     }
 
     @DeleteMapping("/{id}")
@@ -141,7 +143,7 @@ public class TeamController {
 
     @DeleteMapping("/{id}/members/{user_id}")
     @Transactional
-    public ResponseEntity<?> addMember(@PathVariable Long id, @PathVariable Long user_id) {
+    public ResponseEntity<?> deleteMember(@PathVariable Long id, @PathVariable Long user_id) {
         Optional<Team> team = teamRepository.findById(id);
 
         if(team.isEmpty()) return ResponseEntity.badRequest().body("No team exists with this id.");

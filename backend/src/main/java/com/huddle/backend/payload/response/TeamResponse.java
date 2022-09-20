@@ -1,5 +1,6 @@
 package com.huddle.backend.payload.response;
 
+import com.huddle.backend.models.ESport;
 import com.huddle.backend.models.User;
 
 public class TeamResponse {
@@ -8,10 +9,12 @@ public class TeamResponse {
 
     private UserResponse manager;
 
-    public TeamResponse(Long id, String name, UserResponse manager) {
+    private ESport sport;
+    public TeamResponse(Long id, String name, UserResponse manager, ESport sport) {
         this.id = id;
         this.name = name;
         this.manager = manager;
+        this.sport = sport;
     }
 
     public Long getId() {
@@ -33,4 +36,8 @@ public class TeamResponse {
     public UserResponse getManager() { return manager; }
 
     public void setManager(UserResponse manager) { this.manager = manager; }
+
+    public ESport getSport() { return sport; }
+
+    public void setSport(ESport sport) { this.sport = sport; }
 }

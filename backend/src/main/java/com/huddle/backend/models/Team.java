@@ -5,7 +5,7 @@ import java.util.Set;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -15,7 +15,7 @@ public class Team {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotNull
     @Size(max = 20)
     private String name;
 
@@ -26,12 +26,17 @@ public class Team {
     @OneToMany(mappedBy = "team")
     private Set<TeamMember> teamMembers = new HashSet<>();
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private ESport sport;
+
     public Team() {
     }
 
-    public Team(String name, User manager) {
+    public Team(String name, User manager, ESport sport) {
         this.name = name;
         this.manager = manager;
+        this.sport = sport;
     }
 
     public Long getId() {
@@ -57,4 +62,8 @@ public class Team {
     public Set<TeamMember> getTeamMembers() { return teamMembers; }
 
     public void setTeamMembers(Set<TeamMember> teamMembers) { this.teamMembers = teamMembers; }
+
+    public ESport getSport() { return sport; }
+
+    public void setSport(ESport sport) { this.sport = sport; }
 }

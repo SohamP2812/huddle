@@ -1,10 +1,15 @@
 package com.huddle.backend.payload.request;
 
-import javax.validation.constraints.NotBlank;
+import com.huddle.backend.models.ESport;
+
+import javax.validation.constraints.NotNull;
 
 public class TeamRequest {
-    @NotBlank
+    @NotNull
     private String name;
+
+    @NotNull
+    private ESport sport;
 
     public String getName() {
         return name;
@@ -13,4 +18,8 @@ public class TeamRequest {
     public void setName(String name) {
         this.name = name;
     }
+
+    public ESport getSport() { return sport; }
+
+    public void setSport(ESport sport) { this.sport = sport; }
 }
