@@ -27,9 +27,7 @@ import com.huddle.backend.security.jwt.JwtUtils;
 import com.huddle.backend.security.services.UserDetailsImpl;
 
 import java.lang.reflect.Member;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -51,20 +49,27 @@ public class TeamController {
 
         Optional<User> user = userRepository.findById(userDetails.getId());
 
-        if(user.isEmpty()) return ResponseEntity.ok(new MessageResponse("No user exists with this id."));
+        if(user.isEmpty()) return ResponseEntity.badRequest().body("No user exists with this id.");
 
         Team team = new Team(teamRequest.getName(), user.get());
 
         teamRepository.save(team);
 
-        return ResponseEntity.ok(new MessageResponse("Team created successfully!"));
+        return ResponseEntity.ok(new TeamResponse(
+                team.getId(),
+                team.getName(),
+                new UserResponse(
+                        team.getManager().getId(),
+                        team.getManager().getUsername(),
+                        team.getManager().getEmail()
+                )));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getTeam(@PathVariable Long id) {
         Optional<Team> team = teamRepository.findById(id);
 
-        if(team.isEmpty()) return ResponseEntity.ok(new MessageResponse("No team exists with this id."));
+        if(team.isEmpty()) return ResponseEntity.badRequest().body("No team exists with this id.");
 
         return ResponseEntity.ok(new TeamResponse(
                 team.get().getId(),
@@ -81,7 +86,7 @@ public class TeamController {
     public ResponseEntity<?> deleteTeam(@PathVariable Long id) {
         Optional<Team> team = teamRepository.findById(id);
 
-        if(team.isEmpty()) return ResponseEntity.ok(new MessageResponse("No team exists with this id."));
+        if(team.isEmpty()) return ResponseEntity.badRequest().body("No team exists with this id.");
 
         teamMemberRepository.deleteAllByTeamId(team.get().getId());
 
@@ -94,7 +99,7 @@ public class TeamController {
     public ResponseEntity<?> getMembers(@PathVariable Long id) {
         Optional<Team> team = teamRepository.findById(id);
 
-        if(team.isEmpty()) return ResponseEntity.ok(new MessageResponse("No team exists with this id."));
+        if(team.isEmpty()) return ResponseEntity.badRequest().body("No team exists with this id.");
 
         Set<TeamMember> teamMembers = team.get().getTeamMembers();
 
@@ -115,17 +120,17 @@ public class TeamController {
     public ResponseEntity<?> addMember(@PathVariable Long id, @Valid @RequestBody MemberRequest memberRequest) {
         Optional<Team> team = teamRepository.findById(id);
 
-        if(team.isEmpty()) return ResponseEntity.ok(new MessageResponse("No team exists with this id."));
+        if(team.isEmpty()) return ResponseEntity.badRequest().body("No team exists with this id.");
 
         Optional<User> user = userRepository.findById(memberRequest.getId());
 
-        if(user.isEmpty()) return ResponseEntity.ok(new MessageResponse("No user exists with this id."));
+        if(user.isEmpty()) return ResponseEntity.badRequest().body("No user exists with this id.");
 
         Set<TeamMember> memberTeams = user.get().getMemberTeams();
 
         List<Team> teams = memberTeams.stream().map(memberTeam -> memberTeam.getTeam()).toList();
 
-        if(teams.contains(team.get())) return ResponseEntity.ok(new MessageResponse("User already member of team."));
+        if(teams.contains(team.get())) return ResponseEntity.badRequest().body("User is already a member of this team.");
 
         TeamMember teamMember = new TeamMember(ERole.ROLE_MEMBER, user.get(), team.get());
 
@@ -139,11 +144,11 @@ public class TeamController {
     public ResponseEntity<?> addMember(@PathVariable Long id, @PathVariable Long user_id) {
         Optional<Team> team = teamRepository.findById(id);
 
-        if(team.isEmpty()) return ResponseEntity.ok(new MessageResponse("No team exists with this id."));
+        if(team.isEmpty()) return ResponseEntity.badRequest().body("No team exists with this id.");
 
         Optional<User> user = userRepository.findById(user_id);
 
-        if(user.isEmpty()) return ResponseEntity.ok(new MessageResponse("No user exists with this id."));
+        if(user.isEmpty()) return ResponseEntity.badRequest().body("No user exists with this id.");
 
         teamMemberRepository.deleteByTeamIdAndMemberId(id, user_id); // Should I first get member teams from user then filter by team id?
 

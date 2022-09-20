@@ -45,13 +45,13 @@ public class UserController {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
+                    .body(new MessageResponse("Username is already taken!"));
         }
 
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
+                    .body(new MessageResponse("Email is already in use!"));
         }
 
         // Create new user's account
@@ -61,7 +61,7 @@ public class UserController {
 
         userRepository.save(user);
 
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        return ResponseEntity.ok(new UserResponse(user.getId(), user.getUsername(), user.getEmail()));
     }
 
     @GetMapping("")
@@ -77,7 +77,7 @@ public class UserController {
     public ResponseEntity<?> getUser(@PathVariable Long id) {
         Optional<User> user = userRepository.findById(id);
 
-        if(user.isEmpty()) return ResponseEntity.ok(new MessageResponse("No user exists with this id."));
+        if(user.isEmpty()) return ResponseEntity.badRequest().body("No user exists with this id.");
 
         return ResponseEntity.ok(new UserResponse(user.get().getId(), user.get().getUsername(), user.get().getEmail()));
     }
@@ -86,7 +86,7 @@ public class UserController {
     public ResponseEntity<?> getTeams(Authentication authentication, @PathVariable Long id) {
         Optional<User> user = userRepository.findById(id);
 
-        if(user.isEmpty()) return ResponseEntity.ok(new MessageResponse("No user exists with this id."));
+        if(user.isEmpty()) return ResponseEntity.badRequest().body("No user exists with this id.");
 
         // Which method is better?
         Set<TeamMember> memberTeams = user.get().getMemberTeams();
