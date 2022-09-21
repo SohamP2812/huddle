@@ -141,6 +141,7 @@ public class EventController {
                             getId()).
                 toList();
 
+        // Add all event participants that do not currently exist but are in updated list
         for(Long participantId : eventRequest.getParticipantIds()) {
             if(!currentParticipantIds.contains(participantId)) {
                 Optional<User> participant = userRepository.findById(participantId);
@@ -153,6 +154,7 @@ public class EventController {
             }
         }
 
+        // Delete all event participants that currently exist but are not in updated list
         for(Long participantId : currentParticipantIds) {
             if(!eventRequest.getParticipantIds().contains(participantId)) {
                 Optional<EventParticipant> eventParticipant = eventParticipantRepository.findByParticipantIdAndEventId(participantId, event_id);
@@ -182,5 +184,21 @@ public class EventController {
                 event.get().getEventType(),
                 event.get().getTeamScore(),
                 event.get().getOpponentScore()));
+    }
+
+    @GetMapping("/{event_id}/participants")
+    public ResponseEntity<?> getEventParticipants(@PathVariable Long team_id, @PathVariable Long event_id) {
+        List<EventParticipant> eventParticipants = eventParticipantRepository.findAllByEventId(event_id);
+
+        List<UserResponse> users = eventParticipants.stream().map(eventParticipant ->
+                new UserResponse(
+                        eventParticipant.getParticipant().getId(),
+                        eventParticipant.getParticipant().getFirstName(),
+                        eventParticipant.getParticipant().getLastName(),
+                        eventParticipant.getParticipant().getUsername(),
+                        eventParticipant.getParticipant().getEmail()))
+                .toList();
+
+        return ResponseEntity.ok(new UsersResponse(users));
     }
 }
