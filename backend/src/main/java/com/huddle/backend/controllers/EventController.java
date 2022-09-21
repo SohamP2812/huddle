@@ -5,7 +5,7 @@ import javax.validation.Valid;
 import com.huddle.backend.models.*;
 import com.huddle.backend.payload.request.*;
 import com.huddle.backend.payload.response.*;
-import com.huddle.backend.repository.EventRepository;
+import com.huddle.backend.repository.*;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import com.huddle.backend.repository.UserRepository;
-import com.huddle.backend.repository.TeamMemberRepository;
-import com.huddle.backend.repository.TeamRepository;
 import com.huddle.backend.security.jwt.JwtUtils;
 import com.huddle.backend.security.services.UserDetailsImpl;
 
@@ -34,6 +31,13 @@ public class EventController {
 
     @Autowired
     EventRepository eventRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    EventParticipantRepository eventParticipantRepository;
+
     @PostMapping("")
     public ResponseEntity<?> createEvent(@Valid @RequestBody EventRequest eventRequest, @PathVariable Long team_id) {
         Optional<Team> team = teamRepository.findById(team_id);
@@ -48,6 +52,16 @@ public class EventController {
                 eventRequest.getOpponentScore());
 
         eventRepository.save(event);
+
+        for(Long participantId : eventRequest.getParticipantIds()) {
+            Optional<User> participant = userRepository.findById(participantId);
+
+            if(participant.isEmpty()) continue;
+
+            EventParticipant eventParticipant = new EventParticipant(EAttendance.UNDECIDED, participant.get(), event);
+
+            eventParticipantRepository.save(eventParticipant);
+        }
 
         return ResponseEntity.ok(new EventResponse(
                 event.getId(),

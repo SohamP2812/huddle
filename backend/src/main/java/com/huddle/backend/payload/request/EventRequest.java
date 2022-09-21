@@ -5,6 +5,7 @@ import com.huddle.backend.models.ESport;
 
 import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 public class EventRequest {
     @NotNull
@@ -24,6 +25,9 @@ public class EventRequest {
 
     @NotNull
     private Integer opponentScore;
+
+    @NotNull
+    private List<Long> participantIds;
 
     public String getName() {
         return name;
@@ -60,4 +64,8 @@ public class EventRequest {
     public Integer getOpponentScore() { return opponentScore; }
 
     public void setOpponentScore(Integer opponentScore) { this.opponentScore = opponentScore; }
+
+    public List<Long> getParticipantIds() { return participantIds; }
+
+    public void setParticipantIds(List<Long> participantIds) { this.participantIds = participantIds; }
 }

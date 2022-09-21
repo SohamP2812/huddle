@@ -6,6 +6,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.OffsetDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "events")
@@ -35,6 +37,9 @@ public class Event {
     @ManyToOne
     @JoinColumn(name="team_id")
     private Team team;
+
+    @OneToMany(mappedBy = "event")
+    private Set<EventParticipant> eventParticipants = new HashSet<>();
 
     private Integer teamScore;
 

@@ -46,6 +46,9 @@ public class User {
     @OneToMany(mappedBy = "member")
     private Set<TeamMember> memberTeams = new HashSet<>();
 
+    @OneToMany(mappedBy = "participant")
+    private Set<EventParticipant> participantEvents = new HashSet<>();
+
     public User() {
     }
 
