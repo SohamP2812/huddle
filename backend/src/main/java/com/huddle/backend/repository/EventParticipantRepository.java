@@ -10,4 +10,7 @@ import com.huddle.backend.models.EventParticipant;
 
 @Repository
 public interface EventParticipantRepository extends JpaRepository<EventParticipant, Long> {
+    Optional<EventParticipant> findByParticipantIdAndEventId(Long user_id, Long event_id);
+
+    List<EventParticipant> findAllByEventId(Long event_id);
 }

@@ -132,7 +132,38 @@ public class EventController {
 
         eventRepository.save(event.get());
 
-        // Can I return the edited instance or do I need to refetch for confirmation
+        List<EventParticipant> currentParticipants = eventParticipantRepository.findAllByEventId(event_id);
+
+        List<Long> currentParticipantIds = currentParticipants.stream()
+                .map(currentParticipant ->
+                        currentParticipant.
+                            getParticipant().
+                            getId()).
+                toList();
+
+        for(Long participantId : eventRequest.getParticipantIds()) {
+            if(!currentParticipantIds.contains(participantId)) {
+                Optional<User> participant = userRepository.findById(participantId);
+
+                if(participant.isEmpty()) continue;
+
+                EventParticipant eventParticipant = new EventParticipant(EAttendance.UNDECIDED, participant.get(), event.get());
+
+                eventParticipantRepository.save(eventParticipant);
+            }
+        }
+
+        for(Long participantId : currentParticipantIds) {
+            if(!eventRequest.getParticipantIds().contains(participantId)) {
+                Optional<EventParticipant> eventParticipant = eventParticipantRepository.findByParticipantIdAndEventId(participantId, event_id);
+
+                if(eventParticipant.isEmpty()) continue;
+
+                eventParticipantRepository.delete(eventParticipant.get());
+            }
+        }
+
+        // Can I return the edited instance or do I need to re-fetch for confirmation
         return ResponseEntity.ok(new EventResponse(
                 event.get().getId(),
                 event.get().getName(),
