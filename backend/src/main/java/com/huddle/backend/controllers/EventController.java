@@ -223,6 +223,7 @@ public class EventController {
         // No way this is how I should be doing this. Maybe I should either stop sending all objects associated with the main resource
         // or I can find a better way to construct the response rather than passing every field individually
         // ^^ I can just make the constructor of response to take in one param -> the actual model. Then constructor binds what it needs.
+        // dependency injection??
         return ResponseEntity.ok(new EventParticipantResponse(
                 eventParticipant.get().getId(),
                 eventParticipant.get().getAttendance(),
