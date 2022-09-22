@@ -4,6 +4,7 @@ import javax.validation.Valid;
 
 import com.huddle.backend.models.Team;
 import com.huddle.backend.models.TeamMember;
+import com.huddle.backend.payload.request.UserRequest;
 import com.huddle.backend.payload.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -106,6 +107,25 @@ public class UserController {
                                                     user.get().getLastName(),
                                                     user.get().getUsername(),
                                                     user.get().getEmail()));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateUser(@Valid @RequestBody UserRequest userRequest, @PathVariable Long id) {
+        Optional<User> user = userRepository.findById(id);
+
+        if(user.isEmpty()) return ResponseEntity.badRequest().body("No user exists with this id.");
+
+        user.get().setFirstName(userRequest.getFirstName());
+        user.get().setLastName(userRequest.getLastName());
+        user.get().setUsername(userRequest.getUsername());
+
+        userRepository.save(user.get());
+
+        return ResponseEntity.ok(new UserResponse(user.get().getId(),
+                user.get().getFirstName(),
+                user.get().getLastName(),
+                user.get().getUsername(),
+                user.get().getEmail()));
     }
 
     @DeleteMapping("/{id}")
