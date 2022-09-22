@@ -201,4 +201,53 @@ public class EventController {
 
         return ResponseEntity.ok(new UsersResponse(users));
     }
+
+    @PatchMapping("/{event_id}/participants/{user_id}") // Should I get by user_id or participant_id?
+    public ResponseEntity<?> updateEventParticipant(@Valid @RequestBody EventParticipantRequest eventParticipantRequest, @PathVariable Long team_id, @PathVariable Long event_id, @PathVariable Long user_id) {
+        Optional<Team> team = teamRepository.findById(team_id);
+
+        if(team.isEmpty()) return ResponseEntity.badRequest().body("No team exists with this id.");
+
+        Optional<Event> event = eventRepository.findByIdAndTeamId(event_id, team_id);
+
+        if(event.isEmpty()) return ResponseEntity.badRequest().body("No event exists with this id on that team.");
+
+        Optional<EventParticipant> eventParticipant = eventParticipantRepository.findByParticipantIdAndEventId(user_id, event_id);
+
+        if(eventParticipant.isEmpty()) return ResponseEntity.badRequest().body("No participant for that event exists with that user_id");
+
+        eventParticipant.get().setAttendance(eventParticipantRequest.getAttendance());
+
+        eventParticipantRepository.save(eventParticipant.get());
+
+        // No way this is how I should be doing this.
+        return ResponseEntity.ok(new EventParticipantResponse(
+                eventParticipant.get().getId(),
+                eventParticipant.get().getAttendance(),
+                new UserResponse(
+                        eventParticipant.get().getParticipant().getId(),
+                        eventParticipant.get().getParticipant().getFirstName(),
+                        eventParticipant.get().getParticipant().getLastName(),
+                        eventParticipant.get().getParticipant().getUsername(),
+                        eventParticipant.get().getParticipant().getEmail()),
+                new EventResponse(
+                        eventParticipant.get().getEvent().getId(),
+                        eventParticipant.get().getEvent().getName(),
+                        new TeamResponse(
+                                eventParticipant.get().getEvent().getTeam().getId(),
+                                eventParticipant.get().getEvent().getTeam().getName(),
+                                new UserResponse(
+                                        eventParticipant.get().getEvent().getTeam().getManager().getId(),
+                                        eventParticipant.get().getEvent().getTeam().getManager().getFirstName(),
+                                        eventParticipant.get().getEvent().getTeam().getManager().getLastName(),
+                                        eventParticipant.get().getEvent().getTeam().getManager().getUsername(),
+                                        eventParticipant.get().getEvent().getTeam().getManager().getEmail()),
+                                eventParticipant.get().getEvent().getTeam().getSport()),
+                        eventParticipant.get().getEvent().getStartTime(),
+                        eventParticipant.get().getEvent().getEndTime(),
+                        eventParticipant.get().getEvent().getEventType(),
+                        eventParticipant.get().getEvent().getTeamScore(),
+                        eventParticipant.get().getEvent().getOpponentScore()
+                )));
+    }
 }

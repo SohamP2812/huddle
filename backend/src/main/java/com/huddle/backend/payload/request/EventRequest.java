@@ -1,7 +1,6 @@
 package com.huddle.backend.payload.request;
 
 import com.huddle.backend.models.EEvent;
-import com.huddle.backend.models.ESport;
 
 import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
