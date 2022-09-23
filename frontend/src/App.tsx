@@ -7,9 +7,12 @@ import { useAppSelector, useAppDispatch } from "redux/hooks";
 import { loginUser, selectLoggedIn } from "redux/slices/userSlice";
 
 function App() {
-  axios.defaults.baseURL = "http://localhost:8080";
+  axios.defaults.baseURL = "http://127.0.0.1:8080";
   axios.defaults.headers.common["Authorization"] =
-    "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJTb2hhbVAxMiIsImlhdCI6MTY2Mzg5NjExMCwiZXhwIjoxNjY0NTAwOTEwfQ.gKpdUCPTS0xhD1URLcEU-l_IhluJkvhMHXjGBJeZNyMxQqMXCymp1Su0CiaJxPad-o8RTOqW3mD4H0k70uEU4Q";
+    "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJTb2hhbVAxMiIsImlhdCI6MTY2MzkwNTM2MCwiZXhwIjoxNjY0NTEwMTYwfQ.pOm-V6-BdTgBLA4L4tu-EVpGP3F_ykA0h2F2I6Umlgq67jg5T6nA4C2-pGDGiV7uMOySdM0fDcn6g8joeginPA";
+  // axios.defaults.withCredentials = false;
+  // axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
+  // axios.defaults.headers.common["Content-Type"] = "application/json";
 
   const loggedIn = useAppSelector(selectLoggedIn);
   const dispatch = useAppDispatch();
