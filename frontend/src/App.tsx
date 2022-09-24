@@ -4,7 +4,7 @@ import { Counter } from "./features/counter/Counter";
 import "./App.css";
 import axios from "axios";
 import { useAppSelector, useAppDispatch } from "redux/hooks";
-import { loginUser, selectLoggedIn } from "redux/slices/userSlice";
+import { getSelf, loginUser, selectLoggedIn } from "redux/slices/userSlice";
 
 function App() {
   axios.defaults.baseURL = "http://127.0.0.1:8080";
@@ -64,6 +64,13 @@ function App() {
           <button type="submit">Submit</button>
           <p>Logged in: {loggedIn ? "true" : "false"}</p>
         </form>
+        <button
+          onClick={() => {
+            dispatch(getSelf());
+          }}
+        >
+          Get Current User
+        </button>
         <img src={logo} className="App-logo" alt="logo" />
         <Counter />
         <p>

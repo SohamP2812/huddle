@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../redux/store";
-import axios from "axios";
 
 export interface LoginCredentials {
   username: string;
@@ -23,13 +22,42 @@ const initialState: UserState = {
   loggedIn: false,
 };
 
+export const getSelf = createAsyncThunk<
+  UserState,
+  void,
+  {
+    state: RootState;
+  }
+>("user/getSelf", async (_, { getState, rejectWithValue }) => {
+  try {
+    const { loggedIn } = getState().user;
+
+    if (loggedIn) return;
+
+    const response = await fetch("/session", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        accepts: "application/json",
+      },
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.log(error);
+    return rejectWithValue(error);
+  }
+});
+
 export const loginUser = createAsyncThunk(
-  "counter/loginUser",
-  async (loginCredentials: LoginCredentials, thunkAPI) => {
+  "user/loginUser",
+  async (loginCredentials: LoginCredentials, { rejectWithValue }) => {
     try {
-      let cookies = document.cookie;
-      console.log(cookies);
-      const resp = await fetch("/session", {
+      const response = await fetch("/session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,16 +66,12 @@ export const loginUser = createAsyncThunk(
         credentials: "include",
         body: JSON.stringify(loginCredentials),
       });
-      const data = await resp.json();
-
+      const data = await response.json();
+      console.log(data);
       return data;
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        console.log(error.response);
-        return thunkAPI.rejectWithValue(error.response);
-      } else {
-        console.log(error);
-      }
+      console.log(error);
+      return rejectWithValue(error);
     }
   }
 );

@@ -1,7 +1,7 @@
 package com.huddle.backend.models;
 
 public enum EAttendance {
-    YES,
-    NO,
-    UNDECIDED
+  YES,
+  NO,
+  UNDECIDED
 }
