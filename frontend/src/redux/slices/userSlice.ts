@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../redux/store";
 
 export interface LoginCredentials {
@@ -11,7 +11,7 @@ export interface UserState {
   lastName: string;
   username: string;
   email: string;
-  loggedIn: boolean;
+  loggedIn: boolean | null;
   error: string | null;
 }
 
@@ -24,7 +24,7 @@ const initialState: UserState = {
   lastName: "",
   username: "",
   email: "",
-  loggedIn: false,
+  loggedIn: null,
   error: null,
 };
 
@@ -92,7 +92,7 @@ export const login = createAsyncThunk<
       const data = await response.json();
 
       if (response.status !== 200) {
-        throw data; // Should I be throwing some object instance (new Error())?
+        throw data;
       }
 
       return data;
@@ -154,7 +154,7 @@ export const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(login.pending, (state) => {
-        state.loggedIn = false;
+        state.error = null;
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loggedIn = true;
@@ -166,6 +166,7 @@ export const userSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loggedIn = false;
+
         if (action.payload) {
           state.error = action.payload.message;
         } else {
@@ -174,7 +175,9 @@ export const userSlice = createSlice({
             "An unknown error occurred. Please try again.";
         }
       })
-      .addCase(getSelf.pending, (state) => {})
+      .addCase(getSelf.pending, (state) => {
+        state.error = null;
+      })
       .addCase(getSelf.fulfilled, (state, action) => {
         state.loggedIn = true;
 
@@ -182,6 +185,9 @@ export const userSlice = createSlice({
         state.lastName = action.payload.lastName;
         state.username = action.payload.username;
         state.email = action.payload.email;
+      })
+      .addCase(getSelf.rejected, (state) => {
+        state.loggedIn = false;
       })
       .addCase(logout.pending, (state) => {})
       .addCase(logout.fulfilled, (state, action) => {

@@ -6,6 +6,11 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "./index.css";
 import { ChakraProvider } from "@chakra-ui/react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import AuthComponent from "components/AuthComponent";
+
+import SignUp from "components/SignUp";
 
 const container = document.getElementById("root")!;
 const root = createRoot(container);
@@ -14,7 +19,15 @@ root.render(
   <React.StrictMode>
     <ChakraProvider>
       <Provider store={store}>
-        <App />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<AuthComponent children={<App />} />} />
+            <Route
+              path="signup"
+              element={<AuthComponent children={<SignUp />} isProtected />}
+            />
+          </Routes>
+        </BrowserRouter>
       </Provider>
     </ChakraProvider>
   </React.StrictMode>
