@@ -1,21 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "./logo.svg";
 import { Counter } from "./features/counter/Counter";
 import "./App.css";
-import axios from "axios";
 import { useAppSelector, useAppDispatch } from "redux/hooks";
-import { getSelf, loginUser, selectLoggedIn } from "redux/slices/userSlice";
-
+import {
+  getSelf,
+  login,
+  logout,
+  resetError,
+  selectUser,
+} from "redux/slices/userSlice";
+import { useToast } from "@chakra-ui/react";
 function App() {
-  axios.defaults.baseURL = "http://127.0.0.1:8080";
-  axios.defaults.headers.common["Authorization"] =
-    "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJTb2hhbVAxMiIsImlhdCI6MTY2MzkwNTM2MCwiZXhwIjoxNjY0NTEwMTYwfQ.pOm-V6-BdTgBLA4L4tu-EVpGP3F_ykA0h2F2I6Umlgq67jg5T6nA4C2-pGDGiV7uMOySdM0fDcn6g8joeginPA";
-  // axios.defaults.withCredentials = false;
-  // axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
-  // axios.defaults.headers.common["Content-Type"] = "application/json";
+  const toast = useToast();
 
-  const loggedIn = useAppSelector(selectLoggedIn);
+  const user = useAppSelector(selectUser);
+
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(getSelf());
+  }, []);
+
+  useEffect(() => {
+    if (user.error) {
+      toast({
+        title: "An error occurred!",
+        description: user.error,
+        status: "error",
+        position: "top",
+        duration: 5000,
+        isClosable: true,
+      });
+
+      dispatch(resetError());
+    }
+  }, [dispatch, toast, user.error]);
 
   const [loginFields, setLoginFields] = useState({
     username: "",
@@ -31,16 +51,30 @@ function App() {
     });
   };
 
-  const login = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    dispatch(loginUser(loginFields));
+    dispatch(login(loginFields));
+  };
+
+  const handleGetSelf = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ): void => {
+    e.preventDefault();
+    dispatch(getSelf());
+  };
+
+  const handleLogout = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ): void => {
+    e.preventDefault();
+    dispatch(logout());
   };
 
   return (
     <div className="App">
       <header className="App-header">
         <form
-          onSubmit={login}
+          onSubmit={handleLogin}
           style={{ display: "flex", flexDirection: "column" }}
         >
           <label>
@@ -62,58 +96,15 @@ function App() {
             />
           </label>
           <button type="submit">Submit</button>
-          <p>Logged in: {loggedIn ? "true" : "false"}</p>
+          <p>Logged in: {user.loggedIn ? "true" : "false"}</p>
         </form>
-        <button
-          onClick={() => {
-            dispatch(getSelf());
-          }}
-        >
-          Get Current User
-        </button>
+        <button onClick={handleGetSelf}>Get Current User</button>
+        <p>First Name: {user.firstName}</p>
+        <p>Last Name: {user.lastName}</p>
+        <p>Username: {user.username}</p>
+        <button onClick={handleLogout}>Logout</button>
         <img src={logo} className="App-logo" alt="logo" />
         <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
       </header>
     </div>
   );

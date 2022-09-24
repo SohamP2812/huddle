@@ -64,7 +64,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
   }
 
   private String parseJwt(HttpServletRequest request) {
-    String headerAuth = request.getHeader("Authorization");
+    if(request.getCookies() == null) return null;
+    if(request.getCookies().length == 0) return null;
 
     Optional<String> token = Arrays.stream(request.getCookies())
             .filter(cookie -> "huddle_session".equals(cookie.getName()))

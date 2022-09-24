@@ -3,6 +3,7 @@ package com.huddle.backend.controllers;
 import com.huddle.backend.models.User;
 import com.huddle.backend.payload.request.LoginRequest;
 import com.huddle.backend.payload.response.JwtResponse;
+import com.huddle.backend.payload.response.MessageResponse;
 import com.huddle.backend.payload.response.UserResponse;
 import com.huddle.backend.repository.UserRepository;
 import com.huddle.backend.security.jwt.JwtUtils;
@@ -75,7 +76,7 @@ public class SessionController {
     );
   }
 
-  @GetMapping
+  @GetMapping("")
   public ResponseEntity<?> getSelfFromToken(Authentication authentication) {
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
@@ -94,5 +95,18 @@ public class SessionController {
         user.get().getEmail()
       )
     );
+  }
+
+  @DeleteMapping("")
+  public ResponseEntity<?> deleteToken(HttpServletResponse response) {
+    Cookie jwtTokenCookie = new Cookie("huddle_session", null);
+
+    jwtTokenCookie.setMaxAge(0);
+    jwtTokenCookie.setSecure(true);
+    jwtTokenCookie.setHttpOnly(true);
+
+    response.addCookie(jwtTokenCookie);
+
+    return ResponseEntity.ok(new MessageResponse("Logged out."));
   }
 }
