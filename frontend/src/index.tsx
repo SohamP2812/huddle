@@ -12,6 +12,7 @@ import { AuthComponent } from "components/AuthComponent";
 import { LandingPage } from "components/LandingPage/LandingPage";
 import { SignUp } from "components/SignUp/SignUp";
 import { SignIn } from "components/SignIn/SignIn";
+import { Account } from "components/Account/Account";
 
 const container = document.getElementById("root")!;
 const root = createRoot(container);
@@ -33,6 +34,10 @@ root.render(
             <Route
               path="signin"
               element={<AuthComponent children={<SignIn />} />}
+            />
+            <Route
+              path="account"
+              element={<AuthComponent children={<Account />} isProtected />}
             />
           </Routes>
         </BrowserRouter>

@@ -14,8 +14,10 @@ import {
   Text,
   useColorModeValue,
   useToast,
+  Spacer,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 
 import { allFieldsFilled } from "utils/misc";
 
@@ -91,8 +93,8 @@ export const SignUp = () => {
             boxShadow={"lg"}
             p={8}
           >
-            <Stack spacing={4}>
-              <form onSubmit={handleSignup}>
+            <form onSubmit={handleSignup}>
+              <Stack spacing={4}>
                 <FormControl id="username">
                   <FormLabel>Username</FormLabel>
                   <Input
@@ -138,23 +140,23 @@ export const SignUp = () => {
                     value={signupFields.password}
                   />
                 </FormControl>
-                <Stack spacing={10}>
-                  <Link color={"blue.400"}>Forgot password?</Link>
-
-                  <Button
-                    type="submit"
-                    bg={"black"}
-                    color={"white"}
-                    _hover={{
-                      bg: "gray.600",
-                    }}
-                    disabled={!allFieldsFilled(signupFields)}
-                  >
-                    Sign Up
-                  </Button>
-                </Stack>
-              </form>
-            </Stack>
+                <Spacer />
+                <Button
+                  type="submit"
+                  bg={"black"}
+                  color={"white"}
+                  _hover={{
+                    bg: "gray.600",
+                  }}
+                  disabled={!allFieldsFilled(signupFields)}
+                >
+                  Sign Up
+                </Button>
+                <Link as={RouterLink} to="/signin" color={"blue.400"}>
+                  Already have an account? Login.
+                </Link>
+              </Stack>
+            </form>
           </Box>
         </Stack>
       </Flex>

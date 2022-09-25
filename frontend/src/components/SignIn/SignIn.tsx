@@ -16,6 +16,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 
 import { allFieldsFilled } from "utils/misc";
 
@@ -88,8 +89,8 @@ export const SignIn = () => {
             boxShadow={"lg"}
             p={8}
           >
-            <Stack spacing={4}>
-              <form onSubmit={handleLogin}>
+            <form onSubmit={handleLogin}>
+              <Stack spacing={4}>
                 <FormControl id="username">
                   <FormLabel>Username</FormLabel>
                   <Input
@@ -123,8 +124,11 @@ export const SignIn = () => {
                     Sign in
                   </Button>
                 </Stack>
-              </form>
-            </Stack>
+                <Link as={RouterLink} to="/signup" color={"blue.400"}>
+                  Don't have an account? Sign up.
+                </Link>
+              </Stack>
+            </form>
           </Box>
         </Stack>
       </Flex>

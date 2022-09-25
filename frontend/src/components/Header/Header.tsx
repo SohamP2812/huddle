@@ -22,9 +22,14 @@ import {
   ChevronRightIcon,
 } from "@chakra-ui/icons";
 import { FC } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { useAppSelector } from "redux/hooks";
+import { selectUser } from "redux/slices/userSlice";
 
 export const Header: FC<{}> = () => {
+  const navigate = useNavigate();
+  const user = useAppSelector(selectUser);
+
   const { isOpen, onToggle } = useDisclosure();
 
   return (
@@ -54,7 +59,14 @@ export const Header: FC<{}> = () => {
           />
         </Flex>
         <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
-          <Image src={"/images/HuddleLogoBlack.png"} width="200px" />
+          <Image
+            src={"/images/HuddleLogoBlack.png"}
+            width="200px"
+            onClick={() => navigate("/")}
+            _hover={{
+              cursor: "pointer",
+            }}
+          />
 
           <Flex display={{ base: "none", md: "flex" }} ml={10}>
             <DesktopNav />
@@ -67,29 +79,45 @@ export const Header: FC<{}> = () => {
           direction={"row"}
           spacing={6}
         >
-          <Button
-            as={RouterLink}
-            fontSize={"sm"}
-            fontWeight={400}
-            variant={"link"}
-            to={"/signin"}
-          >
-            Sign In
-          </Button>
-          <Button
-            as={RouterLink}
-            display={{ base: "none", md: "inline-flex" }}
-            fontSize={"sm"}
-            fontWeight={600}
-            color={"white"}
-            bg={"black"}
-            _hover={{
-              bg: "gray.600",
-            }}
-            to={"/signup"}
-          >
-            Sign Up
-          </Button>
+          {user.loggedIn ? (
+            <Button
+              as={RouterLink}
+              fontSize={{ base: "lg", md: "xl" }}
+              fontWeight={600}
+              color={"black"}
+              variant={"link"}
+              to={"/account"}
+            >
+              Account
+            </Button>
+          ) : (
+            <>
+              <Button
+                as={RouterLink}
+                fontSize={"md"}
+                fontWeight={400}
+                color={"black"}
+                variant={"link"}
+                to={"/signin"}
+              >
+                Sign In
+              </Button>
+              <Button
+                as={RouterLink}
+                display={{ base: "none", md: "inline-flex" }}
+                fontSize={"md"}
+                fontWeight={600}
+                color={"white"}
+                bg={"black"}
+                _hover={{
+                  bg: "gray.600",
+                }}
+                to={"/signup"}
+              >
+                Sign Up
+              </Button>
+            </>
+          )}
         </Stack>
       </Flex>
 
@@ -101,8 +129,8 @@ export const Header: FC<{}> = () => {
 };
 
 const DesktopNav = () => {
-  const linkColor = useColorModeValue("gray.600", "gray.200");
-  const linkHoverColor = useColorModeValue("gray.800", "white");
+  const linkColor = useColorModeValue("black", "gray.200");
+  const linkHoverColor = useColorModeValue("gray.500", "white");
   const popoverContentBgColor = useColorModeValue("white", "gray.800");
 
   return (
@@ -192,6 +220,8 @@ const MobileNav = () => {
       bg={useColorModeValue("white", "gray.800")}
       p={4}
       display={{ md: "none" }}
+      borderBottom={"1px"}
+      borderColor={"black"}
     >
       {NAV_ITEMS.map((navItem) => (
         <MobileNavItem key={navItem.label} {...navItem} />
@@ -262,41 +292,7 @@ interface NavItem {
 
 const NAV_ITEMS: Array<NavItem> = [
   {
-    label: "Inspiration",
-    children: [
-      {
-        label: "Explore Design Work",
-        subLabel: "Trending Design to inspire you",
-        href: "#",
-      },
-      {
-        label: "New & Noteworthy",
-        subLabel: "Up-and-coming Designers",
-        href: "#",
-      },
-    ],
-  },
-  {
-    label: "Find Work",
-    children: [
-      {
-        label: "Job Board",
-        subLabel: "Find your dream design job",
-        href: "#",
-      },
-      {
-        label: "Freelance Projects",
-        subLabel: "An exclusive list for contract work",
-        href: "#",
-      },
-    ],
-  },
-  {
-    label: "Learn Design",
-    href: "#",
-  },
-  {
-    label: "Hire Designers",
-    href: "#",
+    label: "Placeholder",
+    href: "",
   },
 ];

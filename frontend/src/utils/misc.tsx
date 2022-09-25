@@ -1,6 +1,6 @@
-export const allFieldsFilled = (object: Object): boolean => {
+export const allFieldsFilled = (object: object): boolean => {
   for (const property in object) {
-    if (!property) return false;
+    if (!object[property as keyof typeof object]) return false;
   }
 
   return true;

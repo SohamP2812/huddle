@@ -1,8 +1,8 @@
 import { screen } from "@testing-library/react";
 import { renderWithRouter } from "utils/testing";
 
-import { SignUp } from "components/SignUp/SignUp";
+import { Account } from "components/Account/Account";
 
 it("renders without crashing", () => {
-  renderWithRouter(<SignUp />);
+  renderWithRouter(<Account />);
 });
