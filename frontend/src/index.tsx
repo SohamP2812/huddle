@@ -2,15 +2,16 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
-import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "./index.css";
 import { ChakraProvider } from "@chakra-ui/react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import AuthComponent from "components/AuthComponent";
+import { AuthComponent } from "components/AuthComponent";
 
-import SignUp from "components/SignUp";
+import { LandingPage } from "components/LandingPage/LandingPage";
+import { SignUp } from "components/SignUp/SignUp";
+import { SignIn } from "components/SignIn/SignIn";
 
 const container = document.getElementById("root")!;
 const root = createRoot(container);
@@ -21,10 +22,17 @@ root.render(
       <Provider store={store}>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<AuthComponent children={<App />} />} />
+            <Route
+              path="/"
+              element={<AuthComponent children={<LandingPage />} />}
+            />
             <Route
               path="signup"
-              element={<AuthComponent children={<SignUp />} isProtected />}
+              element={<AuthComponent children={<SignUp />} />}
+            />
+            <Route
+              path="signin"
+              element={<AuthComponent children={<SignIn />} />}
             />
           </Routes>
         </BrowserRouter>

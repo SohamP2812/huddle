@@ -15,6 +15,8 @@ import com.huddle.backend.security.services.UserDetailsImpl;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +49,7 @@ public class UserController {
 
   @PostMapping("")
   public ResponseEntity<?> createUser(
+    HttpServletResponse response,
     @Valid @RequestBody SignupRequest signUpRequest
   ) {
     if (userRepository.existsByUsername(signUpRequest.getUsername())) {
@@ -82,6 +85,14 @@ public class UserController {
     String jwt = jwtUtils.generateJwtToken(authentication);
 
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+    Cookie jwtTokenCookie = new Cookie("huddle_session", jwt);
+
+    jwtTokenCookie.setMaxAge(86400);
+    jwtTokenCookie.setSecure(true);
+    jwtTokenCookie.setHttpOnly(true);
+
+    response.addCookie(jwtTokenCookie);
 
     return ResponseEntity.ok(
       new JwtResponse(

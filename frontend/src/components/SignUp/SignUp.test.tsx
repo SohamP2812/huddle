@@ -1,9 +1,9 @@
 import { screen } from "@testing-library/react";
 import { renderWithRouter } from "utils/testing";
 
-import { App } from "./App";
+import { SignUp } from "components/SignUp/SignUp";
 
 it("renders without crashing", () => {
-  renderWithRouter(<App />);
-  expect(screen.getByText("Sign Up")).toBeInTheDocument();
+  renderWithRouter(<SignUp />);
+  expect(screen.getByText("Logout")).toBeInTheDocument();
 });

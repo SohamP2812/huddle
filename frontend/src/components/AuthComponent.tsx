@@ -8,7 +8,7 @@ interface IProps {
   isProtected?: boolean;
 }
 
-const AuthComponent: FC<IProps> = ({
+export const AuthComponent: FC<IProps> = ({
   children,
   isProtected = false,
 }): JSX.Element => {
@@ -22,11 +22,13 @@ const AuthComponent: FC<IProps> = ({
 
   useEffect(() => {
     if (user.loggedIn == null) dispatch(getSelf());
-    if (user.loggedIn === false && location.pathname != "/") navigate("/");
+    if (user.loggedIn === false && location.pathname !== "/" && isProtected)
+      navigate("/");
   }, [location]);
 
   useEffect(() => {
-    if (user.loggedIn === false && location.pathname != "/") navigate("/");
+    if (user.loggedIn === false && location.pathname !== "/" && isProtected)
+      navigate("/");
   }, [user.loggedIn]);
 
   if (!user.loggedIn && isProtected) {
@@ -35,5 +37,3 @@ const AuthComponent: FC<IProps> = ({
 
   return <>{children}</>;
 };
-
-export default AuthComponent;

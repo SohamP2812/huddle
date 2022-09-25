@@ -6,6 +6,14 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface AccountCreationInfo {
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
 export interface UserState {
   firstName: string;
   lastName: string;
@@ -75,18 +83,63 @@ export const login = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
+>("user/login", async (loginCredentials, { rejectWithValue, getState }) => {
+  try {
+    const { loggedIn } = getState().user;
+
+    if (loggedIn) return;
+
+    const response = await fetch("/session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        accepts: "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(loginCredentials),
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      throw data;
+    }
+
+    return data;
+  } catch (err) {
+    let error: APIError = err;
+
+    if (!error.message) {
+      throw err;
+    }
+
+    return rejectWithValue(error);
+  }
+});
+
+export const createAccount = createAsyncThunk<
+  UserState,
+  AccountCreationInfo,
+  {
+    state: RootState;
+    rejectValue: APIError;
+  }
 >(
-  "user/login",
-  async (loginCredentials: LoginCredentials, { rejectWithValue }) => {
+  "user/createAccount",
+  async (accountCreationInfo, { rejectWithValue, getState }) => {
     try {
-      const response = await fetch("/session", {
+      const { loggedIn } = getState().user;
+
+      if (loggedIn) return;
+
+      const response = await fetch("/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           accepts: "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(loginCredentials),
+        body: JSON.stringify(accountCreationInfo),
       });
 
       const data = await response.json();
@@ -175,6 +228,28 @@ export const userSlice = createSlice({
             "An unknown error occurred. Please try again.";
         }
       })
+      .addCase(createAccount.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(createAccount.fulfilled, (state, action) => {
+        state.loggedIn = true;
+
+        state.firstName = action.payload.firstName;
+        state.lastName = action.payload.lastName;
+        state.username = action.payload.username;
+        state.email = action.payload.email;
+      })
+      .addCase(createAccount.rejected, (state, action) => {
+        state.loggedIn = false;
+
+        if (action.payload) {
+          state.error = action.payload.message;
+        } else {
+          state.error =
+            action.error.message ??
+            "An unknown error occurred. Please try again.";
+        }
+      })
       .addCase(getSelf.pending, (state) => {
         state.error = null;
       })
@@ -191,7 +266,6 @@ export const userSlice = createSlice({
       })
       .addCase(logout.pending, (state) => {})
       .addCase(logout.fulfilled, (state, action) => {
-        console.log(action.payload);
         state.loggedIn = false;
 
         state.firstName = "";

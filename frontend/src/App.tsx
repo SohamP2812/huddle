@@ -1,12 +1,13 @@
 import { FC } from "react";
-import { Link } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
+import { Link } from "@chakra-ui/react";
 
-const App: FC<{}> = () => {
+export const App: FC<{}> = () => {
   return (
     <div>
-      <Link to="/signup">Sign Up</Link>
+      <Link as={RouterLink} to="/signup">
+        Sign Up
+      </Link>
     </div>
   );
 };
-
-export default App;
