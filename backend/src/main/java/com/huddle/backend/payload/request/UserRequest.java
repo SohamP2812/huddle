@@ -3,9 +3,6 @@ package com.huddle.backend.payload.request;
 import javax.validation.constraints.*;
 
 public class UserRequest {
-  @NotNull
-  @Size(min = 3, max = 20)
-  private String username;
 
   @NotNull
   @Size(max = 20)
@@ -14,14 +11,6 @@ public class UserRequest {
   @NotNull
   @Size(max = 20)
   private String lastName;
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
 
   public String getFirstName() {
     return firstName;

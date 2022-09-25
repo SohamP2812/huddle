@@ -5,7 +5,7 @@ import { Link } from "@chakra-ui/react";
 export const App: FC<{}> = () => {
   return (
     <div>
-      <Link as={RouterLink} to="/signup">
+      <Link as={RouterLink} to="/sign-up">
         Sign Up
       </Link>
     </div>

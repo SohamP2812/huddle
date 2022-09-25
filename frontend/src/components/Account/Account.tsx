@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "components/Header/Header";
 import { useAppSelector, useAppDispatch } from "redux/hooks";
-import { logout, selectUser } from "redux/slices/userSlice";
+import { logout, updateUser, selectUser } from "redux/slices/userSlice";
 import {
   Flex,
   Box,
@@ -17,7 +17,8 @@ import {
   useToast,
   Spacer,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+
+import { isObjectDiff } from "utils/misc";
 
 export const Account = () => {
   const toast = useToast();
@@ -25,6 +26,31 @@ export const Account = () => {
   const user = useAppSelector(selectUser);
 
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (user.message) {
+      toast({
+        title: user.message,
+        status: "success",
+        position: "top",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  }, [user.message]);
+
+  useEffect(() => {
+    if (user.error) {
+      toast({
+        title: "An error occurred!",
+        description: user.error,
+        status: "error",
+        position: "top",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  }, [user.error]);
 
   const [accountFields, setAccountFields] = useState({
     username: user.username,
@@ -42,9 +68,19 @@ export const Account = () => {
     });
   };
 
-  const handleLogout = (e: React.FormEvent<HTMLFormElement>): void => {
+  const handleLogout = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ): void => {
     e.preventDefault();
     dispatch(logout());
+  };
+
+  const handleUpdateUser = (e: React.FormEvent<HTMLFormElement>): void => {
+    e.preventDefault();
+
+    const { email, username, ...fieldsToUpdate } = accountFields;
+
+    dispatch(updateUser(fieldsToUpdate));
   };
 
   return (
@@ -60,11 +96,12 @@ export const Account = () => {
           <Stack align={"center"}>
             <Heading fontSize={"4xl"}>Account</Heading>
           </Stack>
-          <form onSubmit={handleLogout}>
+          <form onSubmit={handleUpdateUser}>
             <Stack spacing={4}>
               <FormControl id="username">
                 <FormLabel>Username</FormLabel>
                 <Input
+                  disabled
                   type="text"
                   name="username"
                   onChange={handleChangeSignupFields}
@@ -101,6 +138,7 @@ export const Account = () => {
               </FormControl>
               <Spacer h={"xl"} />
               <Button
+                disabled={!isObjectDiff(accountFields, user)}
                 type="submit"
                 bg={"black"}
                 color={"white"}
@@ -111,7 +149,7 @@ export const Account = () => {
                 Update
               </Button>
               <Button
-                type="submit"
+                onClick={handleLogout}
                 bg={"transparent"}
                 color={"black"}
                 border={"1px"}

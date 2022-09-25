@@ -6,6 +6,11 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface UserUpdateInfo {
+  firstName: string;
+  lastName: string;
+}
+
 export interface AccountCreationInfo {
   username: string;
   firstName: string;
@@ -15,12 +20,14 @@ export interface AccountCreationInfo {
 }
 
 export interface UserState {
+  id: number | null;
   firstName: string;
   lastName: string;
   username: string;
   email: string;
   loggedIn: boolean | null;
   error: string | null;
+  message: string | null;
 }
 
 export interface APIError {
@@ -28,12 +35,14 @@ export interface APIError {
 }
 
 const initialState: UserState = {
+  id: null,
   firstName: "",
   lastName: "",
   username: "",
   email: "",
   loggedIn: null,
   error: null,
+  message: null,
 };
 
 export const getSelf = createAsyncThunk<
@@ -45,10 +54,6 @@ export const getSelf = createAsyncThunk<
   }
 >("user/getSelf", async (_, { getState, rejectWithValue }) => {
   try {
-    const { loggedIn } = getState().user;
-
-    if (loggedIn) return;
-
     const response = await fetch("/session", {
       method: "GET",
       headers: {
@@ -161,6 +166,47 @@ export const createAccount = createAsyncThunk<
   }
 );
 
+export const updateUser = createAsyncThunk<
+  UserState,
+  UserUpdateInfo,
+  {
+    state: RootState;
+    rejectValue: APIError;
+  }
+>("user/updateUser", async (userUpdateInfo, { rejectWithValue, getState }) => {
+  try {
+    const { loggedIn, id } = getState().user;
+
+    if (!loggedIn) return;
+
+    const response = await fetch(`/users/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        accepts: "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(userUpdateInfo),
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      throw data;
+    }
+
+    return data;
+  } catch (err) {
+    let error: APIError = err;
+
+    if (!error.message) {
+      throw err;
+    }
+
+    return rejectWithValue(error);
+  }
+});
+
 export const logout = createAsyncThunk<
   string,
   void,
@@ -208,10 +254,12 @@ export const userSlice = createSlice({
     builder
       .addCase(login.pending, (state) => {
         state.error = null;
+        state.message = null;
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loggedIn = true;
 
+        state.id = action.payload.id;
         state.firstName = action.payload.firstName;
         state.lastName = action.payload.lastName;
         state.username = action.payload.username;
@@ -230,10 +278,12 @@ export const userSlice = createSlice({
       })
       .addCase(createAccount.pending, (state) => {
         state.error = null;
+        state.message = null;
       })
       .addCase(createAccount.fulfilled, (state, action) => {
         state.loggedIn = true;
 
+        state.id = action.payload.id;
         state.firstName = action.payload.firstName;
         state.lastName = action.payload.lastName;
         state.username = action.payload.username;
@@ -250,12 +300,36 @@ export const userSlice = createSlice({
             "An unknown error occurred. Please try again.";
         }
       })
+      .addCase(updateUser.pending, (state) => {
+        state.error = null;
+        state.message = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.message = "Updated successfully.";
+
+        state.id = action.payload.id;
+        state.firstName = action.payload.firstName;
+        state.lastName = action.payload.lastName;
+        state.username = action.payload.username;
+        state.email = action.payload.email;
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        if (action.payload) {
+          state.error = action.payload.message;
+        } else {
+          state.error =
+            action.error.message ??
+            "An unknown error occurred. Please try again.";
+        }
+      })
       .addCase(getSelf.pending, (state) => {
         state.error = null;
+        state.message = null;
       })
       .addCase(getSelf.fulfilled, (state, action) => {
         state.loggedIn = true;
 
+        state.id = action.payload.id;
         state.firstName = action.payload.firstName;
         state.lastName = action.payload.lastName;
         state.username = action.payload.username;

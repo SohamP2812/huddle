@@ -98,7 +98,7 @@ export const Header: FC<{}> = () => {
                 fontWeight={400}
                 color={"black"}
                 variant={"link"}
-                to={"/signin"}
+                to={"/sign-in"}
               >
                 Sign In
               </Button>
@@ -112,7 +112,7 @@ export const Header: FC<{}> = () => {
                 _hover={{
                   bg: "gray.600",
                 }}
-                to={"/signup"}
+                to={"/sign-up"}
               >
                 Sign Up
               </Button>

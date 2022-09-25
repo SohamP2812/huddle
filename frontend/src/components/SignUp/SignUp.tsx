@@ -37,6 +37,18 @@ export const SignUp = () => {
   }, [user.loggedIn]);
 
   useEffect(() => {
+    if (user.message) {
+      toast({
+        title: user.message,
+        status: "success",
+        position: "top",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  }, [user.message]);
+
+  useEffect(() => {
     if (user.error) {
       toast({
         title: "An error occurred!",
@@ -152,7 +164,7 @@ export const SignUp = () => {
                 >
                   Sign Up
                 </Button>
-                <Link as={RouterLink} to="/signin" color={"blue.400"}>
+                <Link as={RouterLink} to="/sign-in" color={"blue.400"}>
                   Already have an account? Login.
                 </Link>
               </Stack>

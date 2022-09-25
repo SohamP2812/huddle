@@ -13,6 +13,7 @@ import { LandingPage } from "components/LandingPage/LandingPage";
 import { SignUp } from "components/SignUp/SignUp";
 import { SignIn } from "components/SignIn/SignIn";
 import { Account } from "components/Account/Account";
+import { CreateTeam } from "components/CreateTeam/CreateTeam";
 
 const container = document.getElementById("root")!;
 const root = createRoot(container);
@@ -28,16 +29,24 @@ root.render(
               element={<AuthComponent children={<LandingPage />} />}
             />
             <Route
-              path="signup"
+              path="sign-up"
               element={<AuthComponent children={<SignUp />} />}
             />
             <Route
-              path="signin"
+              path="sign-in"
               element={<AuthComponent children={<SignIn />} />}
             />
             <Route
               path="account"
               element={<AuthComponent children={<Account />} isProtected />}
+            />
+            <Route
+              path="account"
+              element={<AuthComponent children={<Account />} isProtected />}
+            />
+            <Route
+              path="create-team"
+              element={<AuthComponent children={<CreateTeam />} isProtected />}
             />
           </Routes>
         </BrowserRouter>
