@@ -140,8 +140,9 @@ const DesktopNav = () => {
           <Popover trigger={"hover"} placement={"bottom-start"}>
             <PopoverTrigger>
               <Link
+                as={RouterLink}
                 p={2}
-                href={navItem.href ?? "#"}
+                to={navItem.href ?? "#"}
                 fontSize={"lg"}
                 fontWeight={500}
                 color={linkColor}
@@ -180,7 +181,8 @@ const DesktopNav = () => {
 const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
   return (
     <Link
-      href={href}
+      as={RouterLink}
+      to={href ?? "#"}
       role={"group"}
       display={"block"}
       p={2}
@@ -238,7 +240,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
       <Flex
         py={2}
         as={Link}
-        href={href ?? "#"}
+        to={href ?? "#"}
         justify={"space-between"}
         align={"center"}
         _hover={{
@@ -273,7 +275,12 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
         >
           {children &&
             children.map((child) => (
-              <Link key={child.label} py={2} href={child.href}>
+              <Link
+                as={RouterLink}
+                key={child.label}
+                py={2}
+                to={child.href ?? "#"}
+              >
                 {child.label}
               </Link>
             ))}
@@ -292,7 +299,7 @@ interface NavItem {
 
 const NAV_ITEMS: Array<NavItem> = [
   {
-    label: "Placeholder",
-    href: "",
+    label: "Teams",
+    href: "/teams",
   },
 ];

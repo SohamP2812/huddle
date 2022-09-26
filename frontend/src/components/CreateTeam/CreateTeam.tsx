@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Header } from "components/Header/Header";
 import { useAppSelector, useAppDispatch } from "redux/hooks";
-import { createTeam, selectTeam } from "redux/slices/teamSlice";
+import { createTeam, selectTeams } from "redux/slices/teamsSlice";
 import {
   Flex,
   Box,
@@ -24,26 +24,26 @@ import { sports } from "utils/consts";
 export const CreateTeam = () => {
   const toast = useToast();
 
-  const team = useAppSelector(selectTeam);
+  const teams = useAppSelector(selectTeams);
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (team.error) {
+    if (teams.error) {
       toast({
         title: "An error occurred!",
-        description: team.error,
+        description: teams.error,
         status: "error",
         position: "top",
         duration: 5000,
         isClosable: true,
       });
     }
-  }, [team.error]);
+  }, [teams.error]);
 
   const [teamFields, setTeamFields] = useState({
-    name: team.name,
-    sport: team.sport,
+    name: "",
+    sport: "BASKETBALL",
   });
 
   const handleChangeTeamFields = (
@@ -94,8 +94,13 @@ export const CreateTeam = () => {
                   onChange={handleChangeTeamFields}
                   defaultValue={"BASKETBALL"}
                 >
-                  {Object.keys(sports).map((sport) => (
-                    <option value={sports[sport as keyof typeof sports]}>
+                  {Object.keys(sports.nameToKey).map((sport) => (
+                    <option
+                      key={sport}
+                      value={
+                        sports.nameToKey[sport as keyof typeof sports.nameToKey]
+                      }
+                    >
                       {sport}
                     </option>
                   ))}

@@ -14,6 +14,7 @@ import { SignUp } from "components/SignUp/SignUp";
 import { SignIn } from "components/SignIn/SignIn";
 import { Account } from "components/Account/Account";
 import { CreateTeam } from "components/CreateTeam/CreateTeam";
+import { Teams } from "components/Teams/Teams";
 
 const container = document.getElementById("root")!;
 const root = createRoot(container);
@@ -47,6 +48,10 @@ root.render(
             <Route
               path="create-team"
               element={<AuthComponent children={<CreateTeam />} isProtected />}
+            />
+            <Route
+              path="teams"
+              element={<AuthComponent children={<Teams />} isProtected />}
             />
           </Routes>
         </BrowserRouter>

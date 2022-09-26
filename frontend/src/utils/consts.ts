@@ -1,4 +1,10 @@
 export const sports = {
-  Basketball: "BASKETBALL",
-  Hockey: "HOCKEY",
+  nameToKey: {
+    Basketball: "BASKETBALL",
+    Hockey: "HOCKEY",
+  },
+  keyToName: {
+    BASKETBALL: "Basketball",
+    HOCKEY: "Hockey",
+  },
 };
