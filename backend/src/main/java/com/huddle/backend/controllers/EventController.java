@@ -26,6 +26,48 @@ public class EventController {
   @Autowired
   EventParticipantRepository eventParticipantRepository;
 
+
+  @GetMapping("")
+  public ResponseEntity<?> getEvents(@PathVariable Long team_id) {
+    Optional<Team> team = teamRepository.findById(team_id);
+
+    if (team.isEmpty()) return ResponseEntity
+            .badRequest()
+            .body("No team exists with this id.");
+
+    Set<Event> events = team.get().getEvents();
+
+    List<EventResponse> responseEvents = events
+            .stream()
+            .map(
+                    event ->
+                            new EventResponse(
+                                    event.getId(),
+                                    event.getName(),
+                                    new TeamResponse(
+                                            event.getTeam().getId(),
+                                            event.getTeam().getName(),
+                                            new UserResponse(
+                                                    event.getTeam().getManager().getId(),
+                                                    event.getTeam().getManager().getFirstName(),
+                                                    event.getTeam().getManager().getLastName(),
+                                                    event.getTeam().getManager().getUsername(),
+                                                    event.getTeam().getManager().getEmail()
+                                            ),
+                                            event.getTeam().getSport()
+                                    ),
+                                    event.getStartTime(),
+                                    event.getEndTime(),
+                                    event.getEventType(),
+                                    event.getTeamScore(),
+                                    event.getOpponentScore()
+                            )
+            )
+            .toList();
+
+    return ResponseEntity.ok(new EventsResponse(responseEvents));
+  }
+
   @PostMapping("")
   public ResponseEntity<?> createEvent(
     @Valid @RequestBody EventRequest eventRequest,

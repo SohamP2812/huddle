@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
-export interface Manager {
+export interface User {
   id: number;
   username: string;
   firstName: string;
@@ -12,12 +12,25 @@ export interface Manager {
 export interface Team {
   id: number;
   name: string;
-  manager: Manager;
+  manager: User;
   sport: string;
+}
+
+export interface Event {
+  id: number;
+  name: string;
+  team: Team;
+  startTime: string;
+  endTime: string;
+  eventType: string;
+  teamScore: number;
+  opponentScore: number;
 }
 
 export interface TeamsState {
   teams: Team[];
+  members: User[]; // Should be in a seperate slice - but treat this as "selected team" members
+  events: Event[];
   error: string | null;
   teamCreationSuccess: boolean | null;
 }
@@ -33,6 +46,8 @@ export interface APIError {
 
 const initialState: TeamsState = {
   teams: [],
+  members: [],
+  events: [],
   error: null,
   teamCreationSuccess: null,
 };
@@ -121,6 +136,86 @@ export const getByUser = createAsyncThunk<
   }
 });
 
+export const getMembers = createAsyncThunk<
+  { members: User[] },
+  number,
+  {
+    state: RootState;
+    rejectValue: APIError;
+  }
+>("teams/getMembers", async (id, { rejectWithValue, getState }) => {
+  try {
+    const { loggedIn } = getState().user;
+
+    if (!loggedIn) return;
+
+    const response = await fetch(`/teams/${id}/members`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        accepts: "application/json",
+      },
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      throw data;
+    }
+
+    return data;
+  } catch (err) {
+    let error: APIError = err;
+
+    if (!error.message) {
+      throw err;
+    }
+
+    return rejectWithValue(error);
+  }
+});
+
+export const getEvents = createAsyncThunk<
+  { events: Event[] },
+  number,
+  {
+    state: RootState;
+    rejectValue: APIError;
+  }
+>("teams/getEvents", async (id, { rejectWithValue, getState }) => {
+  try {
+    const { loggedIn } = getState().user;
+
+    if (!loggedIn) return;
+
+    const response = await fetch(`/teams/${id}/events`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        accepts: "application/json",
+      },
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      throw data;
+    }
+
+    return data;
+  } catch (err) {
+    let error: APIError = err;
+
+    if (!error.message) {
+      throw err;
+    }
+
+    return rejectWithValue(error);
+  }
+});
+
 export const teamsSlice = createSlice({
   name: "teams",
   initialState,
@@ -167,6 +262,36 @@ export const teamsSlice = createSlice({
             action.error.message ??
             "An unknown error occurred. Please try again.";
         }
+      })
+      .addCase(getMembers.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(getMembers.fulfilled, (state, action) => {
+        state.members = action.payload.members;
+      })
+      .addCase(getMembers.rejected, (state, action) => {
+        if (action.payload) {
+          state.error = action.payload.message;
+        } else {
+          state.error =
+            action.error.message ??
+            "An unknown error occurred. Please try again.";
+        }
+      })
+      .addCase(getEvents.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(getEvents.fulfilled, (state, action) => {
+        state.events = action.payload.events;
+      })
+      .addCase(getEvents.rejected, (state, action) => {
+        if (action.payload) {
+          state.error = action.payload.message;
+        } else {
+          state.error =
+            action.error.message ??
+            "An unknown error occurred. Please try again.";
+        }
       });
   },
   reducers: {
@@ -177,6 +302,10 @@ export const teamsSlice = createSlice({
 });
 
 export const selectTeams = (state: RootState): TeamsState => state.teams;
+
+export const selectMembers = (state: RootState): User[] => state.teams.members;
+
+export const selectEvents = (state: RootState): Event[] => state.teams.events;
 
 export const selectTeamById = (
   state: RootState,

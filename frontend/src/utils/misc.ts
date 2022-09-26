@@ -19,3 +19,7 @@ export const isObjectDiff = (object1: Object, object2: Object): boolean => {
 
   return false;
 };
+
+export const stringToJSDate = (dateString: string) => {
+  return new Date(dateString);
+};
