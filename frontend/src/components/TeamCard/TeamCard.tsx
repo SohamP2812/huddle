@@ -1,24 +1,29 @@
 import { FC } from "react";
 import {
   Badge,
-  Button,
   Center,
-  Flex,
   Heading,
-  Image,
-  Link,
   Stack,
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 
 interface IProps {
+  id: number;
   name: string;
   sport: string;
   manager: string;
 }
 
-export const TeamCard: FC<IProps> = ({ name, sport, manager }) => {
+export const TeamCard: FC<IProps> = ({ id, name, sport, manager }) => {
+  const navigate = useNavigate();
+
+  const handleClickCard = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.preventDefault();
+    navigate(`/teams/${id}`);
+  };
+
   return (
     <>
       <Center py={6} w={"100%"}>
@@ -38,6 +43,7 @@ export const TeamCard: FC<IProps> = ({ name, sport, manager }) => {
           }}
           transition={"0.19s all ease"}
           cursor={"pointer"}
+          onClick={handleClickCard}
         >
           <Stack
             flex={1}

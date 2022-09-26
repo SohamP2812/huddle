@@ -18,10 +18,17 @@ import {
   Spacer,
   Select,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+
+import { useIsMounted } from "hooks/useIsMounted";
 
 import { sports } from "utils/consts";
 
 export const CreateTeam = () => {
+  const isMounted = useIsMounted();
+
+  const navigate = useNavigate();
+
   const toast = useToast();
 
   const teams = useAppSelector(selectTeams);
@@ -29,7 +36,11 @@ export const CreateTeam = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (teams.error) {
+    if (teams.teamCreationSuccess && isMounted) navigate("/teams");
+  }, [teams.teamCreationSuccess]);
+
+  useEffect(() => {
+    if (teams.error && isMounted) {
       toast({
         title: "An error occurred!",
         description: teams.error,

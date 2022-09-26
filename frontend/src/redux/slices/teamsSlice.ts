@@ -1,22 +1,25 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
-export interface TeamState {
+export interface Manager {
+  id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface Team {
   id: number;
   name: string;
-  manager: {
-    id: number;
-    username: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
+  manager: Manager;
   sport: string;
 }
 
 export interface TeamsState {
-  teams: TeamState[];
+  teams: Team[];
   error: string | null;
+  teamCreationSuccess: boolean | null;
 }
 
 export interface TeamCreationInfo {
@@ -31,10 +34,11 @@ export interface APIError {
 const initialState: TeamsState = {
   teams: [],
   error: null,
+  teamCreationSuccess: null,
 };
 
 export const createTeam = createAsyncThunk<
-  TeamState,
+  Team,
   TeamCreationInfo,
   {
     state: RootState;
@@ -78,7 +82,7 @@ export const createTeam = createAsyncThunk<
 );
 
 export const getByUser = createAsyncThunk<
-  { teams: TeamState[] },
+  { teams: Team[] },
   number,
   {
     state: RootState;
@@ -90,7 +94,7 @@ export const getByUser = createAsyncThunk<
 
     if (!loggedIn) return;
 
-    const response = await fetch(`users/${id}/teams`, {
+    const response = await fetch(`/users/${id}/teams`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -124,9 +128,12 @@ export const teamsSlice = createSlice({
     builder
       .addCase(createTeam.pending, (state) => {
         state.error = null;
+        state.teamCreationSuccess = null;
       })
       .addCase(createTeam.fulfilled, (state, action) => {
-        const newTeam: TeamState = {
+        state.teamCreationSuccess = true;
+
+        const newTeam: Team = {
           id: action.payload.id,
           name: action.payload.name,
           manager: action.payload.manager,
@@ -136,6 +143,8 @@ export const teamsSlice = createSlice({
         state.teams.push(newTeam);
       })
       .addCase(createTeam.rejected, (state, action) => {
+        state.teamCreationSuccess = false;
+
         if (action.payload) {
           state.error = action.payload.message;
         } else {
@@ -168,6 +177,12 @@ export const teamsSlice = createSlice({
 });
 
 export const selectTeams = (state: RootState): TeamsState => state.teams;
+
+export const selectTeamById = (
+  state: RootState,
+  id?: number
+): Team | null | undefined =>
+  id ? state.teams.teams.find((team) => team.id === id) : null;
 
 export const { resetError } = teamsSlice.actions;
 

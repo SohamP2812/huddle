@@ -20,10 +20,13 @@ import { useNavigate } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
 
 import { allFieldsFilled } from "utils/misc";
+import { useIsMounted } from "hooks/useIsMounted";
 
 import { Header } from "components/Header/Header";
 
 export const SignUp = () => {
+  const isMounted = useIsMounted();
+
   const navigate = useNavigate();
 
   const toast = useToast();
@@ -37,7 +40,7 @@ export const SignUp = () => {
   }, [user.loggedIn]);
 
   useEffect(() => {
-    if (user.message) {
+    if (user.message && isMounted) {
       toast({
         title: user.message,
         status: "success",
@@ -49,7 +52,7 @@ export const SignUp = () => {
   }, [user.message]);
 
   useEffect(() => {
-    if (user.error) {
+    if (user.error && isMounted) {
       toast({
         title: "An error occurred!",
         description: user.error,

@@ -18,9 +18,12 @@ import {
   Spacer,
 } from "@chakra-ui/react";
 
+import { useIsMounted } from "hooks/useIsMounted";
 import { isObjectDiff } from "utils/misc";
 
 export const Account = () => {
+  const isMounted = useIsMounted();
+
   const toast = useToast();
 
   const user = useAppSelector(selectUser);
@@ -28,7 +31,7 @@ export const Account = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (user.message) {
+    if (user.message && isMounted) {
       toast({
         title: user.message,
         status: "success",
@@ -40,7 +43,7 @@ export const Account = () => {
   }, [user.message]);
 
   useEffect(() => {
-    if (user.error) {
+    if (user.error && isMounted) {
       toast({
         title: "An error occurred!",
         description: user.error,
