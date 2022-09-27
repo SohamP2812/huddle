@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Header } from "components/Header/Header";
 import { useAppSelector, useAppDispatch } from "redux/hooks";
-import { createTeam, selectTeams } from "redux/slices/teamsSlice";
+import { createEvent, selectTeams } from "redux/slices/teamsSlice";
 import {
   Flex,
   FormControl,
@@ -15,16 +15,17 @@ import {
   Spacer,
   Select,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
+import { eventTypes } from "utils/consts";
+import { toIsoString } from "utils/misc";
 import { useIsMounted } from "hooks/useIsMounted";
 
-import { sports } from "utils/consts";
-
-export const CreateTeam = () => {
+export const CreateEvent = () => {
   const isMounted = useIsMounted();
 
   const navigate = useNavigate();
+  const { team_id } = useParams();
 
   const toast = useToast();
 
@@ -32,9 +33,20 @@ export const CreateTeam = () => {
 
   const dispatch = useAppDispatch();
 
+  const [eventFields, setEventFields] = useState({
+    name: "",
+    startTime: toIsoString(new Date()),
+    endTime: toIsoString(new Date()),
+    eventType: "GAME",
+    teamScore: 0,
+    opponentScore: 0,
+    participantIds: [],
+  });
+
   useEffect(() => {
-    if (teams.teamCreationSuccess && isMounted) navigate("/teams");
-  }, [teams.teamCreationSuccess]);
+    console.log(toIsoString(new Date()));
+    if (teams.eventCreationSuccess && isMounted) navigate(`/teams/${team_id}`);
+  }, [teams.eventCreationSuccess]);
 
   useEffect(() => {
     if (teams.error && isMounted) {
@@ -49,26 +61,24 @@ export const CreateTeam = () => {
     }
   }, [teams.error]);
 
-  const [teamFields, setTeamFields] = useState({
-    name: "",
-    sport: "BASKETBALL",
-  });
-
-  const handleChangeTeamFields = (
+  const handleChangeEventFields = (
     e:
       | React.ChangeEvent<HTMLSelectElement>
       | React.ChangeEvent<HTMLInputElement>
   ): void => {
     e.preventDefault();
-    setTeamFields({
-      ...teamFields,
+    setEventFields({
+      ...eventFields,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleCreateTeam = (e: React.FormEvent<HTMLFormElement>): void => {
+  const handleCreateEvent = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(createTeam(teamFields));
+    team_id &&
+      dispatch(
+        createEvent({ id: parseInt(team_id), eventCreationInfo: eventFields })
+      );
   };
 
   return (
@@ -82,34 +92,36 @@ export const CreateTeam = () => {
       >
         <Stack spacing={8} mx={"auto"} width={"xl"} py={12} px={6}>
           <Stack align={"center"}>
-            <Heading fontSize={"4xl"}>Create a team</Heading>
+            <Heading fontSize={"4xl"}>Create an event</Heading>
           </Stack>
-          <form onSubmit={handleCreateTeam}>
+          <form onSubmit={handleCreateEvent}>
             <Stack spacing={4}>
               <FormControl id="name">
-                <FormLabel>Team Name</FormLabel>
+                <FormLabel>Event Name</FormLabel>
                 <Input
                   type="text"
                   name="name"
-                  onChange={handleChangeTeamFields}
-                  value={teamFields.name}
+                  onChange={handleChangeEventFields}
+                  value={eventFields.name}
                 />
               </FormControl>
               <FormControl id="sport">
                 <FormLabel>Sport</FormLabel>
                 <Select
-                  name="sport"
-                  onChange={handleChangeTeamFields}
-                  defaultValue={"BASKETBALL"}
+                  name="eventType"
+                  onChange={handleChangeEventFields}
+                  defaultValue={"GAME"}
                 >
-                  {Object.keys(sports.nameToKey).map((sport) => (
+                  {Object.keys(eventTypes.nameToKey).map((eventType) => (
                     <option
-                      key={sport}
+                      key={eventType}
                       value={
-                        sports.nameToKey[sport as keyof typeof sports.nameToKey]
+                        eventTypes.nameToKey[
+                          eventType as keyof typeof eventTypes.nameToKey
+                        ]
                       }
                     >
-                      {sport}
+                      {eventType}
                     </option>
                   ))}
                 </Select>

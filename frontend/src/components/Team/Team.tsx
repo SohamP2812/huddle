@@ -1,6 +1,6 @@
 import { Header } from "components/Header/Header";
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "redux/hooks";
 import { selectUser } from "redux/slices/userSlice";
 import {
@@ -20,11 +20,16 @@ import {
   useColorModeValue,
   Badge,
   Divider,
+  Checkbox,
 } from "@chakra-ui/react";
+import { AddIcon } from "@chakra-ui/icons";
 
 import { stringToJSDate } from "utils/misc";
 
 export const Team = () => {
+  const [showPastEvents, setShowPastEvents] = useState(false);
+
+  const navigate = useNavigate();
   const { team_id } = useParams();
 
   const user = useAppSelector(selectUser);
@@ -41,6 +46,18 @@ export const Team = () => {
     team_id && dispatch(getMembers(parseInt(team_id)));
     team_id && dispatch(getEvents(parseInt(team_id)));
   }, []);
+
+  const toggleShowPastEvents = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setShowPastEvents(!showPastEvents);
+  };
+
+  const handleCreateEvent = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    navigate("create-event");
+  };
 
   return (
     <>
@@ -90,7 +107,12 @@ export const Team = () => {
             </Box>
           </Box>
         </Flex>
-        <Flex maxW={"1000px"} w={"full"} gap={5}>
+        <Flex
+          direction={{ sm: "column", md: "row" }}
+          maxW={"1000px"}
+          w={"full"}
+          gap={5}
+        >
           <Box
             height={"fit-content"}
             w={"full"}
@@ -100,6 +122,23 @@ export const Team = () => {
             overflow={"hidden"}
           >
             <Box p={6}>
+              <Stack
+                direction={"row"}
+                justifyContent="right"
+                color="blue.400"
+                mb={"2"}
+              >
+                <Flex
+                  gap={2}
+                  alignItems={"center"}
+                  _hover={{
+                    cursor: "pointer",
+                  }}
+                >
+                  <AddIcon w={3} h={3} />
+                  <Text>Add Member</Text>
+                </Flex>
+              </Stack>
               <Stack spacing={0} align={"center"} mb={5}>
                 <Heading fontSize={"2xl"} fontWeight={800} fontFamily={"body"}>
                   Team Members
@@ -122,16 +161,47 @@ export const Team = () => {
             overflow={"hidden"}
           >
             <Box p={6}>
-              <Stack spacing={0} align={"center"} mb={5}>
+              <Stack
+                direction={"row"}
+                justifyContent="right"
+                color="blue.400"
+                mb={"2"}
+              >
+                <Flex
+                  gap={2}
+                  alignItems={"center"}
+                  _hover={{
+                    cursor: "pointer",
+                  }}
+                  onClick={handleCreateEvent}
+                >
+                  <AddIcon w={3} h={3} />
+                  <Text>Create Event</Text>
+                </Flex>
+              </Stack>
+              <Stack spacing={0} align={"center"} mb={5} gap={2}>
                 <Heading fontSize={"2xl"} fontWeight={800} fontFamily={"body"}>
                   Schedule
                 </Heading>
+                <Checkbox
+                  isChecked={showPastEvents}
+                  onChange={toggleShowPastEvents}
+                >
+                  Show Past Events
+                </Checkbox>
               </Stack>
               <Divider borderColor={"gray.300"} />{" "}
               <Flex direction="column" alignItems={"center"} my={5} gap={5}>
                 {events
                   .filter(
-                    (event) => stringToJSDate(event.startTime) > new Date()
+                    (event) =>
+                      stringToJSDate(event.startTime) > new Date() ||
+                      showPastEvents
+                  )
+                  .sort(
+                    (a, b) =>
+                      stringToJSDate(a.startTime).getTime() -
+                      stringToJSDate(b.startTime).getTime()
                   )
                   .map((event) => (
                     <Box
@@ -172,6 +242,27 @@ export const Team = () => {
                           {event.eventType}
                         </Badge>
                       </Stack>
+                      {stringToJSDate(event.endTime) < new Date() && (
+                        <Stack
+                          justify={"space-evenly"}
+                          textAlign={"center"}
+                          direction={"row"}
+                          mt={7}
+                        >
+                          <Stack direction={"column"}>
+                            <Heading fontSize={"xx-large"}>
+                              {event.teamScore}
+                            </Heading>
+                            <Text>Team Score</Text>
+                          </Stack>
+                          <Stack direction={"column"}>
+                            <Heading fontSize={"xx-large"}>
+                              {event.opponentScore}
+                            </Heading>
+                            <Text>Opponent Score</Text>
+                          </Stack>
+                        </Stack>
+                      )}
                     </Box>
                   ))}
               </Flex>

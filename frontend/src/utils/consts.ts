@@ -9,6 +9,17 @@ export const sports = {
   },
 };
 
+export const eventTypes = {
+  nameToKey: {
+    Game: "GAME",
+    Practice: "PRACTICE",
+  },
+  keyToName: {
+    GAME: "Game",
+    PRACTICE: "Practice",
+  },
+};
+
 export const monthNames = [
   "January",
   "February",

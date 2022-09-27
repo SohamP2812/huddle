@@ -33,11 +33,22 @@ export interface TeamsState {
   events: Event[];
   error: string | null;
   teamCreationSuccess: boolean | null;
+  eventCreationSuccess: boolean | null;
 }
 
 export interface TeamCreationInfo {
   name: string;
   sport: string;
+}
+
+export interface EventCreationInfo {
+  name: string;
+  startTime: string;
+  endTime: string;
+  eventType: string;
+  teamScore: number;
+  opponentScore: number;
+  participantIds: number[];
 }
 
 export interface APIError {
@@ -50,6 +61,7 @@ const initialState: TeamsState = {
   events: [],
   error: null,
   teamCreationSuccess: null,
+  eventCreationSuccess: null,
 };
 
 export const createTeam = createAsyncThunk<
@@ -216,6 +228,50 @@ export const getEvents = createAsyncThunk<
   }
 });
 
+export const createEvent = createAsyncThunk<
+  Event,
+  { id: number; eventCreationInfo: EventCreationInfo },
+  {
+    state: RootState;
+    rejectValue: APIError;
+  }
+>(
+  "teams/createEvent",
+  async ({ id, eventCreationInfo }, { rejectWithValue, getState }) => {
+    try {
+      const { loggedIn } = getState().user;
+
+      if (!loggedIn) return;
+
+      const response = await fetch(`/teams/${id}/events`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accepts: "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(eventCreationInfo),
+      });
+
+      const data = await response.json();
+
+      if (response.status !== 200) {
+        throw data;
+      }
+
+      return data;
+    } catch (err) {
+      let error: APIError = err;
+
+      if (!error.message) {
+        throw err;
+      }
+
+      return rejectWithValue(error);
+    }
+  }
+);
+
 export const teamsSlice = createSlice({
   name: "teams",
   initialState,
@@ -228,14 +284,7 @@ export const teamsSlice = createSlice({
       .addCase(createTeam.fulfilled, (state, action) => {
         state.teamCreationSuccess = true;
 
-        const newTeam: Team = {
-          id: action.payload.id,
-          name: action.payload.name,
-          manager: action.payload.manager,
-          sport: action.payload.sport,
-        };
-
-        state.teams.push(newTeam);
+        state.teams.push(action.payload);
       })
       .addCase(createTeam.rejected, (state, action) => {
         state.teamCreationSuccess = false;
@@ -285,6 +334,26 @@ export const teamsSlice = createSlice({
         state.events = action.payload.events;
       })
       .addCase(getEvents.rejected, (state, action) => {
+        if (action.payload) {
+          state.error = action.payload.message;
+        } else {
+          state.error =
+            action.error.message ??
+            "An unknown error occurred. Please try again.";
+        }
+      })
+      .addCase(createEvent.pending, (state) => {
+        state.error = null;
+        state.eventCreationSuccess = null;
+      })
+      .addCase(createEvent.fulfilled, (state, action) => {
+        state.eventCreationSuccess = true;
+
+        state.events.push(action.payload);
+      })
+      .addCase(createEvent.rejected, (state, action) => {
+        state.eventCreationSuccess = false;
+
         if (action.payload) {
           state.error = action.payload.message;
         } else {
