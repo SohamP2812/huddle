@@ -26,6 +26,9 @@ public class EventController {
   @Autowired
   EventParticipantRepository eventParticipantRepository;
 
+  @Autowired
+  TeamMemberRepository teamMemberRepository;
+
 
   @GetMapping("")
   public ResponseEntity<?> getEvents(@PathVariable Long team_id) {
@@ -95,6 +98,10 @@ public class EventController {
       Optional<User> participant = userRepository.findById(participantId);
 
       if (participant.isEmpty()) continue;
+
+      Optional<TeamMember> teamMember = teamMemberRepository.findByTeamIdAndMemberId(team_id, participantId);
+
+      if(teamMember.isEmpty()) continue;
 
       EventParticipant eventParticipant = new EventParticipant(
         EAttendance.UNDECIDED,

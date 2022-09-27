@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
 import { Header } from "components/Header/Header";
 import { useAppSelector, useAppDispatch } from "redux/hooks";
-import { createEvent, selectTeams } from "redux/slices/teamsSlice";
+import {
+  createEvent,
+  getMembers,
+  selectTeams,
+  selectMembers,
+} from "redux/slices/teamsSlice";
 import {
   Flex,
   FormControl,
@@ -14,6 +19,8 @@ import {
   useToast,
   Spacer,
   Select,
+  Checkbox,
+  CheckboxGroup,
 } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -30,10 +37,21 @@ export const CreateEvent = () => {
   const toast = useToast();
 
   const teams = useAppSelector(selectTeams);
+  const members = useAppSelector(selectMembers);
 
   const dispatch = useAppDispatch();
 
-  const [eventFields, setEventFields] = useState({
+  const [allSelected, setAllSelected] = useState(false);
+
+  const [eventFields, setEventFields] = useState<{
+    name: string;
+    startTime: string;
+    endTime: string;
+    eventType: string;
+    teamScore: number;
+    opponentScore: number;
+    participantIds: number[];
+  }>({
     name: "",
     startTime: toIsoString(new Date()),
     endTime: toIsoString(new Date()),
@@ -44,7 +62,10 @@ export const CreateEvent = () => {
   });
 
   useEffect(() => {
-    console.log(toIsoString(new Date()));
+    team_id && dispatch(getMembers(parseInt(team_id)));
+  }, []);
+
+  useEffect(() => {
     if (teams.eventCreationSuccess && isMounted) navigate(`/teams/${team_id}`);
   }, [teams.eventCreationSuccess]);
 
@@ -71,6 +92,45 @@ export const CreateEvent = () => {
       ...eventFields,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleSelectParticipant = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+
+    let tempParticipantIds = eventFields.participantIds;
+
+    if (tempParticipantIds.includes(parseInt(e.target.name))) {
+      tempParticipantIds = tempParticipantIds.filter(
+        (id) => id !== parseInt(e.target.name)
+      );
+    } else {
+      tempParticipantIds.push(parseInt(e.target.name));
+    }
+
+    console.log(tempParticipantIds);
+    setEventFields({
+      ...eventFields,
+      participantIds: tempParticipantIds,
+    });
+  };
+
+  const handleSelectAllParticipants = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    e.preventDefault();
+    if (allSelected) {
+      setEventFields({
+        ...eventFields,
+        participantIds: [],
+      });
+    } else {
+      const allMembersIds = members.map((member) => member.id);
+      setEventFields({
+        ...eventFields,
+        participantIds: allMembersIds,
+      });
+    }
+    setAllSelected(!allSelected);
   };
 
   const handleCreateEvent = (e: React.FormEvent<HTMLFormElement>) => {
@@ -125,6 +185,43 @@ export const CreateEvent = () => {
                     </option>
                   ))}
                 </Select>
+              </FormControl>
+              <FormControl id="participantIds">
+                <Flex mb={"0.5rem"}>
+                  <FormLabel mb={0}>Participants</FormLabel>
+                  <Checkbox
+                    isChecked={allSelected}
+                    onChange={handleSelectAllParticipants}
+                  >
+                    Select All
+                  </Checkbox>
+                </Flex>
+                <Stack
+                  height={"fit-content"}
+                  minH={"50px"}
+                  maxH={"200px"}
+                  w={"full"}
+                  border={"1px"}
+                  borderColor={"gray.300"}
+                  rounded={"xl"}
+                  overflow={"scroll"}
+                  px={5}
+                  py={2}
+                >
+                  <CheckboxGroup>
+                    {members.map((member) => (
+                      <Checkbox
+                        name={member.id.toString()}
+                        isChecked={eventFields.participantIds.includes(
+                          member.id
+                        )}
+                        onChange={handleSelectParticipant}
+                      >
+                        {member.username}
+                      </Checkbox>
+                    ))}
+                  </CheckboxGroup>
+                </Stack>
               </FormControl>
               <Spacer h={"xl"} />
               <Button

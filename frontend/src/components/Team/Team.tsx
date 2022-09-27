@@ -200,8 +200,8 @@ export const Team = () => {
                   )
                   .sort(
                     (a, b) =>
-                      stringToJSDate(a.startTime).getTime() -
-                      stringToJSDate(b.startTime).getTime()
+                      stringToJSDate(b.startTime).getTime() -
+                      stringToJSDate(a.startTime).getTime()
                   )
                   .map((event) => (
                     <Box
