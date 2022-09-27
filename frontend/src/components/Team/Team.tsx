@@ -129,47 +129,51 @@ export const Team = () => {
               </Stack>
               <Divider borderColor={"gray.300"} />{" "}
               <Flex direction="column" alignItems={"center"} my={5} gap={5}>
-                {events.map((event) => (
-                  <Box
-                    height={"fit-content"}
-                    w={"full"}
-                    border={"1px"}
-                    borderColor={"gray.300"}
-                    rounded={"xl"}
-                    overflow={"hidden"}
-                    py={7}
-                    px={5}
-                  >
-                    <Stack spacing={0} align={"center"}>
-                      <Heading
-                        fontSize={"lg"}
-                        fontWeight={500}
-                        fontFamily={"body"}
-                      >
-                        {event.name}
-                      </Heading>
-                      <Text color={"gray.500"}>
-                        {stringToJSDate(event.startTime).toLocaleString()} -{" "}
-                        {stringToJSDate(event.endTime).toLocaleString()}
-                      </Text>
-                    </Stack>
-                    <Stack
-                      align={"center"}
-                      justify={"center"}
-                      direction={"row"}
-                      mt={5}
+                {events
+                  .filter(
+                    (event) => stringToJSDate(event.startTime) > new Date()
+                  )
+                  .map((event) => (
+                    <Box
+                      height={"fit-content"}
+                      w={"full"}
+                      border={"1px"}
+                      borderColor={"gray.300"}
+                      rounded={"xl"}
+                      overflow={"hidden"}
+                      py={7}
+                      px={5}
                     >
-                      <Badge
-                        px={2}
-                        py={1}
-                        fontWeight={"700"}
-                        textTransform={"none"}
+                      <Stack spacing={0} align={"center"}>
+                        <Heading
+                          fontSize={"lg"}
+                          fontWeight={500}
+                          fontFamily={"body"}
+                        >
+                          {event.name}
+                        </Heading>
+                        <Text color={"gray.500"}>
+                          {stringToJSDate(event.startTime).toLocaleString()} -{" "}
+                          {stringToJSDate(event.endTime).toLocaleString()}
+                        </Text>
+                      </Stack>
+                      <Stack
+                        align={"center"}
+                        justify={"center"}
+                        direction={"row"}
+                        mt={5}
                       >
-                        {event.eventType}
-                      </Badge>
-                    </Stack>
-                  </Box>
-                ))}
+                        <Badge
+                          px={2}
+                          py={1}
+                          fontWeight={"700"}
+                          textTransform={"none"}
+                        >
+                          {event.eventType}
+                        </Badge>
+                      </Stack>
+                    </Box>
+                  ))}
               </Flex>
             </Box>
           </Box>
