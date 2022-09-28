@@ -10,7 +10,7 @@ public class EventParticipantResponse {
 
   private EAttendance attendance;
 
-  private UserResponse participant;
+  private UserResponse user;
 
   private EventResponse event;
 
@@ -22,7 +22,7 @@ public class EventParticipantResponse {
   ) {
     this.id = id;
     this.attendance = attendance;
-    this.participant = participant;
+    this.user = participant;
     this.event = event;
   }
 
@@ -42,12 +42,10 @@ public class EventParticipantResponse {
     this.attendance = attendance;
   }
 
-  public UserResponse getParticipant() {
-    return participant;
-  }
+  public UserResponse getUser() { return user; }
 
-  public void setParticipant(UserResponse participant) {
-    this.participant = participant;
+  public void setUser(UserResponse user) {
+    this.user = user;
   }
 
   public EventResponse getEvent() {

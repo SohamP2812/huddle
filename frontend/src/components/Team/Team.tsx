@@ -26,6 +26,8 @@ import { AddIcon } from "@chakra-ui/icons";
 
 import { stringToJSDate } from "utils/misc";
 
+import { EventCard } from "components/EventCard/EventCard";
+
 export const Team = () => {
   const [showPastEvents, setShowPastEvents] = useState(false);
 
@@ -204,66 +206,7 @@ export const Team = () => {
                       stringToJSDate(a.startTime).getTime()
                   )
                   .map((event) => (
-                    <Box
-                      height={"fit-content"}
-                      w={"full"}
-                      border={"1px"}
-                      borderColor={"gray.300"}
-                      rounded={"xl"}
-                      overflow={"hidden"}
-                      py={7}
-                      px={5}
-                    >
-                      <Stack spacing={0} align={"center"}>
-                        <Heading
-                          fontSize={"lg"}
-                          fontWeight={500}
-                          fontFamily={"body"}
-                        >
-                          {event.name}
-                        </Heading>
-                        <Text color={"gray.500"}>
-                          {stringToJSDate(event.startTime).toLocaleString()} -{" "}
-                          {stringToJSDate(event.endTime).toLocaleString()}
-                        </Text>
-                      </Stack>
-                      <Stack
-                        align={"center"}
-                        justify={"center"}
-                        direction={"row"}
-                        mt={5}
-                      >
-                        <Badge
-                          px={2}
-                          py={1}
-                          fontWeight={"700"}
-                          textTransform={"none"}
-                        >
-                          {event.eventType}
-                        </Badge>
-                      </Stack>
-                      {stringToJSDate(event.endTime) < new Date() && (
-                        <Stack
-                          justify={"space-evenly"}
-                          textAlign={"center"}
-                          direction={"row"}
-                          mt={7}
-                        >
-                          <Stack direction={"column"}>
-                            <Heading fontSize={"xx-large"}>
-                              {event.teamScore}
-                            </Heading>
-                            <Text>Team Score</Text>
-                          </Stack>
-                          <Stack direction={"column"}>
-                            <Heading fontSize={"xx-large"}>
-                              {event.opponentScore}
-                            </Heading>
-                            <Text>Opponent Score</Text>
-                          </Stack>
-                        </Stack>
-                      )}
-                    </Box>
+                    <EventCard event={event} />
                   ))}
               </Flex>
             </Box>

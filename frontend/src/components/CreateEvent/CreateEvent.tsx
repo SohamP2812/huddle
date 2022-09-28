@@ -97,6 +97,8 @@ export const CreateEvent = () => {
   const handleSelectParticipant = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
 
+    if (allSelected) setAllSelected(false);
+
     let tempParticipantIds = eventFields.participantIds;
 
     if (tempParticipantIds.includes(parseInt(e.target.name))) {
@@ -107,7 +109,6 @@ export const CreateEvent = () => {
       tempParticipantIds.push(parseInt(e.target.name));
     }
 
-    console.log(tempParticipantIds);
     setEventFields({
       ...eventFields,
       participantIds: tempParticipantIds,
@@ -125,6 +126,7 @@ export const CreateEvent = () => {
       });
     } else {
       const allMembersIds = members.map((member) => member.id);
+
       setEventFields({
         ...eventFields,
         participantIds: allMembersIds,

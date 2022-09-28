@@ -27,10 +27,18 @@ export interface Event {
   opponentScore: number;
 }
 
+export interface Participant {
+  id: number;
+  user: User;
+  event: Event;
+  attendance: string;
+}
+
 export interface TeamsState {
   teams: Team[];
   members: User[]; // Should be in a seperate slice - but treat this as "selected team" members
-  events: Event[];
+  events: Event[]; // Should be in a seperate slice - but treat this as "selected team" events
+  participants: Participant[];
   error: string | null;
   teamCreationSuccess: boolean | null;
   eventCreationSuccess: boolean | null;
@@ -59,6 +67,7 @@ const initialState: TeamsState = {
   teams: [],
   members: [],
   events: [],
+  participants: [],
   error: null,
   teamCreationSuccess: null,
   eventCreationSuccess: null,
@@ -272,6 +281,107 @@ export const createEvent = createAsyncThunk<
   }
 );
 
+export const getParticipants = createAsyncThunk<
+  { eventParticipants: Participant[] },
+  { team_id: number; event_id: number },
+  {
+    state: RootState;
+    rejectValue: APIError;
+  }
+>(
+  "teams/getParticipants",
+  async ({ team_id, event_id }, { rejectWithValue, getState }) => {
+    try {
+      const { loggedIn } = getState().user;
+
+      if (!loggedIn) return;
+
+      const response = await fetch(
+        `/teams/${team_id}/events/${event_id}/participants`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            accepts: "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.status !== 200) {
+        throw data;
+      }
+
+      return data;
+    } catch (err) {
+      let error: APIError = err;
+
+      if (!error.message) {
+        throw err;
+      }
+
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const updateParticipant = createAsyncThunk<
+  Participant,
+  {
+    team_id: number;
+    event_id: number;
+    user_id: number;
+    participantUpdateInfo: { attendance: string };
+  },
+  {
+    state: RootState;
+    rejectValue: APIError;
+  }
+>(
+  "teams/updateParticipant",
+  async (
+    { team_id, event_id, user_id, participantUpdateInfo },
+    { rejectWithValue, getState }
+  ) => {
+    try {
+      const { loggedIn } = getState().user;
+
+      if (!loggedIn) return;
+
+      const response = await fetch(
+        `/teams/${team_id}/events/${event_id}/participants/${user_id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            accepts: "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(participantUpdateInfo),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.status !== 200) {
+        throw data;
+      }
+
+      return data;
+    } catch (err) {
+      let error: APIError = err;
+
+      if (!error.message) {
+        throw err;
+      }
+
+      return rejectWithValue(error);
+    }
+  }
+);
+
 export const teamsSlice = createSlice({
   name: "teams",
   initialState,
@@ -361,6 +471,38 @@ export const teamsSlice = createSlice({
             action.error.message ??
             "An unknown error occurred. Please try again.";
         }
+      })
+      .addCase(getParticipants.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(getParticipants.fulfilled, (state, action) => {
+        state.participants = action.payload.eventParticipants;
+      })
+      .addCase(getParticipants.rejected, (state, action) => {
+        if (action.payload) {
+          state.error = action.payload.message;
+        } else {
+          state.error =
+            action.error.message ??
+            "An unknown error occurred. Please try again.";
+        }
+      })
+      .addCase(updateParticipant.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(updateParticipant.fulfilled, (state, action) => {
+        state.participants = state.participants.map((participant) =>
+          participant.id === action.payload.id ? action.payload : participant
+        );
+      })
+      .addCase(updateParticipant.rejected, (state, action) => {
+        if (action.payload) {
+          state.error = action.payload.message;
+        } else {
+          state.error =
+            action.error.message ??
+            "An unknown error occurred. Please try again.";
+        }
       });
   },
   reducers: {
@@ -376,11 +518,20 @@ export const selectMembers = (state: RootState): User[] => state.teams.members;
 
 export const selectEvents = (state: RootState): Event[] => state.teams.events;
 
+export const selectParticipants = (state: RootState): Participant[] =>
+  state.teams.participants;
+
 export const selectTeamById = (
   state: RootState,
   id?: number
 ): Team | null | undefined =>
   id ? state.teams.teams.find((team) => team.id === id) : null;
+
+export const selectEventById = (
+  state: RootState,
+  id?: number
+): Event | null | undefined =>
+  id ? state.teams.events.find((event) => event.id === id) : null;
 
 export const { resetError } = teamsSlice.actions;
 

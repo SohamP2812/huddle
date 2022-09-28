@@ -287,21 +287,62 @@ public class EventController {
       event_id
     );
 
-    List<UserResponse> users = eventParticipants
+    List<EventParticipantResponse> responseEventParticipants = eventParticipants
       .stream()
       .map(
         eventParticipant ->
-          new UserResponse(
-            eventParticipant.getParticipant().getId(),
-            eventParticipant.getParticipant().getFirstName(),
-            eventParticipant.getParticipant().getLastName(),
-            eventParticipant.getParticipant().getUsername(),
-            eventParticipant.getParticipant().getEmail()
-          )
+                new EventParticipantResponse(
+                        eventParticipant.getId(),
+                        eventParticipant.getAttendance(),
+                        new UserResponse(
+                                eventParticipant.getParticipant().getId(),
+                                eventParticipant.getParticipant().getFirstName(),
+                                eventParticipant.getParticipant().getLastName(),
+                                eventParticipant.getParticipant().getUsername(),
+                                eventParticipant.getParticipant().getEmail()
+                        ),
+                        new EventResponse(
+                                eventParticipant.getEvent().getId(),
+                                eventParticipant.getEvent().getName(),
+                                new TeamResponse(
+                                        eventParticipant.getEvent().getTeam().getId(),
+                                        eventParticipant.getEvent().getTeam().getName(),
+                                        new UserResponse(
+                                                eventParticipant.getEvent().getTeam().getManager().getId(),
+                                                eventParticipant
+                                                        .getEvent()
+                                                        .getTeam()
+                                                        .getManager()
+                                                        .getFirstName(),
+                                                eventParticipant
+                                                        .getEvent()
+                                                        .getTeam()
+                                                        .getManager()
+                                                        .getLastName(),
+                                                eventParticipant
+                                                        .getEvent()
+                                                        .getTeam()
+                                                        .getManager()
+                                                        .getUsername(),
+                                                eventParticipant
+                                                        .getEvent()
+                                                        .getTeam()
+                                                        .getManager()
+                                                        .getEmail()
+                                        ),
+                                        eventParticipant.getEvent().getTeam().getSport()
+                                ),
+                                eventParticipant.getEvent().getStartTime(),
+                                eventParticipant.getEvent().getEndTime(),
+                                eventParticipant.getEvent().getEventType(),
+                                eventParticipant.getEvent().getTeamScore(),
+                                eventParticipant.getEvent().getOpponentScore()
+                        )
+                )
       )
       .toList();
 
-    return ResponseEntity.ok(new UsersResponse(users));
+    return ResponseEntity.ok(new EventParticipantsResponse(responseEventParticipants));
   }
 
   @PatchMapping("/{event_id}/participants/{user_id}") // Should I get by user_id or participant_id?
