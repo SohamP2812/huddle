@@ -1,3 +1,5 @@
+import { Dayjs } from "dayjs";
+
 export const allFieldsFilled = (object: Object): boolean => {
   for (const property in object) {
     if (!object[property as keyof typeof object]) return false;

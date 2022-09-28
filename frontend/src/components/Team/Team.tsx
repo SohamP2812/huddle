@@ -192,7 +192,7 @@ export const Team = () => {
                   Show Past Events
                 </Checkbox>
               </Stack>
-              <Divider borderColor={"gray.300"} />{" "}
+              <Divider borderColor={"gray.300"} />
               <Flex direction="column" alignItems={"center"} my={5} gap={5}>
                 {events
                   .filter(

@@ -23,9 +23,13 @@ import {
   CheckboxGroup,
 } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
+import TextField from "@mui/material/TextField";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import dayjs from "dayjs";
 
 import { eventTypes } from "utils/consts";
-import { toIsoString } from "utils/misc";
 import { useIsMounted } from "hooks/useIsMounted";
 
 export const CreateEvent = () => {
@@ -53,8 +57,8 @@ export const CreateEvent = () => {
     participantIds: number[];
   }>({
     name: "",
-    startTime: toIsoString(new Date()),
-    endTime: toIsoString(new Date()),
+    startTime: dayjs().set("seconds", 0).format(),
+    endTime: dayjs().set("seconds", 0).add(30, "minutes").format(),
     eventType: "GAME",
     teamScore: 0,
     opponentScore: 0,
@@ -143,6 +147,22 @@ export const CreateEvent = () => {
       );
   };
 
+  const handleChangeStartTime = (newTime: string | null) => {
+    newTime &&
+      setEventFields({
+        ...eventFields,
+        startTime: dayjs(newTime).set("seconds", 0).format(),
+      });
+  };
+
+  const handleChangeEndTime = (newTime: string | null) => {
+    newTime &&
+      setEventFields({
+        ...eventFields,
+        endTime: dayjs(newTime).set("seconds", 0).format(),
+      });
+  };
+
   return (
     <>
       <Header />
@@ -224,6 +244,28 @@ export const CreateEvent = () => {
                     ))}
                   </CheckboxGroup>
                 </Stack>
+              </FormControl>
+              <FormControl id="times">
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <Stack direction={{ sm: "column", md: "row" }} gap={2} mt={3}>
+                    <Stack w="full">
+                      <DateTimePicker
+                        label="Start Time"
+                        value={eventFields.startTime}
+                        onChange={handleChangeStartTime}
+                        renderInput={(params) => <TextField {...params} />}
+                      />
+                    </Stack>
+                    <Stack w="full">
+                      <DateTimePicker
+                        label="End Time"
+                        value={eventFields.endTime}
+                        onChange={handleChangeEndTime}
+                        renderInput={(params) => <TextField {...params} />}
+                      />
+                    </Stack>
+                  </Stack>
+                </LocalizationProvider>
               </FormControl>
               <Spacer h={"xl"} />
               <Button

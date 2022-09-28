@@ -139,6 +139,98 @@ export const Event = () => {
           gap={5}
         >
           <Box
+            minH={"fit-content"}
+            w={{ sm: "100%", md: "60%" }}
+            bg={useColorModeValue("white", "gray.800")}
+            boxShadow={"2xl"}
+            rounded={"xl"}
+            overflow={"hidden"}
+          >
+            <Box p={6}>
+              <Stack
+                direction={"row"}
+                justifyContent="right"
+                color="blue.400"
+                mb={"2"}
+              ></Stack>
+              <Stack spacing={0} align={"center"} mb={5}>
+                <Heading fontSize={"2xl"} fontWeight={800} fontFamily={"body"}>
+                  Score
+                </Heading>
+              </Stack>
+              <Divider borderColor={"gray.300"} />
+              <Stack
+                justify={"space-evenly"}
+                textAlign={"center"}
+                direction={"row"}
+                mt={7}
+              >
+                {stringToJSDate(event?.endTime ?? "") < new Date() ? (
+                  <>
+                    <Stack direction={"column"}>
+                      <Heading fontSize={"xxx-large"}>
+                        {event?.teamScore}
+                      </Heading>
+                      <Text>Team Score</Text>
+                    </Stack>
+                    <Stack direction={"column"}>
+                      <Heading fontSize={"xxx-large"}>
+                        {event?.opponentScore}
+                      </Heading>
+                      <Text>Opponent Score</Text>
+                    </Stack>
+                  </>
+                ) : (
+                  <Badge
+                    px={2}
+                    py={1}
+                    fontWeight={"700"}
+                    textTransform={"none"}
+                  >
+                    TBD
+                  </Badge>
+                )}
+              </Stack>
+            </Box>
+          </Box>
+          <Box
+            minH={"fit-content"}
+            w={{ sm: "100%", md: "40%" }}
+            bg={useColorModeValue("white", "gray.800")}
+            boxShadow={"2xl"}
+            rounded={"xl"}
+            overflow={"hidden"}
+          >
+            <Stack p={6} h={"full"}>
+              <Stack spacing={0} align={"center"} mb={5}>
+                <Heading fontSize={"2xl"} fontWeight={800} fontFamily={"body"}>
+                  Time
+                </Heading>
+              </Stack>
+              <Divider borderColor={"gray.300"} />
+              <Stack
+                spacing={0}
+                align={"center"}
+                flex={"1 1 auto"}
+                justifyContent={"center"}
+              >
+                <Text color={"gray.500"} fontSize={"xl"}>
+                  Start: {stringToJSDate(event?.endTime ?? "").toLocaleString()}
+                </Text>
+                <Text color={"gray.500"} fontSize={"xl"}>
+                  End: {stringToJSDate(event?.endTime ?? "").toLocaleString()}
+                </Text>
+              </Stack>
+            </Stack>
+          </Box>
+        </Flex>
+        <Flex
+          direction={{ sm: "column", md: "row" }}
+          maxW={"1000px"}
+          w={"full"}
+          gap={5}
+        >
+          <Box
             height={"fit-content"}
             w={"full"}
             bg={useColorModeValue("white", "gray.800")}
@@ -195,16 +287,19 @@ export const Event = () => {
                     rounded={"xl"}
                     py={5}
                   >
-                    <Heading fontSize={"3xl"}>YES</Heading>
+                    <Heading fontSize={"2xl"}>YES</Heading>
                     <Divider borderColor={"gray.300"} />
                     {participants
                       .filter((participant) => participant.attendance === "YES")
                       .map((participant) => (
                         <Text
+                          fontWeight={
+                            participant.user.id === user.id ? 600 : 300
+                          }
                           color={
                             participant.user.id === user.id
                               ? "gray.900"
-                              : "gray.500"
+                              : "gray.600"
                           }
                         >
                           {participant.user.username}
@@ -219,16 +314,19 @@ export const Event = () => {
                     rounded={"xl"}
                     py={5}
                   >
-                    <Heading fontSize={"3xl"}>NO</Heading>
+                    <Heading fontSize={"2xl"}>NO</Heading>
                     <Divider borderColor={"gray.300"} />
                     {participants
                       .filter((participant) => participant.attendance === "NO")
                       .map((participant) => (
                         <Text
+                          fontWeight={
+                            participant.user.id === user.id ? 600 : 300
+                          }
                           color={
                             participant.user.id === user.id
                               ? "gray.900"
-                              : "gray.500"
+                              : "gray.600"
                           }
                         >
                           {participant.user.username}
@@ -243,7 +341,7 @@ export const Event = () => {
                     rounded={"xl"}
                     py={5}
                   >
-                    <Heading fontSize={"3xl"}>UNDECIDED</Heading>
+                    <Heading fontSize={"2xl"}>UNDECIDED</Heading>
                     <Divider borderColor={"gray.300"} />
                     {participants
                       .filter(
@@ -251,10 +349,13 @@ export const Event = () => {
                       )
                       .map((participant) => (
                         <Text
+                          fontWeight={
+                            participant.user.id === user.id ? 600 : 300
+                          }
                           color={
                             participant.user.id === user.id
                               ? "gray.900"
-                              : "gray.500"
+                              : "gray.600"
                           }
                         >
                           {participant.user.username}
