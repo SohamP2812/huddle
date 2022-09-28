@@ -185,37 +185,78 @@ export const Event = () => {
                   direction={{ sm: "column", md: "row" }}
                   justifyContent={"space-evenly"}
                   textAlign={"center"}
-                  gap={{ sm: 10, md: 0 }}
+                  gap={{ sm: 10, md: 5 }}
                 >
-                  <Stack w={"full"} gap={3}>
+                  <Stack
+                    w={"full"}
+                    gap={3}
+                    border={"1px"}
+                    borderColor={"gray.300"}
+                    rounded={"xl"}
+                    py={5}
+                  >
                     <Heading fontSize={"3xl"}>YES</Heading>
-
+                    <Divider borderColor={"gray.300"} />
                     {participants
                       .filter((participant) => participant.attendance === "YES")
                       .map((participant) => (
-                        <Text color={"gray.500"}>
+                        <Text
+                          color={
+                            participant.user.id === user.id
+                              ? "gray.900"
+                              : "gray.500"
+                          }
+                        >
                           {participant.user.username}
                         </Text>
                       ))}
                   </Stack>
-                  <Stack w={"full"} gap={3}>
+                  <Stack
+                    w={"full"}
+                    gap={3}
+                    border={"1px"}
+                    borderColor={"gray.300"}
+                    rounded={"xl"}
+                    py={5}
+                  >
                     <Heading fontSize={"3xl"}>NO</Heading>
+                    <Divider borderColor={"gray.300"} />
                     {participants
                       .filter((participant) => participant.attendance === "NO")
                       .map((participant) => (
-                        <Text color={"gray.500"}>
+                        <Text
+                          color={
+                            participant.user.id === user.id
+                              ? "gray.900"
+                              : "gray.500"
+                          }
+                        >
                           {participant.user.username}
                         </Text>
                       ))}
                   </Stack>
-                  <Stack w={"full"} gap={3}>
+                  <Stack
+                    w={"full"}
+                    gap={3}
+                    border={"1px"}
+                    borderColor={"gray.300"}
+                    rounded={"xl"}
+                    py={5}
+                  >
                     <Heading fontSize={"3xl"}>UNDECIDED</Heading>
+                    <Divider borderColor={"gray.300"} />
                     {participants
                       .filter(
                         (participant) => participant.attendance === "UNDECIDED"
                       )
                       .map((participant) => (
-                        <Text color={"gray.500"}>
+                        <Text
+                          color={
+                            participant.user.id === user.id
+                              ? "gray.900"
+                              : "gray.500"
+                          }
+                        >
                           {participant.user.username}
                         </Text>
                       ))}
