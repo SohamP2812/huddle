@@ -1,6 +1,6 @@
 import { Header } from "components/Header/Header";
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "redux/hooks";
 import { selectUser } from "redux/slices/userSlice";
 import {
@@ -9,6 +9,7 @@ import {
   getEvents,
   getParticipants,
   updateParticipant,
+  updateEvent,
   selectEventById,
   selectMembers,
   selectParticipants,
@@ -26,12 +27,45 @@ import {
   FormLabel,
   Select,
   Button,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Checkbox,
+  CheckboxGroup,
 } from "@chakra-ui/react";
+import dayjs from "dayjs";
 
 import { stringToJSDate } from "utils/misc";
+import { isArrayDiff } from "utils/misc";
 
 export const Event = () => {
-  const navigate = useNavigate();
+  const [allSelected, setAllSelected] = useState(false);
+
+  const [eventFields, setEventFields] = useState<{
+    name: string;
+    startTime: string;
+    endTime: string;
+    eventType: string;
+    teamScore: number;
+    opponentScore: number;
+    participantIds: number[];
+  }>({
+    name: "",
+    startTime: dayjs().set("seconds", 0).format(),
+    endTime: dayjs().set("seconds", 0).add(30, "minutes").format(),
+    eventType: "GAME",
+    teamScore: 0,
+    opponentScore: 0,
+    participantIds: [],
+  });
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   const { team_id, event_id } = useParams();
 
   const [status, setStatus] = useState<string>("UNDECIDED");
@@ -59,16 +93,33 @@ export const Event = () => {
       );
   }, []);
 
+  useEffect(() => {
+    event &&
+      setEventFields({
+        ...eventFields,
+        name: event.name,
+        startTime: event.startTime,
+        endTime: event.endTime,
+        eventType: event.eventType,
+        teamScore: event.teamScore,
+        opponentScore: event.opponentScore,
+      });
+  }, [event]);
+
+  useEffect(() => {
+    setStatus(getPersistentStatus());
+    setEventFields({
+      ...eventFields,
+      participantIds: participants.map((participant) => participant.user.id),
+    });
+  }, [participants]);
+
   const getPersistentStatus = () => {
     return (
       participants.find((participant) => participant.user.id === user.id)
         ?.attendance ?? "UNDECIDED"
     );
   };
-
-  useEffect(() => {
-    setStatus(getPersistentStatus());
-  }, [participants]);
 
   const handleChangeStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.preventDefault();
@@ -90,6 +141,83 @@ export const Event = () => {
           participantUpdateInfo: { attendance: status },
         })
       );
+  };
+
+  const handleSelectParticipant = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+
+    if (allSelected) setAllSelected(false);
+
+    let tempParticipantIds = eventFields.participantIds;
+
+    if (tempParticipantIds.includes(parseInt(e.target.name))) {
+      tempParticipantIds = tempParticipantIds.filter(
+        (id) => id !== parseInt(e.target.name)
+      );
+    } else {
+      tempParticipantIds.push(parseInt(e.target.name));
+    }
+
+    setEventFields({
+      ...eventFields,
+      participantIds: tempParticipantIds,
+    });
+  };
+
+  const handleSelectAllParticipants = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    e.preventDefault();
+    if (allSelected) {
+      setEventFields({
+        ...eventFields,
+        participantIds: [],
+      });
+    } else {
+      const allMembersIds = members.map((member) => member.id);
+
+      setEventFields({
+        ...eventFields,
+        participantIds: allMembersIds,
+      });
+    }
+    setAllSelected(!allSelected);
+  };
+
+  const handleOnClose = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setAllSelected(false);
+    setEventFields({
+      ...eventFields,
+      participantIds: participants.map((participant) => participant.user.id),
+    });
+    onClose();
+  };
+
+  const handleUpdateEvent = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    if (team_id && event_id) {
+      const result = await dispatch(
+        updateEvent({
+          team_id: parseInt(team_id),
+          event_id: parseInt(event_id),
+          eventUpdateInfo: eventFields,
+        })
+      );
+      if (updateEvent.fulfilled.match(result)) {
+        await dispatch(
+          getParticipants({
+            team_id: parseInt(team_id),
+            event_id: parseInt(event_id),
+          })
+        );
+        onClose();
+      }
+    }
   };
 
   return (
@@ -239,10 +367,16 @@ export const Event = () => {
             overflow={"hidden"}
           >
             <Box p={6}>
-              <Stack spacing={0} align={"center"} mb={5} gap={5}>
+              <Flex direction={"column"} align={"center"} mb={5} gap={5}>
                 <Heading fontSize={"2xl"} fontWeight={800} fontFamily={"body"}>
                   Participants
                 </Heading>
+                <Button mb={5} onClick={onOpen}>
+                  Update Participants
+                </Button>
+              </Flex>
+              <Divider borderColor={"gray.300"} />
+              <Stack align={"center"} my={5} gap={5}>
                 <FormControl>
                   <FormLabel>Your Status</FormLabel>
                   <Stack direction={"row"}>
@@ -269,9 +403,6 @@ export const Event = () => {
                     </Button>
                   </Stack>
                 </FormControl>
-              </Stack>
-              <Divider borderColor={"gray.300"} />
-              <Stack align={"center"} my={5} gap={2}>
                 <Stack
                   width={"full"}
                   direction={{ sm: "column", md: "row" }}
@@ -367,6 +498,71 @@ export const Event = () => {
             </Box>
           </Box>
         </Flex>
+
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Modal Title</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl id="participantIds">
+                <Flex mb={"0.5rem"}>
+                  <FormLabel mb={0}>Participants</FormLabel>
+                  <Checkbox
+                    isChecked={allSelected}
+                    onChange={handleSelectAllParticipants}
+                  >
+                    Select All
+                  </Checkbox>
+                </Flex>
+                <Stack
+                  height={"fit-content"}
+                  minH={"50px"}
+                  maxH={"200px"}
+                  w={"full"}
+                  border={"1px"}
+                  borderColor={"gray.300"}
+                  rounded={"xl"}
+                  overflow={"scroll"}
+                  px={5}
+                  py={2}
+                >
+                  <CheckboxGroup>
+                    {members.map((member) => (
+                      <Checkbox
+                        name={member.id.toString()}
+                        isChecked={eventFields.participantIds.includes(
+                          member.id
+                        )}
+                        onChange={handleSelectParticipant}
+                      >
+                        {member.username}
+                      </Checkbox>
+                    ))}
+                  </CheckboxGroup>
+                </Stack>
+              </FormControl>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button variant="ghost" mr={3} onClick={handleOnClose}>
+                Close
+              </Button>
+              <Button
+                disabled={
+                  !isArrayDiff(
+                    eventFields.participantIds,
+                    participants.map((participant) => participant.user.id)
+                  )
+                }
+                colorScheme="blue"
+                onClick={handleUpdateEvent}
+              >
+                Update
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </Flex>
     </>
   );

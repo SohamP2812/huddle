@@ -22,6 +22,20 @@ export const isObjectDiff = (object1: Object, object2: Object): boolean => {
   return false;
 };
 
+export const isArrayDiff = <T>(array1: Array<T>, array2: Array<T>) => {
+  if (array1.length === array2.length) {
+    return array1.every((element) => {
+      if (array2.includes(element)) {
+        return false;
+      }
+
+      return true;
+    });
+  }
+
+  return true;
+};
+
 export const stringToJSDate = (dateString: string) => {
   return new Date(dateString);
 };

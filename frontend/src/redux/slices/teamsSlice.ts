@@ -281,6 +281,53 @@ export const createEvent = createAsyncThunk<
   }
 );
 
+export const updateEvent = createAsyncThunk<
+  Event,
+  { team_id: number; event_id: number; eventUpdateInfo: EventCreationInfo },
+  {
+    state: RootState;
+    rejectValue: APIError;
+  }
+>(
+  "teams/updateEvent",
+  async (
+    { team_id, event_id, eventUpdateInfo },
+    { rejectWithValue, getState }
+  ) => {
+    try {
+      const { loggedIn } = getState().user;
+
+      if (!loggedIn) return;
+
+      const response = await fetch(`/teams/${team_id}/events/${event_id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          accepts: "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(eventUpdateInfo),
+      });
+
+      const data = await response.json();
+
+      if (response.status !== 200) {
+        throw data;
+      }
+
+      return data;
+    } catch (err) {
+      let error: APIError = err;
+
+      if (!error.message) {
+        throw err;
+      }
+
+      return rejectWithValue(error);
+    }
+  }
+);
+
 export const getParticipants = createAsyncThunk<
   { eventParticipants: Participant[] },
   { team_id: number; event_id: number },
@@ -464,6 +511,23 @@ export const teamsSlice = createSlice({
       .addCase(createEvent.rejected, (state, action) => {
         state.eventCreationSuccess = false;
 
+        if (action.payload) {
+          state.error = action.payload.message;
+        } else {
+          state.error =
+            action.error.message ??
+            "An unknown error occurred. Please try again.";
+        }
+      })
+      .addCase(updateEvent.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(updateEvent.fulfilled, (state, action) => {
+        state.events = state.events.map((event) =>
+          event.id === action.payload.id ? action.payload : event
+        );
+      })
+      .addCase(updateEvent.rejected, (state, action) => {
         if (action.payload) {
           state.error = action.payload.message;
         } else {
