@@ -148,21 +148,17 @@ public class TeamController {
 
     Set<TeamMember> teamMembers = team.get().getTeamMembers();
 
-    List<User> members = teamMembers
-      .stream()
-      .map(teamMember -> teamMember.getMember())
-      .toList();
-
-    List<MemberResponse> responseMembers = members
+    List<MemberResponse> responseMembers = teamMembers
       .stream()
       .map(
         member ->
           new MemberResponse(
-            member.getId(),
-            member.getFirstName(),
-            member.getLastName(),
-            member.getUsername(),
-            member.getEmail()
+            member.getMember().getId(),
+            member.getMember().getFirstName(),
+            member.getMember().getLastName(),
+            member.getMember().getUsername(),
+            member.getMember().getEmail(),
+            member.isManager()
           )
       )
       .toList();

@@ -291,17 +291,20 @@ export const Event = () => {
                 color="blue.400"
                 mb={"2"}
               >
-                <Flex
-                  gap={2}
-                  alignItems={"center"}
-                  _hover={{
-                    cursor: "pointer",
-                  }}
-                  onClick={toUpdateEvent}
-                >
-                  <EditIcon w={3} h={3} />
-                  <Text>Edit Event</Text>
-                </Flex>
+                {teams.members.find((member) => member.id === user.user.id)
+                  ?.isManager && (
+                  <Flex
+                    gap={2}
+                    alignItems={"center"}
+                    _hover={{
+                      cursor: "pointer",
+                    }}
+                    onClick={toUpdateEvent}
+                  >
+                    <EditIcon w={3} h={3} />
+                    <Text>Edit Event</Text>
+                  </Flex>
+                )}
               </Stack>
               <Stack spacing={0} align={"center"} mb={5}>
                 <Heading fontSize={"2xl"} fontWeight={800} fontFamily={"body"}>

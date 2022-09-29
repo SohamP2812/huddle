@@ -9,20 +9,25 @@ public class MemberResponse {
   private String firstName;
 
   private String lastName;
+
   private String email;
+
+  private Boolean isManager;
 
   public MemberResponse(
     Long id,
     String firstName,
     String lastName,
     String username,
-    String email
+    String email,
+    Boolean isManager
   ) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
     this.username = username;
     this.email = email;
+    this.isManager = isManager;
   }
 
   public Long getId() {
@@ -64,4 +69,10 @@ public class MemberResponse {
   public void setLastName(String lastName) {
     this.lastName = lastName;
   }
+
+  public Boolean getIsManager() {
+    return isManager;
+  }
+
+  public void setIsManager(Boolean isManager) { this.isManager = isManager; }
 }
