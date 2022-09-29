@@ -77,6 +77,7 @@ export const Teams = () => {
         <Spacer py={5} />
         {teams.teams.map((team) => (
           <TeamCard
+            key={team.name}
             id={team.id}
             name={team.name}
             sport={

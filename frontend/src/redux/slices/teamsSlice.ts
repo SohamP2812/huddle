@@ -42,6 +42,8 @@ export interface TeamsState {
   error: string | null;
   teamCreationSuccess: boolean | null;
   eventCreationSuccess: boolean | null;
+  eventUpdateSuccess: boolean | null;
+  message: string | null;
 }
 
 export interface TeamCreationInfo {
@@ -71,6 +73,8 @@ const initialState: TeamsState = {
   error: null,
   teamCreationSuccess: null,
   eventCreationSuccess: null,
+  eventUpdateSuccess: null,
+  message: null,
 };
 
 export const createTeam = createAsyncThunk<
@@ -521,13 +525,19 @@ export const teamsSlice = createSlice({
       })
       .addCase(updateEvent.pending, (state) => {
         state.error = null;
+        state.eventUpdateSuccess = null;
       })
       .addCase(updateEvent.fulfilled, (state, action) => {
+        state.message = "Updated successfully.";
+        state.eventUpdateSuccess = true;
+
         state.events = state.events.map((event) =>
           event.id === action.payload.id ? action.payload : event
         );
       })
       .addCase(updateEvent.rejected, (state, action) => {
+        state.eventUpdateSuccess = false;
+
         if (action.payload) {
           state.error = action.payload.message;
         } else {

@@ -1,6 +1,6 @@
 import { Header } from "components/Header/Header";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "redux/hooks";
 import { selectUser } from "redux/slices/userSlice";
 import {
@@ -13,6 +13,7 @@ import {
   selectEventById,
   selectMembers,
   selectParticipants,
+  selectTeams,
 } from "redux/slices/teamsSlice";
 import {
   Heading,
@@ -37,13 +38,23 @@ import {
   useDisclosure,
   Checkbox,
   CheckboxGroup,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  useToast,
 } from "@chakra-ui/react";
+import { EditIcon } from "@chakra-ui/icons";
 import dayjs from "dayjs";
 
 import { stringToJSDate } from "utils/misc";
 import { isArrayDiff } from "utils/misc";
+import { useIsMounted } from "hooks/useIsMounted";
 
 export const Event = () => {
+  const isMounted = useIsMounted();
+
   const [allSelected, setAllSelected] = useState(false);
 
   const [eventFields, setEventFields] = useState<{
@@ -65,7 +76,13 @@ export const Event = () => {
   });
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isUpdateScoreOpen,
+    onOpen: onUpdateScoreOpen,
+    onClose: onUpdateScoreClose,
+  } = useDisclosure();
 
+  const navigate = useNavigate();
   const { team_id, event_id } = useParams();
 
   const [status, setStatus] = useState<string>("UNDECIDED");
@@ -76,8 +93,23 @@ export const Event = () => {
   );
   const members = useAppSelector(selectMembers);
   const participants = useAppSelector(selectParticipants);
+  const teams = useAppSelector(selectTeams);
 
   const dispatch = useAppDispatch();
+
+  const toast = useToast();
+
+  useEffect(() => {
+    if (teams.eventUpdateSuccess && isMounted) {
+      toast({
+        title: teams.message,
+        status: "success",
+        position: "top",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  }, [teams.eventUpdateSuccess]);
 
   useEffect(() => {
     user.id && dispatch(getByUser(user.id));
@@ -216,8 +248,14 @@ export const Event = () => {
           })
         );
         onClose();
+        onUpdateScoreClose();
       }
     }
+  };
+
+  const toUpdateEvent = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.preventDefault();
+    navigate("edit");
   };
 
   return (
@@ -242,6 +280,24 @@ export const Event = () => {
             overflow={"hidden"}
           >
             <Box p={6}>
+              <Stack
+                direction={"row"}
+                justifyContent="right"
+                color="blue.400"
+                mb={"2"}
+              >
+                <Flex
+                  gap={2}
+                  alignItems={"center"}
+                  _hover={{
+                    cursor: "pointer",
+                  }}
+                  onClick={toUpdateEvent}
+                >
+                  <EditIcon w={3} h={3} />
+                  <Text>Edit Event</Text>
+                </Flex>
+              </Stack>
               <Stack spacing={0} align={"center"} mb={5}>
                 <Heading fontSize={"2xl"} fontWeight={800} fontFamily={"body"}>
                   {event?.name}
@@ -292,6 +348,7 @@ export const Event = () => {
                 textAlign={"center"}
                 direction={"row"}
                 mt={7}
+                mb={10}
               >
                 {stringToJSDate(event?.endTime ?? "") < new Date() ? (
                   <>
@@ -319,6 +376,11 @@ export const Event = () => {
                   </Badge>
                 )}
               </Stack>
+              <Flex justifyContent={"center"}>
+                <Button mb={5} onClick={onUpdateScoreOpen}>
+                  Update Score
+                </Button>
+              </Flex>
             </Box>
           </Box>
           <Box
@@ -343,10 +405,24 @@ export const Event = () => {
                 justifyContent={"center"}
               >
                 <Text color={"gray.500"} fontSize={"xl"}>
-                  Start: {stringToJSDate(event?.endTime ?? "").toLocaleString()}
+                  Start:{" "}
+                  {stringToJSDate(event?.endTime ?? "").toLocaleString([], {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </Text>
                 <Text color={"gray.500"} fontSize={"xl"}>
-                  End: {stringToJSDate(event?.endTime ?? "").toLocaleString()}
+                  End:{" "}
+                  {stringToJSDate(event?.endTime ?? "").toLocaleString([], {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </Text>
               </Stack>
             </Stack>
@@ -380,11 +456,7 @@ export const Event = () => {
                 <FormControl>
                   <FormLabel>Your Status</FormLabel>
                   <Stack direction={"row"}>
-                    <Select
-                      onChange={handleChangeStatus}
-                      value={status}
-                      defaultValue={"UNDECIDED"}
-                    >
+                    <Select onChange={handleChangeStatus} value={status}>
                       <option key={"UNDECIDED"} value={"UNDECIDED"}>
                         UNDECIDED
                       </option>
@@ -499,10 +571,67 @@ export const Event = () => {
           </Box>
         </Flex>
 
+        <Modal isOpen={isUpdateScoreOpen} onClose={onUpdateScoreClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Update Score</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl id="participantIds">
+                <FormLabel mb={0}>Team Score</FormLabel>
+                <NumberInput
+                  value={eventFields.teamScore}
+                  mb={2}
+                  min={0}
+                  onChange={(_, value) => {
+                    setEventFields({ ...eventFields, teamScore: value });
+                  }}
+                >
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+                <FormLabel mb={0}>Opponent Score</FormLabel>
+                <NumberInput
+                  value={eventFields.opponentScore}
+                  min={0}
+                  onChange={(_, value) => {
+                    setEventFields({ ...eventFields, opponentScore: value });
+                  }}
+                >
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </FormControl>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button variant="ghost" mr={3} onClick={onUpdateScoreClose}>
+                Close
+              </Button>
+              <Button
+                disabled={
+                  eventFields.opponentScore === event?.opponentScore &&
+                  eventFields.teamScore === event?.teamScore
+                }
+                colorScheme="blue"
+                onClick={handleUpdateEvent}
+              >
+                Update
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Modal Title</ModalHeader>
+            <ModalHeader>Update Participant List</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <FormControl id="participantIds">

@@ -100,7 +100,7 @@ export const CreateTeam = () => {
                 <Select
                   name="sport"
                   onChange={handleChangeTeamFields}
-                  defaultValue={"BASKETBALL"}
+                  value={teamFields.sport}
                 >
                   {Object.keys(sports.nameToKey).map((sport) => (
                     <option

@@ -2,10 +2,13 @@ import { useState, useEffect } from "react";
 import { Header } from "components/Header/Header";
 import { useAppSelector, useAppDispatch } from "redux/hooks";
 import {
-  createEvent,
   getMembers,
+  getEvents,
+  getParticipants,
+  updateEvent,
+  selectEventById,
+  selectParticipants,
   selectTeams,
-  selectMembers,
 } from "redux/slices/teamsSlice";
 import {
   Flex,
@@ -31,21 +34,23 @@ import dayjs from "dayjs";
 
 import { eventTypes } from "utils/consts";
 import { useIsMounted } from "hooks/useIsMounted";
+import { isObjectDiff } from "utils/misc";
 
-export const CreateEvent = () => {
+export const EditEvent = () => {
   const isMounted = useIsMounted();
 
   const navigate = useNavigate();
-  const { team_id } = useParams();
+  const { team_id, event_id } = useParams();
 
   const toast = useToast();
 
+  const event = useAppSelector((state) =>
+    selectEventById(state, event_id ? parseInt(event_id) : undefined)
+  );
+  const participants = useAppSelector(selectParticipants);
   const teams = useAppSelector(selectTeams);
-  const members = useAppSelector(selectMembers);
 
   const dispatch = useAppDispatch();
-
-  const [allSelected, setAllSelected] = useState(false);
 
   const [eventFields, setEventFields] = useState<{
     name: string;
@@ -54,7 +59,6 @@ export const CreateEvent = () => {
     eventType: string;
     teamScore: number;
     opponentScore: number;
-    participantIds: number[];
   }>({
     name: "",
     startTime: dayjs().set("seconds", 0).format(),
@@ -62,16 +66,25 @@ export const CreateEvent = () => {
     eventType: "GAME",
     teamScore: 0,
     opponentScore: 0,
-    participantIds: [],
   });
 
   useEffect(() => {
     team_id && dispatch(getMembers(parseInt(team_id)));
+    team_id && dispatch(getEvents(parseInt(team_id)));
+    team_id &&
+      event_id &&
+      dispatch(
+        getParticipants({
+          team_id: parseInt(team_id),
+          event_id: parseInt(event_id),
+        })
+      );
   }, []);
 
   useEffect(() => {
-    if (teams.eventCreationSuccess && isMounted) navigate(`/teams/${team_id}`);
-  }, [teams.eventCreationSuccess]);
+    if (teams.eventUpdateSuccess && isMounted)
+      navigate(`/teams/${team_id}/events/${event_id}`);
+  }, [teams.eventUpdateSuccess]);
 
   useEffect(() => {
     if (teams.error && isMounted) {
@@ -86,6 +99,19 @@ export const CreateEvent = () => {
     }
   }, [teams.error]);
 
+  useEffect(() => {
+    event &&
+      setEventFields({
+        ...eventFields,
+        name: event.name,
+        startTime: event.startTime,
+        endTime: event.endTime,
+        eventType: event.eventType,
+        teamScore: event.teamScore,
+        opponentScore: event.opponentScore,
+      });
+  }, [event]);
+
   const handleChangeEventFields = (
     e:
       | React.ChangeEvent<HTMLSelectElement>
@@ -98,52 +124,20 @@ export const CreateEvent = () => {
     });
   };
 
-  const handleSelectParticipant = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUpdateEvent = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (allSelected) setAllSelected(false);
-
-    let tempParticipantIds = eventFields.participantIds;
-
-    if (tempParticipantIds.includes(parseInt(e.target.name))) {
-      tempParticipantIds = tempParticipantIds.filter(
-        (id) => id !== parseInt(e.target.name)
-      );
-    } else {
-      tempParticipantIds.push(parseInt(e.target.name));
-    }
-
-    setEventFields({
-      ...eventFields,
-      participantIds: tempParticipantIds,
-    });
-  };
-
-  const handleSelectAllParticipants = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    e.preventDefault();
-    if (allSelected) {
-      setEventFields({
-        ...eventFields,
-        participantIds: [],
-      });
-    } else {
-      const allMembersIds = members.map((member) => member.id);
-
-      setEventFields({
-        ...eventFields,
-        participantIds: allMembersIds,
-      });
-    }
-    setAllSelected(!allSelected);
-  };
-
-  const handleCreateEvent = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    team_id &&
+    if (team_id && event_id)
       dispatch(
-        createEvent({ id: parseInt(team_id), eventCreationInfo: eventFields })
+        updateEvent({
+          team_id: parseInt(team_id),
+          event_id: parseInt(event_id),
+          eventUpdateInfo: {
+            ...eventFields,
+            participantIds: participants.map(
+              (participant) => participant.user.id
+            ),
+          },
+        })
       );
   };
 
@@ -174,9 +168,9 @@ export const CreateEvent = () => {
       >
         <Stack spacing={8} mx={"auto"} width={"xl"} py={12} px={6}>
           <Stack align={"center"}>
-            <Heading fontSize={"4xl"}>Create an event</Heading>
+            <Heading fontSize={"4xl"}>Update event</Heading>
           </Stack>
-          <form onSubmit={handleCreateEvent}>
+          <form onSubmit={handleUpdateEvent}>
             <Stack spacing={4}>
               <FormControl id="name">
                 <FormLabel>Event Name</FormLabel>
@@ -208,43 +202,6 @@ export const CreateEvent = () => {
                   ))}
                 </Select>
               </FormControl>
-              <FormControl id="participantIds">
-                <Flex mb={"0.5rem"}>
-                  <FormLabel mb={0}>Participants</FormLabel>
-                  <Checkbox
-                    isChecked={allSelected}
-                    onChange={handleSelectAllParticipants}
-                  >
-                    Select All
-                  </Checkbox>
-                </Flex>
-                <Stack
-                  height={"fit-content"}
-                  minH={"50px"}
-                  maxH={"200px"}
-                  w={"full"}
-                  border={"1px"}
-                  borderColor={"gray.300"}
-                  rounded={"xl"}
-                  overflow={"scroll"}
-                  px={5}
-                  py={2}
-                >
-                  <CheckboxGroup>
-                    {members.map((member) => (
-                      <Checkbox
-                        name={member.id.toString()}
-                        isChecked={eventFields.participantIds.includes(
-                          member.id
-                        )}
-                        onChange={handleSelectParticipant}
-                      >
-                        {member.username}
-                      </Checkbox>
-                    ))}
-                  </CheckboxGroup>
-                </Stack>
-              </FormControl>
               <FormControl id="times">
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <Stack direction={{ sm: "column", md: "row" }} gap={2} mt={3}>
@@ -275,6 +232,16 @@ export const CreateEvent = () => {
                 _hover={{
                   bg: "gray.600",
                 }}
+                disabled={
+                  !isObjectDiff(eventFields, {
+                    name: event?.name,
+                    startTime: event?.startTime,
+                    endTime: event?.endTime,
+                    eventType: event?.eventType,
+                    teamScore: event?.teamScore,
+                    opponentScore: event?.opponentScore,
+                  })
+                }
               >
                 Submit
               </Button>

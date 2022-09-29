@@ -41,8 +41,21 @@ export const EventCard: FC<IProps> = ({ event }) => {
           {event.name}
         </Heading>
         <Text color={"gray.500"}>
-          {stringToJSDate(event.startTime).toLocaleString()} -{" "}
-          {stringToJSDate(event.endTime).toLocaleString()}
+          {stringToJSDate(event.startTime).toLocaleString([], {
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}{" "}
+          -{" "}
+          {stringToJSDate(event.endTime).toLocaleString([], {
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </Text>
       </Stack>
       <Stack align={"center"} justify={"center"} direction={"row"} mt={5}>
