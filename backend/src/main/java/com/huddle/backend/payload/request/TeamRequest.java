@@ -1,13 +1,15 @@
 package com.huddle.backend.payload.request;
 
 import com.huddle.backend.models.ESport;
+
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 public class TeamRequest {
-  @NotNull
+  @NotEmpty(message = "Name must not be empty")
   private String name;
 
-  @NotNull
+  @NotNull(message = "Sport must not be empty")
   private ESport sport;
 
   public String getName() {

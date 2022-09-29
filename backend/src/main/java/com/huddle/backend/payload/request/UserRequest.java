@@ -4,11 +4,11 @@ import javax.validation.constraints.*;
 
 public class UserRequest {
 
-  @NotNull
+  @NotEmpty
   @Size(max = 20)
   private String firstName;
 
-  @NotNull
+  @NotEmpty
   @Size(max = 20)
   private String lastName;
 

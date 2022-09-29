@@ -4,24 +4,24 @@ import java.util.Set;
 import javax.validation.constraints.*;
 
 public class SignupRequest {
-  @NotNull
+  @NotEmpty
   @Size(min = 3, max = 20)
   private String username;
 
-  @NotNull
+  @NotEmpty
   @Size(max = 20)
   private String firstName;
 
-  @NotNull
+  @NotEmpty
   @Size(max = 20)
   private String lastName;
 
-  @NotNull
+  @NotEmpty
   @Size(max = 50)
   @Email
   private String email;
 
-  @NotNull
+  @NotEmpty
   @Size(min = 6, max = 40)
   private String password;
 

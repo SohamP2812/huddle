@@ -108,6 +108,10 @@ export const createTeam = createAsyncThunk<
       const data = await response.json();
 
       if (response.status !== 200) {
+        if (data.errors && data.errors.length && response.status === 400) {
+          data.message = data.errors[0].defaultMessage;
+        }
+
         throw data;
       }
 
@@ -152,6 +156,10 @@ export const addMember = createAsyncThunk<
       const data = await response.json();
 
       if (response.status !== 200) {
+        if (data.errors && data.errors.length && response.status === 400) {
+          data.message = data.errors[0].defaultMessage;
+        }
+
         throw data;
       }
 
@@ -193,6 +201,10 @@ export const getByUser = createAsyncThunk<
     const data = await response.json();
 
     if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
+      }
+
       throw data;
     }
 
@@ -233,6 +245,10 @@ export const getMembers = createAsyncThunk<
     const data = await response.json();
 
     if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
+      }
+
       throw data;
     }
 
@@ -273,6 +289,10 @@ export const getEvents = createAsyncThunk<
     const data = await response.json();
 
     if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
+      }
+
       throw data;
     }
 
@@ -316,6 +336,10 @@ export const createEvent = createAsyncThunk<
       const data = await response.json();
 
       if (response.status !== 200) {
+        if (data.errors && data.errors.length && response.status === 400) {
+          data.message = data.errors[0].defaultMessage;
+        }
+
         throw data;
       }
 
@@ -363,6 +387,10 @@ export const updateEvent = createAsyncThunk<
       const data = await response.json();
 
       if (response.status !== 200) {
+        if (data.errors && data.errors.length && response.status === 400) {
+          data.message = data.errors[0].defaultMessage;
+        }
+
         throw data;
       }
 
@@ -409,6 +437,10 @@ export const getParticipants = createAsyncThunk<
       const data = await response.json();
 
       if (response.status !== 200) {
+        if (data.errors && data.errors.length && response.status === 400) {
+          data.message = data.errors[0].defaultMessage;
+        }
+
         throw data;
       }
 
@@ -464,6 +496,10 @@ export const updateParticipant = createAsyncThunk<
       const data = await response.json();
 
       if (response.status !== 200) {
+        if (data.errors && data.errors.length && response.status === 400) {
+          data.message = data.errors[0].defaultMessage;
+        }
+
         throw data;
       }
 

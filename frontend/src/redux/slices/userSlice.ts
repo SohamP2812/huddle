@@ -68,6 +68,10 @@ export const getUsersByQuery = createAsyncThunk<
     const data = await response.json();
 
     if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
+      }
+
       throw data; // Should I be throwing some object instance (new Error())?
     }
 
@@ -104,6 +108,10 @@ export const getSelf = createAsyncThunk<
     const data = await response.json();
 
     if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
+      }
+
       throw data; // Should I be throwing some object instance (new Error())?
     }
 
@@ -145,6 +153,10 @@ export const login = createAsyncThunk<
     const data = await response.json();
 
     if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
+      }
+
       throw data;
     }
 
@@ -188,6 +200,10 @@ export const createAccount = createAsyncThunk<
       const data = await response.json();
 
       if (response.status !== 200) {
+        if (data.errors && data.errors.length && response.status === 400) {
+          data.message = data.errors[0].defaultMessage;
+        }
+
         throw data;
       }
 
@@ -233,6 +249,10 @@ export const updateUser = createAsyncThunk<
     const data = await response.json();
 
     if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
+      }
+
       throw data;
     }
 
@@ -273,6 +293,10 @@ export const logout = createAsyncThunk<
     const data = await response.json();
 
     if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
+      }
+
       throw data;
     }
 

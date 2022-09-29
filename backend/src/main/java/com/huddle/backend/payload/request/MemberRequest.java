@@ -1,9 +1,10 @@
 package com.huddle.backend.payload.request;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 public class MemberRequest {
-  @NotNull
+  @NotEmpty
   private Long id;
 
   public Long getId() {

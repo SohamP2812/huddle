@@ -3,28 +3,29 @@ package com.huddle.backend.payload.request;
 import com.huddle.backend.models.EEvent;
 import java.time.OffsetDateTime;
 import java.util.List;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 public class EventRequest {
-  @NotNull
+  @NotEmpty
   private String name;
 
-  @NotNull
+  @NotEmpty
   private EEvent eventType;
 
-  @NotNull
+  @NotEmpty
   private OffsetDateTime startTime;
 
-  @NotNull
+  @NotEmpty
   private OffsetDateTime endTime;
 
-  @NotNull
+  @NotEmpty
   private Integer teamScore;
 
-  @NotNull
+  @NotEmpty
   private Integer opponentScore;
 
-  @NotNull
+  @NotEmpty
   private List<Long> participantIds;
 
   public String getName() {
