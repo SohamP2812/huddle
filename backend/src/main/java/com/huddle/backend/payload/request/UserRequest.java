@@ -4,11 +4,11 @@ import javax.validation.constraints.*;
 
 public class UserRequest {
 
-  @NotEmpty
+  @NotEmpty(message = "First name must not be empty")
   @Size(max = 20)
   private String firstName;
 
-  @NotEmpty
+  @NotEmpty(message = "Last name must not be empty")
   @Size(max = 20)
   private String lastName;
 

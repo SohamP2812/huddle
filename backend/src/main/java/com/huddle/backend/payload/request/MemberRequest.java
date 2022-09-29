@@ -4,7 +4,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 public class MemberRequest {
-  @NotEmpty
+  @NotNull
   private Long id;
 
   public Long getId() {

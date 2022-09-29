@@ -90,14 +90,27 @@ public class EventController {
 
   @PostMapping("")
   public ResponseEntity<?> createEvent(
+    Authentication authentication,
     @Valid @RequestBody EventRequest eventRequest,
     @PathVariable Long team_id
   ) {
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+    Optional<User> user = userRepository.findById(userDetails.getId());
+
     Optional<Team> team = teamRepository.findById(team_id);
 
     if (team.isEmpty()) return ResponseEntity
       .badRequest()
       .body(new MessageResponse("No team exists with this id."));
+
+    for (TeamMember member : user.get().getMemberTeams()) {
+      if (member.getTeam().getId() == team_id && !member.isManager()) {
+        return ResponseEntity
+                .badRequest()
+                .body(new MessageResponse("You do not have the authority to make this change."));
+      }
+    }
 
     Event event = new Event(
       eventRequest.getName(),
@@ -212,10 +225,15 @@ public class EventController {
 
   @PatchMapping("/{event_id}")
   public ResponseEntity<?> updateEvent(
+    Authentication authentication,
     @Valid @RequestBody EventRequest eventRequest,
     @PathVariable Long team_id,
     @PathVariable Long event_id
   ) {
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+    Optional<User> user = userRepository.findById(userDetails.getId());
+
     Optional<Team> team = teamRepository.findById(team_id);
 
     if (team.isEmpty()) return ResponseEntity
@@ -230,6 +248,14 @@ public class EventController {
     if (event.isEmpty()) return ResponseEntity
       .badRequest()
       .body(new MessageResponse("No event exists with this id on that team."));
+
+    for (TeamMember member : user.get().getMemberTeams()) {
+      if (member.getTeam().getId() == team_id && !member.isManager()) {
+        return ResponseEntity
+                .badRequest()
+                .body(new MessageResponse("You do not have the authority to make this change."));
+      }
+    }
 
     event.get().setEventType(eventRequest.getEventType());
     event.get().setName(eventRequest.getName());
@@ -375,11 +401,20 @@ public class EventController {
 
   @PatchMapping("/{event_id}/participants/{user_id}") // Should I get by user_id or participant_id?
   public ResponseEntity<?> updateEventParticipant(
+    Authentication authentication,
     @Valid @RequestBody EventParticipantRequest eventParticipantRequest,
     @PathVariable Long team_id,
     @PathVariable Long event_id,
     @PathVariable Long user_id
   ) {
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+    Optional<User> user = userRepository.findById(userDetails.getId());
+
+    if (user.get().getId() != user_id) return ResponseEntity
+            .badRequest()
+            .body(new MessageResponse("You do not have the authority to make this change."));
+
     Optional<Team> team = teamRepository.findById(team_id);
 
     if (team.isEmpty()) return ResponseEntity

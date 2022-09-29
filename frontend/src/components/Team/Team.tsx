@@ -299,7 +299,7 @@ export const Team = () => {
                 {events
                   .filter(
                     (event) =>
-                      stringToJSDate(event.startTime) > new Date() ||
+                      stringToJSDate(event.endTime) > new Date() ||
                       showPastEvents
                   )
                   .sort(

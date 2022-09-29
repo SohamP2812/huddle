@@ -4,10 +4,10 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 public class LoginRequest {
-  @NotEmpty
+  @NotEmpty(message = "Username must not be empty")
   private String username;
 
-  @NotEmpty
+  @NotEmpty(message = "Password must not be empty")
   private String password;
 
   public String getUsername() {

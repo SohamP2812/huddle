@@ -116,12 +116,24 @@ public class TeamController {
 
   @DeleteMapping("/{id}")
   @Transactional // WHAT IS THIS? (without: No EntityManager with actual transaction available for current thread - cannot reliably process 'remove' call)
-  public ResponseEntity<?> deleteTeam(@PathVariable Long id) {
+  public ResponseEntity<?> deleteTeam(Authentication authentication, @PathVariable Long id) {
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+    Optional<User> user = userRepository.findById(userDetails.getId());
+
     Optional<Team> team = teamRepository.findById(id);
 
     if (team.isEmpty()) return ResponseEntity
       .badRequest()
       .body(new MessageResponse("No team exists with this id."));
+
+    for (TeamMember member : user.get().getMemberTeams()) {
+      if (member.getTeam().getId() == id && !member.isManager()) {
+        return ResponseEntity
+                .badRequest()
+                .body(new MessageResponse("You do not have the authority to make this change."));
+      }
+    }
 
     teamMemberRepository.deleteAllByTeamId(team.get().getId());
 
@@ -168,22 +180,39 @@ public class TeamController {
 
   @PostMapping("/{id}/members")
   public ResponseEntity<?> addMember(
+    Authentication authentication,
     @PathVariable Long id,
     @Valid @RequestBody MemberRequest memberRequest
   ) {
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+    Optional<User> user = userRepository.findById(userDetails.getId());
+
     Optional<Team> team = teamRepository.findById(id);
 
     if (team.isEmpty()) return ResponseEntity
       .badRequest()
       .body(new MessageResponse("No team exists with this id."));
 
-    Optional<User> user = userRepository.findById(memberRequest.getId());
+    if(!user.get().getMemberTeams().stream().map(memberTeam -> memberTeam.getTeam().getId()).toList().contains(id)) return ResponseEntity
+            .badRequest()
+            .body(new MessageResponse("You are not a member of this team."));
 
-    if (user.isEmpty()) return ResponseEntity
+    for (TeamMember member : user.get().getMemberTeams()) {
+      if (member.getTeam().getId() == id && !member.isManager()) {
+        return ResponseEntity
+                .badRequest()
+                .body(new MessageResponse("You do not have the authority to make this change."));
+      }
+    }
+
+    Optional<User> userToAdd = userRepository.findById(memberRequest.getId());
+
+    if (userToAdd.isEmpty()) return ResponseEntity
       .badRequest()
       .body(new MessageResponse("No user exists with this id."));
 
-    Set<TeamMember> memberTeams = user.get().getMemberTeams();
+    Set<TeamMember> memberTeams = userToAdd.get().getMemberTeams();
 
     List<Team> teams = memberTeams
       .stream()
@@ -196,38 +225,51 @@ public class TeamController {
 
     TeamMember teamMember = new TeamMember(
       ERole.ROLE_MEMBER,
-      user.get(),
+      userToAdd.get(),
       team.get()
     );
 
     teamMemberRepository.save(teamMember);
 
     return ResponseEntity.ok(new UserResponse(
-            user.get().getId(),
-            user.get().getFirstName(),
-            user.get().getLastName(),
-            user.get().getUsername(),
-            user.get().getEmail()
+            userToAdd.get().getId(),
+            userToAdd.get().getFirstName(),
+            userToAdd.get().getLastName(),
+            userToAdd.get().getUsername(),
+            userToAdd.get().getEmail()
     ));
   }
 
   @DeleteMapping("/{id}/members/{user_id}")
   @Transactional
   public ResponseEntity<?> deleteMember(
+    Authentication authentication,
     @PathVariable Long id,
     @PathVariable Long user_id
   ) {
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+    Optional<User> user = userRepository.findById(userDetails.getId());
+
     Optional<Team> team = teamRepository.findById(id);
 
     if (team.isEmpty()) return ResponseEntity
       .badRequest()
       .body(new MessageResponse("No team exists with this id."));
 
-    Optional<User> user = userRepository.findById(user_id);
+    Optional<User> userToDelete = userRepository.findById(user_id);
 
-    if (user.isEmpty()) return ResponseEntity
+    if (userToDelete.isEmpty()) return ResponseEntity
       .badRequest()
       .body(new MessageResponse("No user exists with this id."));
+
+    for (TeamMember member : user.get().getMemberTeams()) {
+      if (member.getTeam().getId() == id && !member.isManager()) {
+        return ResponseEntity
+                .badRequest()
+                .body(new MessageResponse("You do not have the authority to make this change."));
+      }
+    }
 
     Optional<TeamMember> teamMember = teamMemberRepository.findByTeamIdAndMemberId(
       id,

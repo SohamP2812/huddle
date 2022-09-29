@@ -418,7 +418,7 @@ export const Event = () => {
               >
                 <Text color={"gray.500"} fontSize={"xl"}>
                   Start:{" "}
-                  {stringToJSDate(event?.endTime ?? "").toLocaleString([], {
+                  {stringToJSDate(event?.startTime ?? "").toLocaleString([], {
                     year: "numeric",
                     month: "numeric",
                     day: "numeric",

@@ -7,25 +7,23 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 public class EventRequest {
-  @NotEmpty
+  @NotEmpty(message = "Name must not be empty")
   private String name;
 
-  @NotEmpty
+  @NotNull
   private EEvent eventType;
 
-  @NotEmpty
+  @NotNull
   private OffsetDateTime startTime;
 
-  @NotEmpty
+  @NotNull
   private OffsetDateTime endTime;
 
-  @NotEmpty
   private Integer teamScore;
 
-  @NotEmpty
   private Integer opponentScore;
 
-  @NotEmpty
+  @NotNull
   private List<Long> participantIds;
 
   public String getName() {

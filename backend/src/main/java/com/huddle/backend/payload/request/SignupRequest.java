@@ -4,24 +4,24 @@ import java.util.Set;
 import javax.validation.constraints.*;
 
 public class SignupRequest {
-  @NotEmpty
+  @NotEmpty(message = "Username must not be empty")
   @Size(min = 3, max = 20)
   private String username;
 
-  @NotEmpty
+  @NotEmpty(message = "First name must not be empty")
   @Size(max = 20)
   private String firstName;
 
-  @NotEmpty
+  @NotEmpty(message = "Last name must not be empty")
   @Size(max = 20)
   private String lastName;
 
-  @NotEmpty
+  @NotEmpty(message = "Email must not be empty")
   @Size(max = 50)
   @Email
   private String email;
 
-  @NotEmpty
+  @NotEmpty(message = "Password must not be empty")
   @Size(min = 6, max = 40)
   private String password;
 
