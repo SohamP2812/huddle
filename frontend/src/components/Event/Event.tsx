@@ -384,13 +384,15 @@ export const Event = () => {
                   </Badge>
                 )}
               </Stack>
-              {stringToJSDate(event?.endTime ?? "") < new Date() && (
-                <Flex justifyContent={"center"}>
-                  <Button mb={5} onClick={onUpdateScoreOpen}>
-                    Update Score
-                  </Button>
-                </Flex>
-              )}
+              {stringToJSDate(event?.endTime ?? "") < new Date() &&
+                teams.members.find((member) => member.id === user.user.id)
+                  ?.isManager && (
+                  <Flex justifyContent={"center"}>
+                    <Button mb={5} onClick={onUpdateScoreOpen}>
+                      Update Score
+                    </Button>
+                  </Flex>
+                )}
             </Box>
           </Box>
           <Box
@@ -457,9 +459,12 @@ export const Event = () => {
                 <Heading fontSize={"2xl"} fontWeight={800} fontFamily={"body"}>
                   Participants
                 </Heading>
-                <Button mb={5} onClick={onOpen}>
-                  Update Participants
-                </Button>
+                {teams.members.find((member) => member.id === user.user.id)
+                  ?.isManager && (
+                  <Button mb={5} onClick={onOpen}>
+                    Update Participants
+                  </Button>
+                )}
               </Flex>
               <Divider borderColor={"gray.300"} />
               <Stack align={"center"} my={5} gap={5}>
