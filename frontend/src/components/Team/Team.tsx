@@ -242,7 +242,11 @@ export const Team = () => {
               <Divider borderColor={"gray.300"} />
               <Stack align={"center"} my={5} gap={2}>
                 {members.map((member) => (
-                  <Text key={member.id} color={"gray.500"}>
+                  <Text
+                    key={member.id}
+                    fontWeight={member.id === user.user.id ? 600 : 300}
+                    color={member.id === user.user.id ? "gray.900" : "gray.600"}
+                  >
                     {member.username}
                   </Text>
                 ))}
@@ -314,7 +318,7 @@ export const Team = () => {
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Update Participant List</ModalHeader>
+            <ModalHeader>Update Member List</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <FormControl mb={10} id="participantIds">
