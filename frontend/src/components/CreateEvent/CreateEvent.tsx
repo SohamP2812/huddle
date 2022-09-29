@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Header } from "components/Header/Header";
+import { selectUser } from "redux/slices/userSlice";
 import { useAppSelector, useAppDispatch } from "redux/hooks";
 import {
   createEvent,
@@ -42,6 +43,7 @@ export const CreateEvent = () => {
 
   const teams = useAppSelector(selectTeams);
   const members = useAppSelector(selectMembers);
+  const user = useAppSelector(selectUser);
 
   const dispatch = useAppDispatch();
 
@@ -70,7 +72,16 @@ export const CreateEvent = () => {
   }, []);
 
   useEffect(() => {
-    if (teams.eventCreationSuccess && isMounted) navigate(`/teams/${team_id}`);
+    if (teams.eventCreationSuccess && isMounted) {
+      toast({
+        title: teams.message,
+        status: "success",
+        position: "top",
+        duration: 5000,
+        isClosable: true,
+      });
+      navigate(`/teams/${team_id}`);
+    }
   }, [teams.eventCreationSuccess]);
 
   useEffect(() => {
@@ -143,7 +154,13 @@ export const CreateEvent = () => {
     e.preventDefault();
     team_id &&
       dispatch(
-        createEvent({ id: parseInt(team_id), eventCreationInfo: eventFields })
+        createEvent({
+          id: parseInt(team_id),
+          eventCreationInfo: {
+            ...eventFields,
+            participantIds: [...eventFields.participantIds, user.user.id],
+          },
+        })
       );
   };
 
@@ -231,21 +248,23 @@ export const CreateEvent = () => {
                   py={2}
                 >
                   <CheckboxGroup>
-                    {members.map((member) => (
-                      <>
-                        {member.id && (
-                          <Checkbox
-                            name={member.id.toString()}
-                            isChecked={eventFields.participantIds.includes(
-                              member.id
-                            )}
-                            onChange={handleSelectParticipant}
-                          >
-                            {member.username}
-                          </Checkbox>
-                        )}
-                      </>
-                    ))}
+                    {members
+                      .filter((member) => member.id !== user.user.id)
+                      .map((member) => (
+                        <>
+                          {member.id && (
+                            <Checkbox
+                              name={member.id.toString()}
+                              isChecked={eventFields.participantIds.includes(
+                                member.id
+                              )}
+                              onChange={handleSelectParticipant}
+                            >
+                              {member.username}
+                            </Checkbox>
+                          )}
+                        </>
+                      ))}
                   </CheckboxGroup>
                 </Stack>
               </FormControl>

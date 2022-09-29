@@ -142,7 +142,9 @@ export const Event = () => {
     setStatus(getPersistentStatus());
     setEventFields({
       ...eventFields,
-      participantIds: participants.map((participant) => participant.user.id),
+      participantIds: participants
+        .filter((member) => member.id !== user.user.id)
+        .map((participant) => participant.user.id),
     });
   }, [participants]);
 
@@ -237,7 +239,10 @@ export const Event = () => {
         updateEvent({
           team_id: parseInt(team_id),
           event_id: parseInt(event_id),
-          eventUpdateInfo: eventFields,
+          eventUpdateInfo: {
+            ...eventFields,
+            participantIds: [...eventFields.participantIds, user.user.id],
+          },
         })
       );
       if (updateEvent.fulfilled.match(result)) {
@@ -376,11 +381,13 @@ export const Event = () => {
                   </Badge>
                 )}
               </Stack>
-              <Flex justifyContent={"center"}>
-                <Button mb={5} onClick={onUpdateScoreOpen}>
-                  Update Score
-                </Button>
-              </Flex>
+              {stringToJSDate(event?.endTime ?? "") < new Date() && (
+                <Flex justifyContent={"center"}>
+                  <Button mb={5} onClick={onUpdateScoreOpen}>
+                    Update Score
+                  </Button>
+                </Flex>
+              )}
             </Box>
           </Box>
           <Box
@@ -657,21 +664,23 @@ export const Event = () => {
                   py={2}
                 >
                   <CheckboxGroup>
-                    {members.map((member) => (
-                      <>
-                        {member.id && (
-                          <Checkbox
-                            name={member.id.toString()}
-                            isChecked={eventFields.participantIds.includes(
-                              member.id
-                            )}
-                            onChange={handleSelectParticipant}
-                          >
-                            {member.username}
-                          </Checkbox>
-                        )}
-                      </>
-                    ))}
+                    {members
+                      .filter((member) => member.id !== user.user.id)
+                      .map((member) => (
+                        <>
+                          {member.id && (
+                            <Checkbox
+                              name={member.id.toString()}
+                              isChecked={eventFields.participantIds.includes(
+                                member.id
+                              )}
+                              onChange={handleSelectParticipant}
+                            >
+                              {member.username}
+                            </Checkbox>
+                          )}
+                        </>
+                      ))}
                   </CheckboxGroup>
                 </Stack>
               </FormControl>

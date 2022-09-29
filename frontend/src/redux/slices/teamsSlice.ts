@@ -554,6 +554,7 @@ export const teamsSlice = createSlice({
         state.eventCreationSuccess = null;
       })
       .addCase(createEvent.fulfilled, (state, action) => {
+        state.message = "Event created successfully.";
         state.eventCreationSuccess = true;
 
         state.events.push(action.payload);
