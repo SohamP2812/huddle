@@ -43,7 +43,7 @@ export const Teams = () => {
   }, [teams.error]);
 
   useEffect(() => {
-    user.id && dispatch(getByUser(user.id));
+    user.user.id && dispatch(getByUser(user.user.id));
   }, []);
 
   return (

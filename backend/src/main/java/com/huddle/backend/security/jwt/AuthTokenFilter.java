@@ -57,6 +57,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
       }
     } catch (Exception e) {
+      Cookie jwtTokenCookie = new Cookie("huddle_session", null);
+
+      jwtTokenCookie.setMaxAge(0);
+      jwtTokenCookie.setSecure(true);
+      jwtTokenCookie.setHttpOnly(true);
+
+      response.addCookie(jwtTokenCookie);
+
       logger.error("Cannot set user authentication: {}", e);
     }
 

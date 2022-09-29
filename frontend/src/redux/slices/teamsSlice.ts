@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
 export interface User {
-  id: number;
+  id: number | null;
   username: string;
   firstName: string;
   lastName: string;
@@ -43,6 +43,7 @@ export interface TeamsState {
   teamCreationSuccess: boolean | null;
   eventCreationSuccess: boolean | null;
   eventUpdateSuccess: boolean | null;
+  memberAddedSuccess: boolean | null;
   message: string | null;
 }
 
@@ -58,7 +59,7 @@ export interface EventCreationInfo {
   eventType: string;
   teamScore: number;
   opponentScore: number;
-  participantIds: number[];
+  participantIds: (number | null)[];
 }
 
 export interface APIError {
@@ -74,6 +75,7 @@ const initialState: TeamsState = {
   teamCreationSuccess: null,
   eventCreationSuccess: null,
   eventUpdateSuccess: null,
+  memberAddedSuccess: null,
   message: null,
 };
 
@@ -100,6 +102,50 @@ export const createTeam = createAsyncThunk<
         },
         credentials: "include",
         body: JSON.stringify(teamCreationInfo),
+      });
+
+      const data = await response.json();
+
+      if (response.status !== 200) {
+        throw data;
+      }
+
+      return data;
+    } catch (err) {
+      let error: APIError = err;
+
+      if (!error.message) {
+        throw err;
+      }
+
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const addMember = createAsyncThunk<
+  User,
+  { team_id: number; teamMemberInfo: { id: number } },
+  {
+    state: RootState;
+    rejectValue: APIError;
+  }
+>(
+  "teams/addMember",
+  async ({ team_id, teamMemberInfo }, { rejectWithValue, getState }) => {
+    try {
+      const { loggedIn } = getState().user;
+
+      if (!loggedIn) return;
+
+      const response = await fetch(`/teams/${team_id}/members`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accepts: "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(teamMemberInfo),
       });
 
       const data = await response.json();
@@ -570,6 +616,26 @@ export const teamsSlice = createSlice({
         );
       })
       .addCase(updateParticipant.rejected, (state, action) => {
+        if (action.payload) {
+          state.error = action.payload.message;
+        } else {
+          state.error =
+            action.error.message ??
+            "An unknown error occurred. Please try again.";
+        }
+      })
+      .addCase(addMember.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(addMember.fulfilled, (state, action) => {
+        state.message = "Added successfully.";
+        state.memberAddedSuccess = true;
+
+        state.members.push(action.payload);
+      })
+      .addCase(addMember.rejected, (state, action) => {
+        state.memberAddedSuccess = false;
+
         if (action.payload) {
           state.error = action.payload.message;
         } else {

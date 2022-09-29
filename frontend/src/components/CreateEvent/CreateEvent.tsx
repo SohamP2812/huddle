@@ -54,7 +54,7 @@ export const CreateEvent = () => {
     eventType: string;
     teamScore: number;
     opponentScore: number;
-    participantIds: number[];
+    participantIds: (number | null)[];
   }>({
     name: "",
     startTime: dayjs().set("seconds", 0).format(),
@@ -232,15 +232,19 @@ export const CreateEvent = () => {
                 >
                   <CheckboxGroup>
                     {members.map((member) => (
-                      <Checkbox
-                        name={member.id.toString()}
-                        isChecked={eventFields.participantIds.includes(
-                          member.id
+                      <>
+                        {member.id && (
+                          <Checkbox
+                            name={member.id.toString()}
+                            isChecked={eventFields.participantIds.includes(
+                              member.id
+                            )}
+                            onChange={handleSelectParticipant}
+                          >
+                            {member.username}
+                          </Checkbox>
                         )}
-                        onChange={handleSelectParticipant}
-                      >
-                        {member.username}
-                      </Checkbox>
+                      </>
                     ))}
                   </CheckboxGroup>
                 </Stack>

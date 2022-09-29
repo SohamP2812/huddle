@@ -64,7 +64,7 @@ export const Event = () => {
     eventType: string;
     teamScore: number;
     opponentScore: number;
-    participantIds: number[];
+    participantIds: (number | null)[];
   }>({
     name: "",
     startTime: dayjs().set("seconds", 0).format(),
@@ -112,7 +112,7 @@ export const Event = () => {
   }, [teams.eventUpdateSuccess]);
 
   useEffect(() => {
-    user.id && dispatch(getByUser(user.id));
+    user.user.id && dispatch(getByUser(user.user.id));
     team_id && dispatch(getMembers(parseInt(team_id)));
     team_id && dispatch(getEvents(parseInt(team_id)));
     team_id &&
@@ -148,7 +148,7 @@ export const Event = () => {
 
   const getPersistentStatus = () => {
     return (
-      participants.find((participant) => participant.user.id === user.id)
+      participants.find((participant) => participant.user.id === user.user.id)
         ?.attendance ?? "UNDECIDED"
     );
   };
@@ -164,12 +164,12 @@ export const Event = () => {
     e.preventDefault();
     team_id &&
       event_id &&
-      user.id &&
+      user.user.id &&
       dispatch(
         updateParticipant({
           team_id: parseInt(team_id),
           event_id: parseInt(event_id),
-          user_id: user.id,
+          user_id: user.user.id,
           participantUpdateInfo: { attendance: status },
         })
       );
@@ -497,10 +497,10 @@ export const Event = () => {
                       .map((participant) => (
                         <Text
                           fontWeight={
-                            participant.user.id === user.id ? 600 : 300
+                            participant.user.id === user.user.id ? 600 : 300
                           }
                           color={
-                            participant.user.id === user.id
+                            participant.user.id === user.user.id
                               ? "gray.900"
                               : "gray.600"
                           }
@@ -524,10 +524,10 @@ export const Event = () => {
                       .map((participant) => (
                         <Text
                           fontWeight={
-                            participant.user.id === user.id ? 600 : 300
+                            participant.user.id === user.user.id ? 600 : 300
                           }
                           color={
-                            participant.user.id === user.id
+                            participant.user.id === user.user.id
                               ? "gray.900"
                               : "gray.600"
                           }
@@ -553,10 +553,10 @@ export const Event = () => {
                       .map((participant) => (
                         <Text
                           fontWeight={
-                            participant.user.id === user.id ? 600 : 300
+                            participant.user.id === user.user.id ? 600 : 300
                           }
                           color={
-                            participant.user.id === user.id
+                            participant.user.id === user.user.id
                               ? "gray.900"
                               : "gray.600"
                           }
@@ -658,15 +658,19 @@ export const Event = () => {
                 >
                   <CheckboxGroup>
                     {members.map((member) => (
-                      <Checkbox
-                        name={member.id.toString()}
-                        isChecked={eventFields.participantIds.includes(
-                          member.id
+                      <>
+                        {member.id && (
+                          <Checkbox
+                            name={member.id.toString()}
+                            isChecked={eventFields.participantIds.includes(
+                              member.id
+                            )}
+                            onChange={handleSelectParticipant}
+                          >
+                            {member.username}
+                          </Checkbox>
                         )}
-                        onChange={handleSelectParticipant}
-                      >
-                        {member.username}
-                      </Checkbox>
+                      </>
                     ))}
                   </CheckboxGroup>
                 </Stack>

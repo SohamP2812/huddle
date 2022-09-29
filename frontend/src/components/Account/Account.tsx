@@ -56,10 +56,10 @@ export const Account = () => {
   }, [user.error]);
 
   const [accountFields, setAccountFields] = useState({
-    username: user.username,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
+    username: user.user.username,
+    firstName: user.user.firstName,
+    lastName: user.user.lastName,
+    email: user.user.email,
   });
 
   const handleChangeSignupFields = (

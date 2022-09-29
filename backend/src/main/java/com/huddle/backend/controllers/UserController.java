@@ -3,12 +3,10 @@ package com.huddle.backend.controllers;
 import com.huddle.backend.models.Team;
 import com.huddle.backend.models.TeamMember;
 import com.huddle.backend.models.User;
-import com.huddle.backend.payload.request.LoginRequest;
 import com.huddle.backend.payload.request.SignupRequest;
 import com.huddle.backend.payload.request.UserRequest;
 import com.huddle.backend.payload.response.*;
 import com.huddle.backend.repository.TeamMemberRepository;
-import com.huddle.backend.repository.TeamRepository;
 import com.huddle.backend.repository.UserRepository;
 import com.huddle.backend.security.jwt.JwtUtils;
 import com.huddle.backend.security.services.UserDetailsImpl;
@@ -96,8 +94,8 @@ public class UserController {
   }
 
   @GetMapping("")
-  public ResponseEntity<?> getUsers() {
-    List<User> users = userRepository.findAll();
+  public ResponseEntity<?> getUsers(@RequestParam String username) {
+    List<User> users = userRepository.findByUsernameStartsWith(username);
 
     List<UserResponse> responseUsers = users
       .stream()

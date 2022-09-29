@@ -1,6 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../redux/store";
 
+export interface User {
+  id: number | null;
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
 export interface LoginCredentials {
   username: string;
   password: string;
@@ -20,14 +28,11 @@ export interface AccountCreationInfo {
 }
 
 export interface UserState {
-  id: number | null;
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
+  user: User;
   loggedIn: boolean | null;
   error: string | null;
   message: string | null;
+  queryUsers: User[];
 }
 
 export interface APIError {
@@ -35,18 +40,51 @@ export interface APIError {
 }
 
 const initialState: UserState = {
-  id: null,
-  firstName: "",
-  lastName: "",
-  username: "",
-  email: "",
+  user: { id: null, firstName: "", lastName: "", username: "", email: "" },
   loggedIn: null,
   error: null,
   message: null,
+  queryUsers: [],
 };
 
+export const getUsersByQuery = createAsyncThunk<
+  { users: User[] },
+  string,
+  {
+    state: RootState;
+    rejectValue: APIError;
+  }
+>("user/getUsersByQuery", async (username, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`/users?username=${username}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        accepts: "application/json",
+      },
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      throw data; // Should I be throwing some object instance (new Error())?
+    }
+
+    return data;
+  } catch (err) {
+    let error: APIError = err;
+
+    if (!error.message) {
+      throw err;
+    }
+
+    return rejectWithValue(error);
+  }
+});
+
 export const getSelf = createAsyncThunk<
-  UserState,
+  User,
   void,
   {
     state: RootState;
@@ -82,7 +120,7 @@ export const getSelf = createAsyncThunk<
 });
 
 export const login = createAsyncThunk<
-  UserState,
+  User,
   LoginCredentials,
   {
     state: RootState;
@@ -123,7 +161,7 @@ export const login = createAsyncThunk<
 });
 
 export const createAccount = createAsyncThunk<
-  UserState,
+  User,
   AccountCreationInfo,
   {
     state: RootState;
@@ -167,7 +205,7 @@ export const createAccount = createAsyncThunk<
 );
 
 export const updateUser = createAsyncThunk<
-  UserState,
+  User,
   UserUpdateInfo,
   {
     state: RootState;
@@ -175,7 +213,10 @@ export const updateUser = createAsyncThunk<
   }
 >("user/updateUser", async (userUpdateInfo, { rejectWithValue, getState }) => {
   try {
-    const { loggedIn, id } = getState().user;
+    const {
+      loggedIn,
+      user: { id },
+    } = getState().user;
 
     if (!loggedIn) return;
 
@@ -259,11 +300,7 @@ export const userSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.loggedIn = true;
 
-        state.id = action.payload.id;
-        state.firstName = action.payload.firstName;
-        state.lastName = action.payload.lastName;
-        state.username = action.payload.username;
-        state.email = action.payload.email;
+        state.user = action.payload;
       })
       .addCase(login.rejected, (state, action) => {
         state.loggedIn = false;
@@ -283,11 +320,7 @@ export const userSlice = createSlice({
       .addCase(createAccount.fulfilled, (state, action) => {
         state.loggedIn = true;
 
-        state.id = action.payload.id;
-        state.firstName = action.payload.firstName;
-        state.lastName = action.payload.lastName;
-        state.username = action.payload.username;
-        state.email = action.payload.email;
+        state.user = action.payload;
       })
       .addCase(createAccount.rejected, (state, action) => {
         state.loggedIn = false;
@@ -307,11 +340,7 @@ export const userSlice = createSlice({
       .addCase(updateUser.fulfilled, (state, action) => {
         state.message = "Updated successfully.";
 
-        state.id = action.payload.id;
-        state.firstName = action.payload.firstName;
-        state.lastName = action.payload.lastName;
-        state.username = action.payload.username;
-        state.email = action.payload.email;
+        state.user = action.payload;
       })
       .addCase(updateUser.rejected, (state, action) => {
         if (action.payload) {
@@ -329,11 +358,7 @@ export const userSlice = createSlice({
       .addCase(getSelf.fulfilled, (state, action) => {
         state.loggedIn = true;
 
-        state.id = action.payload.id;
-        state.firstName = action.payload.firstName;
-        state.lastName = action.payload.lastName;
-        state.username = action.payload.username;
-        state.email = action.payload.email;
+        state.user = action.payload;
       })
       .addCase(getSelf.rejected, (state) => {
         state.loggedIn = false;
@@ -342,14 +367,33 @@ export const userSlice = createSlice({
       .addCase(logout.fulfilled, (state, action) => {
         state.loggedIn = false;
 
-        state.firstName = "";
-        state.lastName = "";
-        state.username = "";
-        state.email = "";
+        state.user = {
+          id: null,
+          firstName: "",
+          lastName: "",
+          username: "",
+          email: "",
+        };
       })
       .addCase(logout.rejected, (state, action) => {
         state.loggedIn = false;
 
+        if (action.payload) {
+          state.error = action.payload.message;
+        } else {
+          state.error =
+            action.error.message ??
+            "An unknown error occurred. Please try again.";
+        }
+      })
+      .addCase(getUsersByQuery.pending, (state) => {
+        state.error = null;
+        state.message = null;
+      })
+      .addCase(getUsersByQuery.fulfilled, (state, action) => {
+        state.queryUsers = action.payload.users;
+      })
+      .addCase(getUsersByQuery.rejected, (state, action) => {
         if (action.payload) {
           state.error = action.payload.message;
         } else {
@@ -363,11 +407,14 @@ export const userSlice = createSlice({
     resetError: (state) => {
       state.error = "";
     },
+    resetUserQuery: (state) => {
+      state.queryUsers = [];
+    },
   },
 });
 
 export const selectUser = (state: RootState): UserState => state.user;
 
-export const { resetError } = userSlice.actions;
+export const { resetError, resetUserQuery } = userSlice.actions;
 
 export default userSlice.reducer;

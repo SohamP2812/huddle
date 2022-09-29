@@ -190,7 +190,13 @@ public class TeamController {
 
     teamMemberRepository.save(teamMember);
 
-    return ResponseEntity.ok(new MessageResponse("Member added successfully!"));
+    return ResponseEntity.ok(new UserResponse(
+            user.get().getId(),
+            user.get().getFirstName(),
+            user.get().getLastName(),
+            user.get().getUsername(),
+            user.get().getEmail()
+    ));
   }
 
   @DeleteMapping("/{id}/members/{user_id}")

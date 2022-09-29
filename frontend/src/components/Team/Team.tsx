@@ -2,14 +2,20 @@ import { Header } from "components/Header/Header";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "redux/hooks";
-import { selectUser } from "redux/slices/userSlice";
 import {
+  getUsersByQuery,
+  resetUserQuery,
+  selectUser,
+} from "redux/slices/userSlice";
+import {
+  addMember,
   getByUser,
   getMembers,
   getEvents,
   selectTeamById,
   selectMembers,
   selectEvents,
+  selectTeams,
 } from "redux/slices/teamsSlice";
 import {
   Heading,
@@ -21,19 +27,40 @@ import {
   Badge,
   Divider,
   Checkbox,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  FormControl,
+  FormLabel,
+  Button,
+  Input,
+  useToast,
 } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 
 import { stringToJSDate } from "utils/misc";
+import { useIsMounted } from "hooks/useIsMounted";
 
 import { EventCard } from "components/EventCard/EventCard";
 
 export const Team = () => {
+  const isMounted = useIsMounted();
+
+  const [usernameQuery, setUsernameQuery] = useState("");
+
   const [showPastEvents, setShowPastEvents] = useState(false);
+
+  const toast = useToast();
 
   const navigate = useNavigate();
   const { team_id } = useParams();
 
+  const teams = useAppSelector(selectTeams);
   const user = useAppSelector(selectUser);
   const team = useAppSelector((state) =>
     selectTeamById(state, team_id ? parseInt(team_id) : undefined)
@@ -43,11 +70,43 @@ export const Team = () => {
 
   const dispatch = useAppDispatch();
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   useEffect(() => {
-    user.id && dispatch(getByUser(user.id)); // we are getting all teams to get a single team. should use seperate slice for single team store.
+    if (teams.error && isMounted) {
+      toast({
+        title: "An error occurred!",
+        description: teams.error,
+        status: "error",
+        position: "top",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  }, [teams.error]);
+
+  useEffect(() => {
+    if (teams.memberAddedSuccess && isMounted) {
+      toast({
+        title: teams.message,
+        status: "success",
+        position: "top",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+    onClose();
+  }, [teams.memberAddedSuccess]);
+
+  useEffect(() => {
+    user.user.id && dispatch(getByUser(user.user.id)); // we are getting all teams to get a single team. should use seperate slice for single team store.
     team_id && dispatch(getMembers(parseInt(team_id)));
     team_id && dispatch(getEvents(parseInt(team_id)));
   }, []);
+
+  useEffect(() => {
+    usernameQuery && dispatch(getUsersByQuery(usernameQuery));
+  }, [usernameQuery]);
 
   const toggleShowPastEvents = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -59,6 +118,36 @@ export const Team = () => {
   ) => {
     e.preventDefault();
     navigate("create-event");
+  };
+
+  const handleUpdateUsernameQuery = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setUsernameQuery(e.target.value);
+  };
+
+  const handleOnClose = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setUsernameQuery("");
+    dispatch(resetUserQuery());
+    onClose();
+  };
+
+  const handleAddMember = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    user_id: number | null
+  ) => {
+    e.preventDefault();
+    team_id &&
+      user_id &&
+      dispatch(
+        addMember({
+          team_id: parseInt(team_id),
+          teamMemberInfo: { id: user_id },
+        })
+      );
   };
 
   return (
@@ -136,6 +225,7 @@ export const Team = () => {
                   _hover={{
                     cursor: "pointer",
                   }}
+                  onClick={onOpen}
                 >
                   <AddIcon w={3} h={3} />
                   <Text>Add Member</Text>
@@ -149,7 +239,9 @@ export const Team = () => {
               <Divider borderColor={"gray.300"} />
               <Stack align={"center"} my={5} gap={2}>
                 {members.map((member) => (
-                  <Text color={"gray.500"}>{member.username}</Text>
+                  <Text key={member.id} color={"gray.500"}>
+                    {member.username}
+                  </Text>
                 ))}
               </Stack>
             </Box>
@@ -206,12 +298,65 @@ export const Team = () => {
                       stringToJSDate(a.startTime).getTime()
                   )
                   .map((event) => (
-                    <EventCard event={event} />
+                    <EventCard key={event.id} event={event} />
                   ))}
               </Flex>
             </Box>
           </Box>
         </Flex>
+
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Update Participant List</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl mb={10} id="participantIds">
+                <FormLabel mb={0}>Username</FormLabel>
+                <Input
+                  type="text"
+                  name="name"
+                  onChange={handleUpdateUsernameQuery}
+                  value={usernameQuery}
+                />
+              </FormControl>
+              <Stack
+                height={"fit-content"}
+                h={"170px"}
+                w={"full"}
+                border={"1px"}
+                borderColor={"gray.300"}
+                rounded={"xl"}
+                overflow={"scroll"}
+                px={5}
+                py={2}
+              >
+                {user.queryUsers
+                  .filter(
+                    (queriedUser) =>
+                      queriedUser.id !== user.user.id &&
+                      !members.some((members) => members.id === queriedUser.id)
+                  )
+                  .map((queriedUser) => (
+                    <Box
+                      p={2}
+                      _hover={{ cursor: "pointer", bg: "gray.50" }}
+                      onClick={(e) => handleAddMember(e, queriedUser.id)}
+                    >
+                      <Text key={queriedUser.id}>{queriedUser.username}</Text>
+                      <Divider borderColor={"gray.300"} />
+                    </Box>
+                  ))}
+              </Stack>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button variant="ghost" mr={3} onClick={handleOnClose}>
+                Close
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </Flex>
     </>
   );
