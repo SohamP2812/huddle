@@ -84,7 +84,7 @@ public class SessionController {
 
     if (user.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No user exists with this id.");
+      .body(new MessageResponse("No user exists with this id."));
 
     return ResponseEntity.ok(
       new UserResponse(

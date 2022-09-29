@@ -48,7 +48,7 @@ public class TeamController {
 
     if (user.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No user exists with this id.");
+      .body(new MessageResponse("No user exists with this id."));
 
     Team team = new Team(
       teamRequest.getName(),
@@ -83,12 +83,20 @@ public class TeamController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<?> getTeam(@PathVariable Long id) {
+  public ResponseEntity<?> getTeam(Authentication authentication, @PathVariable Long id) {
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+    Optional<User> user = userRepository.findById(userDetails.getId());
+
     Optional<Team> team = teamRepository.findById(id);
 
     if (team.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No team exists with this id.");
+      .body(new MessageResponse("No team exists with this id."));
+
+    if(!user.get().getMemberTeams().stream().map(memberTeam -> memberTeam.getTeam().getId()).toList().contains(id)) return ResponseEntity
+            .badRequest()
+            .body(new MessageResponse("You are not a member of this team."));
 
     return ResponseEntity.ok(
       new TeamResponse(
@@ -113,7 +121,7 @@ public class TeamController {
 
     if (team.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No team exists with this id.");
+      .body(new MessageResponse("No team exists with this id."));
 
     teamMemberRepository.deleteAllByTeamId(team.get().getId());
 
@@ -123,12 +131,20 @@ public class TeamController {
   }
 
   @GetMapping("/{id}/members")
-  public ResponseEntity<?> getMembers(@PathVariable Long id) {
+  public ResponseEntity<?> getMembers(Authentication authentication, @PathVariable Long id) {
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+    Optional<User> user = userRepository.findById(userDetails.getId());
+
     Optional<Team> team = teamRepository.findById(id);
 
     if (team.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No team exists with this id.");
+      .body(new MessageResponse("No team exists with this id."));
+
+    if(!user.get().getMemberTeams().stream().map(memberTeam -> memberTeam.getTeam().getId()).toList().contains(id)) return ResponseEntity
+            .badRequest()
+            .body(new MessageResponse("You are not a member of this team."));
 
     Set<TeamMember> teamMembers = team.get().getTeamMembers();
 
@@ -163,13 +179,13 @@ public class TeamController {
 
     if (team.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No team exists with this id.");
+      .body(new MessageResponse("No team exists with this id."));
 
     Optional<User> user = userRepository.findById(memberRequest.getId());
 
     if (user.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No user exists with this id.");
+      .body(new MessageResponse("No user exists with this id."));
 
     Set<TeamMember> memberTeams = user.get().getMemberTeams();
 
@@ -180,7 +196,7 @@ public class TeamController {
 
     if (teams.contains(team.get())) return ResponseEntity
       .badRequest()
-      .body("User is already a member of this team.");
+      .body(new MessageResponse("User is already a member of this team."));
 
     TeamMember teamMember = new TeamMember(
       ERole.ROLE_MEMBER,
@@ -209,13 +225,13 @@ public class TeamController {
 
     if (team.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No team exists with this id.");
+      .body(new MessageResponse("No team exists with this id."));
 
     Optional<User> user = userRepository.findById(user_id);
 
     if (user.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No user exists with this id.");
+      .body(new MessageResponse("No user exists with this id."));
 
     Optional<TeamMember> teamMember = teamMemberRepository.findByTeamIdAndMemberId(
       id,
@@ -224,11 +240,11 @@ public class TeamController {
 
     if (teamMember.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("This user is not a member of that team.");
+      .body(new MessageResponse("This user is not a member of that team."));
 
     if (teamMember.get().isManager()) return ResponseEntity
       .badRequest()
-      .body("You cannot delete the manager from a team.");
+      .body(new MessageResponse("You cannot delete the manager from a team."));
 
     teamMemberRepository.deleteByTeamIdAndMemberId(id, user_id); // Should I first get member teams from user then filter by team id?
 

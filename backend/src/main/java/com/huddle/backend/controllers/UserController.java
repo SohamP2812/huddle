@@ -13,6 +13,8 @@ import com.huddle.backend.security.services.UserDetailsImpl;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +47,7 @@ public class UserController {
 
   @PostMapping("")
   public ResponseEntity<?> createUser(
+    HttpServletResponse response,
     @Valid @RequestBody SignupRequest signUpRequest
   ) {
     if (userRepository.existsByUsername(signUpRequest.getUsername())) {
@@ -79,11 +82,18 @@ public class UserController {
     SecurityContextHolder.getContext().setAuthentication(authentication);
     String jwt = jwtUtils.generateJwtToken(authentication);
 
+    Cookie jwtTokenCookie = new Cookie("huddle_session", jwt);
+
+    jwtTokenCookie.setMaxAge(86400);
+    jwtTokenCookie.setSecure(true);
+    jwtTokenCookie.setHttpOnly(true);
+
+    response.addCookie(jwtTokenCookie);
+
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
     return ResponseEntity.ok(
-      new JwtResponse(
-        jwt,
+      new UserResponse(
         userDetails.getId(),
         userDetails.getFirstName(),
         userDetails.getLastName(),
@@ -120,7 +130,7 @@ public class UserController {
 
     if (user.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No user exists with this id.");
+      .body(new MessageResponse("No user exists with this id."));
 
     return ResponseEntity.ok(
       new UserResponse(
@@ -142,7 +152,7 @@ public class UserController {
 
     if (user.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No user exists with this id.");
+      .body(new MessageResponse("No user exists with this id."));
 
     user.get().setFirstName(userRequest.getFirstName());
     user.get().setLastName(userRequest.getLastName());
@@ -167,7 +177,7 @@ public class UserController {
 
     if (user.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No user exists with this id.");
+      .body(new MessageResponse("No user exists with this id."));
 
     userRepository.delete(user.get());
 
@@ -183,7 +193,7 @@ public class UserController {
 
     if (user.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No user exists with this id.");
+      .body(new MessageResponse("No user exists with this id."));
 
     // Which method is better?
     Set<TeamMember> memberTeams = user.get().getMemberTeams();

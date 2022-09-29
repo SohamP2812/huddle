@@ -6,8 +6,11 @@ import com.huddle.backend.payload.response.*;
 import com.huddle.backend.repository.*;
 import java.util.*;
 import javax.validation.Valid;
+
+import com.huddle.backend.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -31,14 +34,28 @@ public class EventController {
 
 
   @GetMapping("")
-  public ResponseEntity<?> getEvents(@PathVariable Long team_id) {
+  public ResponseEntity<?> getEvents(Authentication authentication, @PathVariable Long team_id) {
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+    Optional<User> user = userRepository.findById(userDetails.getId());
+
     Optional<Team> team = teamRepository.findById(team_id);
+
+    if(!user.get().getMemberTeams().stream().map(memberTeam -> memberTeam.getTeam().getId()).toList().contains(team_id)) return ResponseEntity
+            .badRequest()
+            .body(new MessageResponse("You are not a member of this team."));
 
     if (team.isEmpty()) return ResponseEntity
             .badRequest()
-            .body("No team exists with this id.");
+            .body(new MessageResponse("No team exists with this id."));
 
     Set<Event> events = team.get().getEvents();
+
+    for(Event event : events) {
+      Optional<EventParticipant> eventParticipant = eventParticipantRepository.findByParticipantIdAndEventId(user.get().getId(), event.getId());
+
+      if(eventParticipant.isEmpty()) events.remove(event);
+    }
 
     List<EventResponse> responseEvents = events
             .stream()
@@ -80,7 +97,7 @@ public class EventController {
 
     if (team.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No team exists with this id.");
+      .body(new MessageResponse("No team exists with this id."));
 
     Event event = new Event(
       eventRequest.getName(),
@@ -139,14 +156,19 @@ public class EventController {
 
   @GetMapping("/{event_id}")
   public ResponseEntity<?> getEvent(
+    Authentication authentication,
     @PathVariable Long team_id,
     @PathVariable Long event_id
   ) {
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+    Optional<User> user = userRepository.findById(userDetails.getId());
+
     Optional<Team> team = teamRepository.findById(team_id);
 
     if (team.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No team exists with this id.");
+      .body(new MessageResponse("No team exists with this id."));
 
     Optional<Event> event = eventRepository.findByIdAndTeamId(
       event_id,
@@ -155,7 +177,13 @@ public class EventController {
 
     if (event.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No event exists with this id on that team.");
+      .body(new MessageResponse("No event exists with this id on that team."));
+
+    Optional<EventParticipant> eventParticipant = eventParticipantRepository.findByParticipantIdAndEventId(user.get().getId(), event.get().getId());
+
+    if (eventParticipant.isEmpty()) return ResponseEntity
+            .badRequest()
+            .body(new MessageResponse("You are not a participant of this event."));
 
     return ResponseEntity.ok(
       new EventResponse(
@@ -192,7 +220,7 @@ public class EventController {
 
     if (team.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No team exists with this id.");
+      .body(new MessageResponse("No team exists with this id."));
 
     Optional<Event> event = eventRepository.findByIdAndTeamId(
       event_id,
@@ -201,7 +229,7 @@ public class EventController {
 
     if (event.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No event exists with this id on that team.");
+      .body(new MessageResponse("No event exists with this id on that team."));
 
     event.get().setEventType(eventRequest.getEventType());
     event.get().setName(eventRequest.getName());
@@ -356,7 +384,7 @@ public class EventController {
 
     if (team.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No team exists with this id.");
+      .body(new MessageResponse("No team exists with this id."));
 
     Optional<Event> event = eventRepository.findByIdAndTeamId(
       event_id,
@@ -365,7 +393,7 @@ public class EventController {
 
     if (event.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No event exists with this id on that team.");
+      .body(new MessageResponse("No event exists with this id on that team."));
 
     Optional<EventParticipant> eventParticipant = eventParticipantRepository.findByParticipantIdAndEventId(
       user_id,
@@ -374,7 +402,7 @@ public class EventController {
 
     if (eventParticipant.isEmpty()) return ResponseEntity
       .badRequest()
-      .body("No participant for that event exists with that user_id");
+      .body(new MessageResponse("No participant for that event exists with that user_id"));
 
     eventParticipant
       .get()

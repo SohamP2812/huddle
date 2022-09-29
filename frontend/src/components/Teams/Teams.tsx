@@ -54,7 +54,6 @@ export const Teams = () => {
         minH={"100vh"}
         pt={10}
         px={10}
-        justify={"center"}
         bg={useColorModeValue("gray.50", "gray.800")}
         alignItems={"center"}
       >
@@ -74,7 +73,7 @@ export const Teams = () => {
         >
           <AddIcon w={3} h={3} /> <Text>Create A Team</Text>
         </Button>
-        <Spacer py={5} />
+        <Spacer py={5} flex={0} />
         {teams.teams.map((team) => (
           <TeamCard
             key={team.name}
