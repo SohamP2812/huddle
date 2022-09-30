@@ -38,7 +38,7 @@ export const Header: FC<{}> = () => {
         bg={useColorModeValue("white", "gray.800")}
         color={useColorModeValue("gray.600", "white")}
         py={{ base: 4 }}
-        px={{ base: 4 }}
+        px={{ sm: 4, md: 10, lg: "10vw" }}
         borderBottom={1}
         borderStyle={"solid"}
         borderColor={useColorModeValue("gray.200", "gray.900")}
@@ -61,7 +61,7 @@ export const Header: FC<{}> = () => {
         <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
           <Image
             src={"/images/HuddleLogoBlack.png"}
-            width="200px"
+            width="150px"
             onClick={() => navigate("/")}
             _hover={{
               cursor: "pointer",
@@ -142,14 +142,15 @@ const DesktopNav = ({ loggedIn }: { loggedIn: boolean | null }) => {
               <PopoverTrigger>
                 <Link
                   as={RouterLink}
-                  p={2}
+                  p={3}
                   to={navItem.href ?? "#"}
                   fontSize={"lg"}
                   fontWeight={500}
-                  color={linkColor}
+                  color={"black"}
+                  rounded="xl"
                   _hover={{
                     textDecoration: "none",
-                    color: linkHoverColor,
+                    background: "gray.100",
                   }}
                 >
                   {navItem.label}

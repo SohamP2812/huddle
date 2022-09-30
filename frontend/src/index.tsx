@@ -1,3 +1,5 @@
+import "@fontsource/plus-jakarta-sans/800.css";
+
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
@@ -8,6 +10,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { extendTheme } from "@chakra-ui/react";
 
 import { AuthComponent } from "components/AuthComponent";
 
@@ -22,15 +25,23 @@ import { CreateEvent } from "components/CreateEvent/CreateEvent";
 import { Event } from "components/Event/Event";
 import { EditEvent } from "components/EditEvent/EditEvent";
 
-import theme from "theme";
+import { theme as baseTheme } from "theme";
 
 const container = document.getElementById("root")!;
 const root = createRoot(container);
 
+const theme = extendTheme(
+  {
+    fonts: {
+      heading: `'Plus Jakarta Sans', sans-serif`,
+    },
+  },
+  baseTheme
+);
+
 root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      {" "}
       <CssBaseline />
       <ChakraProvider>
         <Provider store={store}>
