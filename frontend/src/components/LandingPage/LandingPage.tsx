@@ -63,16 +63,19 @@ export const LandingPage: FC<{}> = () => {
                   </Heading>
                 </Flex>
                 <Text fontSize={20} color={{ sm: "white", md: "black" }}>
-                  Huddle offers a robust team management software to ease
+                  Huddle offers a robust team management solution to ease
                   painpoints and return the focus to good team performance.
                 </Text>
                 <Button
                   border={"1px"}
                   borderColor={"gray.300"}
-                  bg={"gray.300"}
+                  bg={{ sm: "white", md: "gray.300" }}
                   py={6}
                   alignItems={"center"}
-                  _hover={{ background: "gray.100" }}
+                  _hover={{
+                    sm: { background: "gray.300" },
+                    md: { background: "gray.100" },
+                  }}
                   onClick={() =>
                     navigate(user.loggedIn ? `/teams` : `/sign-up`)
                   }

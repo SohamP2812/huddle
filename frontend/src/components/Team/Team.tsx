@@ -106,13 +106,15 @@ export const Team = () => {
 
   useEffect(() => {
     if (teams.memberDeletionSuccess && isMounted) {
-      toast({
-        title: teams.message,
-        status: "success",
-        position: "top",
-        duration: 5000,
-        isClosable: true,
-      });
+      if (teams.members.find((member) => member.id === user.user.id)?.isManager)
+        toast({
+          title: teams.message,
+          status: "success",
+          position: "top",
+          duration: 5000,
+          isClosable: true,
+        });
+      else navigate(`/teams`);
     }
     onClose();
   }, [teams.memberDeletionSuccess]);
@@ -170,7 +172,9 @@ export const Team = () => {
   };
 
   const handleDeleteMember = (
-    e: React.MouseEvent<SVGElement, MouseEvent>,
+    e:
+      | React.MouseEvent<SVGElement, MouseEvent>
+      | React.MouseEvent<HTMLButtonElement, MouseEvent>,
     user_id: number | null
   ) => {
     e.preventDefault();
@@ -373,7 +377,7 @@ export const Team = () => {
           </Box>
         </Flex>
         {teams.members.find((member) => member.id === user.user.id)
-          ?.isManager && (
+          ?.isManager ? (
           <Button
             mb={5}
             p={4}
@@ -384,6 +388,20 @@ export const Team = () => {
             onClick={handleDeleteTeam}
           >
             Delete Team
+          </Button>
+        ) : (
+          <Button
+            mb={5}
+            p={4}
+            py={6}
+            bg="red"
+            color="white"
+            _hover={{ bg: "red.400" }}
+            onClick={(e) => {
+              handleDeleteMember(e, user.user.id);
+            }}
+          >
+            Leave Team
           </Button>
         )}
 

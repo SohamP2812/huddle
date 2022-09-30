@@ -279,7 +279,7 @@ public class TeamController {
       .body(new MessageResponse("No user exists with this id."));
 
     for (TeamMember member : user.get().getMemberTeams()) {
-      if (member.getTeam().getId() == id && !member.isManager()) {
+      if (member.getTeam().getId() == id && !member.isManager() && member.getMember().getId() != user_id) {
         return ResponseEntity
                 .badRequest()
                 .body(new MessageResponse("You do not have the authority to make this change."));
