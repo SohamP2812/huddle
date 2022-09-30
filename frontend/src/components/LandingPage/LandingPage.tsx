@@ -24,55 +24,70 @@ export const LandingPage: FC<{}> = () => {
       <Header />
       <Flex
         minH={"100vh"}
-        pt={10}
+        pt={{ sm: 0, md: 10 }}
         justify={"center"}
         bg={useColorModeValue("gray.50", "gray.800")}
       >
         <Stack
-          alignItems={"center"}
-          p={10}
-          mx={"auto"}
-          w={"100%"}
-          maxW={"1200px"}
+          w="100%"
+          backgroundRepeat={"no-repeat"}
+          objectFit={"cover"}
+          bgImage={{ sm: 'url("/images/NBACourtDark.jpeg")', md: "" }}
+          brightness={0.1}
         >
-          <Stack gap={60} alignItems={"center"} direction={"row"}>
-            <Flex direction="column" gap={8}>
-              <Flex direction="column">
-                <Heading
-                  color="blue.500"
-                  fontSize={60}
-                  fontFamily={"Plus Jakarta Sans"}
+          <Stack
+            alignItems={"center"}
+            p={10}
+            mx={"auto"}
+            w={"100%"}
+            maxW={"1200px"}
+          >
+            <Stack gap={60} alignItems={"center"} direction={"row"}>
+              <Flex direction="column" gap={8}>
+                <Flex direction="column">
+                  <Heading
+                    color={{ sm: "blue.400", md: "blue.500" }}
+                    fontSize={60}
+                    fontFamily={"Plus Jakarta Sans"}
+                  >
+                    Take control
+                  </Heading>
+                  <Heading
+                    fontSize={60}
+                    fontFamily={"Plus Jakarta Sans"}
+                    color={{ sm: "white", md: "black" }}
+                  >
+                    with better team management
+                  </Heading>
+                </Flex>
+                <Text fontSize={20} color={{ sm: "white", md: "black" }}>
+                  Huddle offers a robust team management software to ease
+                  painpoints and return the focus to good team performance.
+                </Text>
+                <Button
+                  border={"1px"}
+                  borderColor={"gray.300"}
+                  bg={"gray.300"}
+                  py={6}
+                  alignItems={"center"}
+                  _hover={{ background: "gray.100" }}
+                  onClick={() =>
+                    navigate(user.loggedIn ? `/teams` : `/sign-up`)
+                  }
                 >
-                  Take control
-                </Heading>
-                <Heading fontSize={60} fontFamily={"Plus Jakarta Sans"}>
-                  with better team management
-                </Heading>
+                  Get Started <ChevronRightIcon w={5} h={5} />
+                </Button>
               </Flex>
-              <Text fontSize={20}>
-                Huddle offers a robust team management software to ease
-                painpoints and return the focus to good team performance.
-              </Text>
-              <Button
-                border={"1px"}
-                borderColor={"gray.300"}
-                bg={"gray.300"}
-                py={6}
-                alignItems={"center"}
-                _hover={{ background: "gray.100" }}
-                onClick={() => navigate(user.loggedIn ? `/teams` : `/sign-up`)}
-              >
-                Get Started <ChevronRightIcon w={5} h={5} />
-              </Button>
-            </Flex>
-            <Image
-              maxWidth={"500px"}
-              height={"700px"}
-              rounded={"2xl"}
-              objectFit={"cover"}
-              src={"/images/NBACourt.jpeg"}
-            />
-          </Stack>
+              <Image
+                maxWidth={"500px"}
+                height={"700px"}
+                rounded={"2xl"}
+                objectFit={"cover"}
+                src={"/images/NBACourt.jpeg"}
+                display={{ sm: "none", md: "block" }}
+              />
+            </Stack>
+          </Stack>{" "}
         </Stack>
       </Flex>
     </>
