@@ -24,7 +24,7 @@ export const LandingPage: FC<{}> = () => {
       <Header />
       <Flex
         minH={"100vh"}
-        pt={{ sm: 0, md: 10 }}
+        pt={{ sm: 0, md: 5 }}
         justify={"center"}
         bg={useColorModeValue("gray.50", "gray.800")}
       >
@@ -49,6 +49,7 @@ export const LandingPage: FC<{}> = () => {
                     color={{ sm: "blue.400", md: "blue.500" }}
                     fontSize={60}
                     fontFamily={"Plus Jakarta Sans"}
+                    fontWeight={"extrabold"}
                   >
                     Take control
                   </Heading>
@@ -56,6 +57,7 @@ export const LandingPage: FC<{}> = () => {
                     fontSize={60}
                     fontFamily={"Plus Jakarta Sans"}
                     color={{ sm: "white", md: "black" }}
+                    fontWeight={"extrabold"}
                   >
                     with better team management
                   </Heading>

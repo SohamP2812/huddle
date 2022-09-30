@@ -129,8 +129,6 @@ export const Header: FC<{}> = () => {
 };
 
 const DesktopNav = ({ loggedIn }: { loggedIn: boolean | null }) => {
-  const linkColor = useColorModeValue("black", "gray.200");
-  const linkHoverColor = useColorModeValue("gray.500", "white");
   const popoverContentBgColor = useColorModeValue("white", "gray.800");
 
   return (
@@ -244,7 +242,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
     <Stack spacing={4} onClick={children && onToggle}>
       <Flex
         py={2}
-        as={Link}
+        as={RouterLink}
         to={href ?? "#"}
         justify={"space-between"}
         align={"center"}
@@ -252,10 +250,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
           textDecoration: "none",
         }}
       >
-        <Text
-          fontWeight={600}
-          color={useColorModeValue("gray.600", "gray.200")}
-        >
+        <Text fontWeight={600} color={useColorModeValue("black", "gray.200")}>
           {label}
         </Text>
         {children && (

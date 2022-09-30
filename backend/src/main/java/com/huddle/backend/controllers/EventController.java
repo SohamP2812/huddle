@@ -11,6 +11,7 @@ import com.huddle.backend.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -110,6 +111,12 @@ public class EventController {
                 .badRequest()
                 .body(new MessageResponse("You do not have the authority to make this change."));
       }
+    }
+
+    if (eventRequest.getEndTime().compareTo(eventRequest.getStartTime()) <= 0) {
+      return ResponseEntity
+              .badRequest()
+              .body(new MessageResponse("Start time must be before end time."));
     }
 
     Event event = new Event(
@@ -220,6 +227,69 @@ public class EventController {
         event.get().getTeamScore(),
         event.get().getOpponentScore()
       )
+    );
+  }
+
+  @DeleteMapping("{event_id}")
+  @Transactional
+  public ResponseEntity<?> deleteEvent(
+          Authentication authentication,
+          @PathVariable Long team_id,
+          @PathVariable Long event_id
+  ) {
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+    Optional<User> user = userRepository.findById(userDetails.getId());
+
+    Optional<Team> team = teamRepository.findById(team_id);
+
+    if (team.isEmpty()) return ResponseEntity
+            .badRequest()
+            .body(new MessageResponse("No team exists with this id."));
+
+    Optional<Event> event = eventRepository.findByIdAndTeamId(
+            event_id,
+            team_id
+    );
+
+    if (event.isEmpty()) return ResponseEntity
+            .badRequest()
+            .body(new MessageResponse("No event exists with this id on that team."));
+
+    for (TeamMember member : user.get().getMemberTeams()) {
+      if (member.getTeam().getId() == team_id && !member.isManager()) {
+        return ResponseEntity
+                .badRequest()
+                .body(new MessageResponse("You do not have the authority to make this change."));
+      }
+    }
+
+    eventParticipantRepository.deleteAllByEventId(event_id);
+
+    eventRepository.delete(event.get());
+
+    return ResponseEntity.ok(
+            new EventResponse(
+                    event.get().getId(),
+                    event.get().getName(),
+                    new TeamResponse(
+                            event.get().getTeam().getId(),
+                            event.get().getTeam().getName(),
+                            new UserResponse(
+                                    event.get().getTeam().getManager().getId(),
+                                    event.get().getTeam().getManager().getFirstName(),
+                                    event.get().getTeam().getManager().getLastName(),
+                                    event.get().getTeam().getManager().getUsername(),
+                                    event.get().getTeam().getManager().getEmail()
+                            ),
+                            event.get().getTeam().getSport()
+                    ),
+                    event.get().getStartTime(),
+                    event.get().getEndTime(),
+                    event.get().getEventType(),
+                    event.get().getTeamScore(),
+                    event.get().getOpponentScore()
+            )
     );
   }
 

@@ -46,6 +46,7 @@ export interface TeamsState {
   eventUpdateSuccess: boolean | null;
   memberAddedSuccess: boolean | null;
   memberDeletionSuccess: boolean | null;
+  eventDeletionSuccess: boolean | null;
   message: string | null;
 }
 
@@ -79,6 +80,7 @@ const initialState: TeamsState = {
   eventUpdateSuccess: null,
   memberAddedSuccess: null,
   memberDeletionSuccess: null,
+  eventDeletionSuccess: null,
   message: null,
 };
 
@@ -356,6 +358,53 @@ export const getEvents = createAsyncThunk<
     return rejectWithValue(error);
   }
 });
+
+export const deleteEvent = createAsyncThunk<
+  Event,
+  { team_id: number; event_id: number },
+  {
+    state: RootState;
+    rejectValue: APIError;
+  }
+>(
+  "teams/deleteEvent",
+  async ({ team_id, event_id }, { rejectWithValue, getState }) => {
+    try {
+      const { loggedIn } = getState().user;
+
+      if (!loggedIn) return;
+
+      const response = await fetch(`/teams/${team_id}/events/${event_id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          accepts: "application/json",
+        },
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (response.status !== 200) {
+        if (data.errors && data.errors.length && response.status === 400) {
+          data.message = data.errors[0].defaultMessage;
+        }
+
+        throw data;
+      }
+
+      return data;
+    } catch (err) {
+      let error: APIError = err;
+
+      if (!error.message) {
+        throw err;
+      }
+
+      return rejectWithValue(error);
+    }
+  }
+);
 
 export const createEvent = createAsyncThunk<
   Event,
@@ -647,6 +696,26 @@ export const teamsSlice = createSlice({
         state.events = action.payload.events;
       })
       .addCase(getEvents.rejected, (state, action) => {
+        if (action.payload) {
+          state.error = action.payload.message;
+        } else {
+          state.error =
+            action.error.message ??
+            "An unknown error occurred. Please try again.";
+        }
+      })
+      .addCase(deleteEvent.pending, (state) => {
+        state.error = null;
+        state.eventDeletionSuccess = null;
+      })
+      .addCase(deleteEvent.fulfilled, (state, action) => {
+        state.events = state.events.filter(
+          (event) => event.id !== action.payload.id
+        );
+        state.message = "Event deleted successfully.";
+        state.eventDeletionSuccess = true;
+      })
+      .addCase(deleteEvent.rejected, (state, action) => {
         if (action.payload) {
           state.error = action.payload.message;
         } else {

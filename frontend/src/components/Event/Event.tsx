@@ -10,6 +10,7 @@ import {
   getParticipants,
   updateParticipant,
   updateEvent,
+  deleteEvent,
   selectEventById,
   selectMembers,
   selectParticipants,
@@ -98,6 +99,23 @@ export const Event = () => {
   const dispatch = useAppDispatch();
 
   const toast = useToast();
+
+  useEffect(() => {
+    if (teams.error && isMounted) {
+      toast({
+        title: "An error occurred!",
+        description: teams.error,
+        status: "error",
+        position: "top",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  }, [teams.error]);
+
+  useEffect(() => {
+    if (teams.eventDeletionSuccess && isMounted) navigate(`/teams/${team_id}`);
+  }, [teams.eventDeletionSuccess]);
 
   useEffect(() => {
     if (teams.eventUpdateSuccess && isMounted) {
@@ -261,6 +279,20 @@ export const Event = () => {
   const toUpdateEvent = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.preventDefault();
     navigate("edit");
+  };
+
+  const handleDeleteEvent = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    team_id &&
+      event_id &&
+      dispatch(
+        deleteEvent({
+          team_id: parseInt(team_id),
+          event_id: parseInt(event_id),
+        })
+      );
   };
 
   return (
@@ -585,6 +617,17 @@ export const Event = () => {
             </Box>
           </Box>
         </Flex>
+        <Button
+          mb={5}
+          p={4}
+          py={6}
+          bg="red"
+          color="white"
+          _hover={{ bg: "red.400" }}
+          onClick={handleDeleteEvent}
+        >
+          Delete Event
+        </Button>
 
         <Modal isOpen={isUpdateScoreOpen} onClose={onUpdateScoreClose}>
           <ModalOverlay />

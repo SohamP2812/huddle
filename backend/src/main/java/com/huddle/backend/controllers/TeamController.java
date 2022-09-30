@@ -139,7 +139,20 @@ public class TeamController {
 
     teamRepository.delete(team.get());
 
-    return ResponseEntity.ok(new MessageResponse("Team deleted successfully!"));
+    return ResponseEntity.ok(
+            new TeamResponse(
+                    team.get().getId(),
+                    team.get().getName(),
+                    new UserResponse(
+                            team.get().getManager().getId(),
+                            team.get().getManager().getFirstName(),
+                            team.get().getManager().getLastName(),
+                            team.get().getManager().getUsername(),
+                            team.get().getManager().getEmail()
+                    ),
+                    team.get().getSport()
+            )
+    );
   }
 
   @GetMapping("/{id}/members")
