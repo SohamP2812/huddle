@@ -45,6 +45,7 @@ export interface TeamsState {
   eventCreationSuccess: boolean | null;
   eventUpdateSuccess: boolean | null;
   memberAddedSuccess: boolean | null;
+  memberDeletionSuccess: boolean | null;
   message: string | null;
 }
 
@@ -77,6 +78,7 @@ const initialState: TeamsState = {
   eventCreationSuccess: null,
   eventUpdateSuccess: null,
   memberAddedSuccess: null,
+  memberDeletionSuccess: null,
   message: null,
 };
 
@@ -263,6 +265,53 @@ export const getMembers = createAsyncThunk<
     return rejectWithValue(error);
   }
 });
+
+export const deleteMember = createAsyncThunk<
+  User,
+  { user_id: number; team_id: number },
+  {
+    state: RootState;
+    rejectValue: APIError;
+  }
+>(
+  "teams/deleteMember",
+  async ({ user_id, team_id }, { rejectWithValue, getState }) => {
+    try {
+      const { loggedIn } = getState().user;
+
+      if (!loggedIn) return;
+
+      const response = await fetch(`/teams/${team_id}/members/${user_id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          accepts: "application/json",
+        },
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (response.status !== 200) {
+        if (data.errors && data.errors.length && response.status === 400) {
+          data.message = data.errors[0].defaultMessage;
+        }
+
+        throw data;
+      }
+
+      return data;
+    } catch (err) {
+      let error: APIError = err;
+
+      if (!error.message) {
+        throw err;
+      }
+
+      return rejectWithValue(error);
+    }
+  }
+);
 
 export const getEvents = createAsyncThunk<
   { events: Event[] },
@@ -571,6 +620,26 @@ export const teamsSlice = createSlice({
             "An unknown error occurred. Please try again.";
         }
       })
+      .addCase(deleteMember.pending, (state) => {
+        state.error = null;
+        state.memberDeletionSuccess = null;
+      })
+      .addCase(deleteMember.fulfilled, (state, action) => {
+        state.members = state.members.filter(
+          (member) => member.id !== action.payload.id
+        );
+        state.message = "Member removed successfully.";
+        state.memberDeletionSuccess = true;
+      })
+      .addCase(deleteMember.rejected, (state, action) => {
+        if (action.payload) {
+          state.error = action.payload.message;
+        } else {
+          state.error =
+            action.error.message ??
+            "An unknown error occurred. Please try again.";
+        }
+      })
       .addCase(getEvents.pending, (state) => {
         state.error = null;
       })
@@ -664,6 +733,7 @@ export const teamsSlice = createSlice({
       })
       .addCase(addMember.pending, (state) => {
         state.error = null;
+        state.memberAddedSuccess = null;
       })
       .addCase(addMember.fulfilled, (state, action) => {
         state.message = "Added successfully.";

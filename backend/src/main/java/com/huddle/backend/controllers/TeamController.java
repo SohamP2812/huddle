@@ -286,8 +286,11 @@ public class TeamController {
 
     teamMemberRepository.deleteByTeamIdAndMemberId(id, user_id); // Should I first get member teams from user then filter by team id?
 
-    return ResponseEntity.ok(
-      new MessageResponse("Member deleted successfully!")
-    );
+    return ResponseEntity.ok(new UserResponse(
+            userToDelete.get().getId(),
+            userToDelete.get().getFirstName(),
+            userToDelete.get().getLastName(),
+            userToDelete.get().getUsername(),
+            userToDelete.get().getEmail()));
   }
 }

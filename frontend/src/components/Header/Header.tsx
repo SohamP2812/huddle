@@ -69,7 +69,7 @@ export const Header: FC<{}> = () => {
           />
 
           <Flex display={{ base: "none", md: "flex" }} ml={10}>
-            <DesktopNav />
+            <DesktopNav loggedIn={user.loggedIn} />
           </Flex>
         </Flex>
 
@@ -122,58 +122,60 @@ export const Header: FC<{}> = () => {
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
-        <MobileNav />
+        <MobileNav loggedIn={user.loggedIn} />
       </Collapse>
     </Box>
   );
 };
 
-const DesktopNav = () => {
+const DesktopNav = ({ loggedIn }: { loggedIn: boolean | null }) => {
   const linkColor = useColorModeValue("black", "gray.200");
   const linkHoverColor = useColorModeValue("gray.500", "white");
   const popoverContentBgColor = useColorModeValue("white", "gray.800");
 
   return (
     <Stack direction={"row"} align={"center"} spacing={4}>
-      {NAV_ITEMS.map((navItem) => (
-        <Box key={navItem.label}>
-          <Popover trigger={"hover"} placement={"bottom-start"}>
-            <PopoverTrigger>
-              <Link
-                as={RouterLink}
-                p={2}
-                to={navItem.href ?? "#"}
-                fontSize={"lg"}
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: "none",
-                  color: linkHoverColor,
-                }}
-              >
-                {navItem.label}
-              </Link>
-            </PopoverTrigger>
+      {NAV_ITEMS.filter((navItem) => !navItem.protected || loggedIn).map(
+        (navItem) => (
+          <Box key={navItem.label}>
+            <Popover trigger={"hover"} placement={"bottom-start"}>
+              <PopoverTrigger>
+                <Link
+                  as={RouterLink}
+                  p={2}
+                  to={navItem.href ?? "#"}
+                  fontSize={"lg"}
+                  fontWeight={500}
+                  color={linkColor}
+                  _hover={{
+                    textDecoration: "none",
+                    color: linkHoverColor,
+                  }}
+                >
+                  {navItem.label}
+                </Link>
+              </PopoverTrigger>
 
-            {navItem.children && (
-              <PopoverContent
-                border={0}
-                boxShadow={"xl"}
-                bg={popoverContentBgColor}
-                p={4}
-                rounded={"xl"}
-                minW={"sm"}
-              >
-                <Stack>
-                  {navItem.children.map((child) => (
-                    <DesktopSubNav key={child.label} {...child} />
-                  ))}
-                </Stack>
-              </PopoverContent>
-            )}
-          </Popover>
-        </Box>
-      ))}
+              {navItem.children && (
+                <PopoverContent
+                  border={0}
+                  boxShadow={"xl"}
+                  bg={popoverContentBgColor}
+                  p={4}
+                  rounded={"xl"}
+                  minW={"sm"}
+                >
+                  <Stack>
+                    {navItem.children.map((child) => (
+                      <DesktopSubNav key={child.label} {...child} />
+                    ))}
+                  </Stack>
+                </PopoverContent>
+              )}
+            </Popover>
+          </Box>
+        )
+      )}
     </Stack>
   );
 };
@@ -216,7 +218,7 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
   );
 };
 
-const MobileNav = () => {
+const MobileNav = ({ loggedIn }: { loggedIn: boolean | null }) => {
   return (
     <Stack
       bg={useColorModeValue("white", "gray.800")}
@@ -225,9 +227,11 @@ const MobileNav = () => {
       borderBottom={"1px"}
       borderColor={"black"}
     >
-      {NAV_ITEMS.map((navItem) => (
-        <MobileNavItem key={navItem.label} {...navItem} />
-      ))}
+      {NAV_ITEMS.filter((navItem) => !navItem.protected || loggedIn).map(
+        (navItem) => (
+          <MobileNavItem key={navItem.label} {...navItem} />
+        )
+      )}
     </Stack>
   );
 };
@@ -295,11 +299,13 @@ interface NavItem {
   subLabel?: string;
   children?: Array<NavItem>;
   href?: string;
+  protected?: boolean;
 }
 
 const NAV_ITEMS: Array<NavItem> = [
   {
     label: "Teams",
     href: "/teams",
+    protected: true,
   },
 ];

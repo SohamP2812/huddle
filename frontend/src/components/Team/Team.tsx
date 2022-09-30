@@ -8,6 +8,7 @@ import {
   selectUser,
 } from "redux/slices/userSlice";
 import {
+  deleteMember,
   addMember,
   getByUser,
   getMembers,
@@ -41,7 +42,7 @@ import {
   Input,
   useToast,
 } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
+import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 
 import { stringToJSDate } from "utils/misc";
 import { useIsMounted } from "hooks/useIsMounted";
@@ -99,6 +100,19 @@ export const Team = () => {
   }, [teams.memberAddedSuccess]);
 
   useEffect(() => {
+    if (teams.memberDeletionSuccess && isMounted) {
+      toast({
+        title: teams.message,
+        status: "success",
+        position: "top",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+    onClose();
+  }, [teams.memberDeletionSuccess]);
+
+  useEffect(() => {
     user.user.id && dispatch(getByUser(user.user.id)); // we are getting all teams to get a single team. should use seperate slice for single team store.
     team_id && dispatch(getMembers(parseInt(team_id)));
     team_id && dispatch(getEvents(parseInt(team_id)));
@@ -146,6 +160,21 @@ export const Team = () => {
         addMember({
           team_id: parseInt(team_id),
           teamMemberInfo: { id: user_id },
+        })
+      );
+  };
+
+  const handleDeleteMember = (
+    e: React.MouseEvent<SVGElement, MouseEvent>,
+    user_id: number | null
+  ) => {
+    e.preventDefault();
+    team_id &&
+      user_id &&
+      dispatch(
+        deleteMember({
+          user_id: user_id,
+          team_id: parseInt(team_id),
         })
       );
   };
@@ -240,16 +269,30 @@ export const Team = () => {
                 </Heading>
               </Stack>
               <Divider borderColor={"gray.300"} />
-              <Stack align={"center"} my={5} gap={2}>
-                {members.map((member) => (
-                  <Text
-                    key={member.id}
-                    fontWeight={member.id === user.user.id ? 600 : 300}
-                    color={member.id === user.user.id ? "gray.900" : "gray.600"}
-                  >
-                    {member.username}
-                  </Text>
-                ))}
+              <Stack my={5} gap={2}>
+                {members
+                  .filter((member) => member.id !== user.user.id)
+                  .map((member) => (
+                    <Stack
+                      justify={"space-between"}
+                      align="center"
+                      direction="row"
+                    >
+                      <Text key={member.id} fontWeight={300} color={"gray.600"}>
+                        {member.username}
+                      </Text>
+                      {member.id !== user.user.id && (
+                        <DeleteIcon
+                          onClick={(e) => {
+                            handleDeleteMember(e, member.id);
+                          }}
+                          _hover={{ cursor: "pointer", color: "red" }}
+                          w={4}
+                          h={4}
+                        />
+                      )}
+                    </Stack>
+                  ))}
               </Stack>
             </Box>
           </Box>
