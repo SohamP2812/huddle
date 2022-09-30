@@ -264,8 +264,6 @@ public class EventController {
       }
     }
 
-    eventParticipantRepository.deleteAllByEventId(event_id);
-
     eventRepository.delete(event.get());
 
     return ResponseEntity.ok(

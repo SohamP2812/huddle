@@ -41,13 +41,13 @@ public class User {
   @Size(max = 120)
   private String password;
 
-  @OneToMany(mappedBy = "manager")
+  @OneToMany(mappedBy = "manager", cascade = CascadeType.REMOVE)
   private Set<Team> teams = new HashSet<>();
 
-  @OneToMany(mappedBy = "member")
+  @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
   private Set<TeamMember> memberTeams = new HashSet<>();
 
-  @OneToMany(mappedBy = "participant")
+  @OneToMany(mappedBy = "participant", cascade = CascadeType.REMOVE)
   private Set<EventParticipant> participantEvents = new HashSet<>();
 
   public User() {}

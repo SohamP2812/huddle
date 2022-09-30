@@ -9,6 +9,7 @@ import {
 } from "redux/slices/userSlice";
 import {
   deleteMember,
+  deleteTeam,
   addMember,
   getByUser,
   getMembers,
@@ -85,6 +86,10 @@ export const Team = () => {
       });
     }
   }, [teams.error]);
+
+  useEffect(() => {
+    if (teams.teamDeletionSuccess && isMounted) navigate(`/teams`);
+  }, [teams.teamDeletionSuccess]);
 
   useEffect(() => {
     if (teams.memberAddedSuccess && isMounted) {
@@ -177,6 +182,13 @@ export const Team = () => {
           team_id: parseInt(team_id),
         })
       );
+  };
+
+  const handleDeleteTeam = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    team_id && dispatch(deleteTeam(parseInt(team_id)));
   };
 
   return (
@@ -281,16 +293,19 @@ export const Team = () => {
                       <Text key={member.id} fontWeight={300} color={"gray.600"}>
                         {member.username}
                       </Text>
-                      {member.id !== user.user.id && (
-                        <DeleteIcon
-                          onClick={(e) => {
-                            handleDeleteMember(e, member.id);
-                          }}
-                          _hover={{ cursor: "pointer", color: "red" }}
-                          w={4}
-                          h={4}
-                        />
-                      )}
+                      {member.id !== user.user.id &&
+                        teams.members.find(
+                          (member) => member.id === user.user.id
+                        )?.isManager && (
+                          <DeleteIcon
+                            onClick={(e) => {
+                              handleDeleteMember(e, member.id);
+                            }}
+                            _hover={{ cursor: "pointer", color: "red" }}
+                            w={4}
+                            h={4}
+                          />
+                        )}
                     </Stack>
                   ))}
               </Stack>
@@ -357,6 +372,20 @@ export const Team = () => {
             </Box>
           </Box>
         </Flex>
+        {teams.members.find((member) => member.id === user.user.id)
+          ?.isManager && (
+          <Button
+            mb={5}
+            p={4}
+            py={6}
+            bg="red"
+            color="white"
+            _hover={{ bg: "red.400" }}
+            onClick={handleDeleteTeam}
+          >
+            Delete Team
+          </Button>
+        )}
 
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />

@@ -37,7 +37,7 @@ public class Event {
   @JoinColumn(name = "team_id")
   private Team team;
 
-  @OneToMany(mappedBy = "event")
+  @OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE)
   private Set<EventParticipant> eventParticipants = new HashSet<>();
 
   private Integer teamScore;

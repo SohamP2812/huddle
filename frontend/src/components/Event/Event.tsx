@@ -617,18 +617,20 @@ export const Event = () => {
             </Box>
           </Box>
         </Flex>
-        <Button
-          mb={5}
-          p={4}
-          py={6}
-          bg="red"
-          color="white"
-          _hover={{ bg: "red.400" }}
-          onClick={handleDeleteEvent}
-        >
-          Delete Event
-        </Button>
-
+        {teams.members.find((member) => member.id === user.user.id)
+          ?.isManager && (
+          <Button
+            mb={5}
+            p={4}
+            py={6}
+            bg="red"
+            color="white"
+            _hover={{ bg: "red.400" }}
+            onClick={handleDeleteEvent}
+          >
+            Delete Event
+          </Button>
+        )}
         <Modal isOpen={isUpdateScoreOpen} onClose={onUpdateScoreClose}>
           <ModalOverlay />
           <ModalContent>

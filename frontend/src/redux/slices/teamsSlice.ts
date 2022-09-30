@@ -47,6 +47,7 @@ export interface TeamsState {
   memberAddedSuccess: boolean | null;
   memberDeletionSuccess: boolean | null;
   eventDeletionSuccess: boolean | null;
+  teamDeletionSuccess: boolean | null;
   message: string | null;
 }
 
@@ -81,6 +82,7 @@ const initialState: TeamsState = {
   memberAddedSuccess: null,
   memberDeletionSuccess: null,
   eventDeletionSuccess: null,
+  teamDeletionSuccess: null,
   message: null,
 };
 
@@ -131,6 +133,50 @@ export const createTeam = createAsyncThunk<
     }
   }
 );
+
+export const deleteTeam = createAsyncThunk<
+  Event,
+  number,
+  {
+    state: RootState;
+    rejectValue: APIError;
+  }
+>("teams/deleteTeam", async (team_id, { rejectWithValue, getState }) => {
+  try {
+    const { loggedIn } = getState().user;
+
+    if (!loggedIn) return;
+
+    const response = await fetch(`/teams/${team_id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        accepts: "application/json",
+      },
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
+      }
+
+      throw data;
+    }
+
+    return data;
+  } catch (err) {
+    let error: APIError = err;
+
+    if (!error.message) {
+      throw err;
+    }
+
+    return rejectWithValue(error);
+  }
+});
 
 export const addMember = createAsyncThunk<
   User,
@@ -639,6 +685,27 @@ export const teamsSlice = createSlice({
             "An unknown error occurred. Please try again.";
         }
       })
+      .addCase(deleteTeam.pending, (state) => {
+        state.error = null;
+        state.teamDeletionSuccess = null;
+      })
+      .addCase(deleteTeam.fulfilled, (state, action) => {
+        state.teams = state.teams.filter(
+          (team) => team.id !== action.payload.id
+        );
+        state.message = "Team deleted successfully.";
+        state.teamDeletionSuccess = true;
+      })
+      .addCase(deleteTeam.rejected, (state, action) => {
+        state.teamDeletionSuccess = false;
+        if (action.payload) {
+          state.error = action.payload.message;
+        } else {
+          state.error =
+            action.error.message ??
+            "An unknown error occurred. Please try again.";
+        }
+      })
       .addCase(getByUser.pending, (state) => {
         state.error = null;
       })
@@ -681,6 +748,7 @@ export const teamsSlice = createSlice({
         state.memberDeletionSuccess = true;
       })
       .addCase(deleteMember.rejected, (state, action) => {
+        state.memberDeletionSuccess = false;
         if (action.payload) {
           state.error = action.payload.message;
         } else {
@@ -716,6 +784,7 @@ export const teamsSlice = createSlice({
         state.eventDeletionSuccess = true;
       })
       .addCase(deleteEvent.rejected, (state, action) => {
+        state.eventDeletionSuccess = false;
         if (action.payload) {
           state.error = action.payload.message;
         } else {

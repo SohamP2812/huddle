@@ -6,6 +6,7 @@ import com.huddle.backend.payload.request.MemberRequest;
 import com.huddle.backend.payload.request.SignupRequest;
 import com.huddle.backend.payload.request.TeamRequest;
 import com.huddle.backend.payload.response.*;
+import com.huddle.backend.repository.EventRepository;
 import com.huddle.backend.repository.TeamMemberRepository;
 import com.huddle.backend.repository.TeamRepository;
 import com.huddle.backend.repository.UserRepository;
@@ -36,6 +37,9 @@ public class TeamController {
 
   @Autowired
   TeamMemberRepository teamMemberRepository;
+
+  @Autowired
+  EventRepository eventRepository;
 
   @PostMapping("")
   public ResponseEntity<?> createTeam(
@@ -134,8 +138,6 @@ public class TeamController {
                 .body(new MessageResponse("You do not have the authority to make this change."));
       }
     }
-
-    teamMemberRepository.deleteAllByTeamId(team.get().getId());
 
     teamRepository.delete(team.get());
 

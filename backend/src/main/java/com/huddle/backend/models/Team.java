@@ -21,10 +21,10 @@ public class Team {
   @JoinColumn(name = "manager")
   private User manager;
 
-  @OneToMany(mappedBy = "team")
+  @OneToMany(mappedBy = "team", cascade = CascadeType.REMOVE)
   private Set<TeamMember> teamMembers = new HashSet<>();
 
-  @OneToMany(mappedBy = "team")
+  @OneToMany(mappedBy = "team", cascade = CascadeType.REMOVE)
   private Set<Event> events = new HashSet<>();
 
   @NotNull
