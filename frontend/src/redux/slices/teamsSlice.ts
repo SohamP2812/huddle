@@ -101,7 +101,7 @@ export const createTeam = createAsyncThunk<
 
       if (!loggedIn) return;
 
-      const response = await fetch("/teams", {
+      const response = await fetch("/api/teams", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -147,7 +147,7 @@ export const deleteTeam = createAsyncThunk<
 
     if (!loggedIn) return;
 
-    const response = await fetch(`/teams/${team_id}`, {
+    const response = await fetch(`/api/teams/${team_id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -193,7 +193,7 @@ export const addMember = createAsyncThunk<
 
       if (!loggedIn) return;
 
-      const response = await fetch(`/teams/${team_id}/members`, {
+      const response = await fetch(`/api/teams/${team_id}/members`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -239,7 +239,7 @@ export const getByUser = createAsyncThunk<
 
     if (!loggedIn) return;
 
-    const response = await fetch(`/users/${id}/teams`, {
+    const response = await fetch(`/api/users/${id}/teams`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -283,7 +283,7 @@ export const getMembers = createAsyncThunk<
 
     if (!loggedIn) return;
 
-    const response = await fetch(`/teams/${id}/members`, {
+    const response = await fetch(`/api/teams/${id}/members`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -329,7 +329,7 @@ export const deleteMember = createAsyncThunk<
 
       if (!loggedIn) return;
 
-      const response = await fetch(`/teams/${team_id}/members/${user_id}`, {
+      const response = await fetch(`/api/teams/${team_id}/members/${user_id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -374,7 +374,7 @@ export const getEvents = createAsyncThunk<
 
     if (!loggedIn) return;
 
-    const response = await fetch(`/teams/${id}/events`, {
+    const response = await fetch(`/api/teams/${id}/events`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -420,7 +420,7 @@ export const deleteEvent = createAsyncThunk<
 
       if (!loggedIn) return;
 
-      const response = await fetch(`/teams/${team_id}/events/${event_id}`, {
+      const response = await fetch(`/api/teams/${team_id}/events/${event_id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -467,7 +467,7 @@ export const createEvent = createAsyncThunk<
 
       if (!loggedIn) return;
 
-      const response = await fetch(`/teams/${id}/events`, {
+      const response = await fetch(`/api/teams/${id}/events`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -518,7 +518,7 @@ export const updateEvent = createAsyncThunk<
 
       if (!loggedIn) return;
 
-      const response = await fetch(`/teams/${team_id}/events/${event_id}`, {
+      const response = await fetch(`/api/teams/${team_id}/events/${event_id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -567,7 +567,7 @@ export const getParticipants = createAsyncThunk<
       if (!loggedIn) return;
 
       const response = await fetch(
-        `/teams/${team_id}/events/${event_id}/participants`,
+        `/api/teams/${team_id}/events/${event_id}/participants`,
         {
           method: "GET",
           headers: {
@@ -625,7 +625,7 @@ export const updateParticipant = createAsyncThunk<
       if (!loggedIn) return;
 
       const response = await fetch(
-        `/teams/${team_id}/events/${event_id}/participants/${user_id}`,
+        `/api/teams/${team_id}/events/${event_id}/participants/${user_id}`,
         {
           method: "PATCH",
           headers: {
@@ -895,6 +895,9 @@ export const teamsSlice = createSlice({
     resetError: (state) => {
       state.error = "";
     },
+    clearTeamState: (state) => {
+      state = initialState;
+    },
   },
 });
 
@@ -919,6 +922,6 @@ export const selectEventById = (
 ): Event | null | undefined =>
   id ? state.teams.events.find((event) => event.id === id) : null;
 
-export const { resetError } = teamsSlice.actions;
+export const { resetError, clearTeamState } = teamsSlice.actions;
 
 export default teamsSlice.reducer;

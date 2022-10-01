@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @RestController
-@RequestMapping("/session")
+@RequestMapping("/api/session")
 public class SessionController {
   @Autowired
   AuthenticationManager authenticationManager;

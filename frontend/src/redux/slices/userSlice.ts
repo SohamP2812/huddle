@@ -56,7 +56,7 @@ export const getUsersByQuery = createAsyncThunk<
   }
 >("user/getUsersByQuery", async (username, { rejectWithValue }) => {
   try {
-    const response = await fetch(`/users?username=${username}`, {
+    const response = await fetch(`/api/users?username=${username}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -96,7 +96,7 @@ export const getSelf = createAsyncThunk<
   }
 >("user/getSelf", async (_, { getState, rejectWithValue }) => {
   try {
-    const response = await fetch("/session", {
+    const response = await fetch("/api/session", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -140,7 +140,7 @@ export const login = createAsyncThunk<
 
     if (loggedIn) return;
 
-    const response = await fetch("/session", {
+    const response = await fetch("/api/session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -187,7 +187,7 @@ export const createAccount = createAsyncThunk<
 
       if (loggedIn) return;
 
-      const response = await fetch("/users", {
+      const response = await fetch("/api/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -236,7 +236,7 @@ export const updateUser = createAsyncThunk<
 
     if (!loggedIn) return;
 
-    const response = await fetch(`/users/${id}`, {
+    const response = await fetch(`/api/users/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -281,7 +281,7 @@ export const logout = createAsyncThunk<
 
     if (!loggedIn) return;
 
-    const response = await fetch("/session", {
+    const response = await fetch("/api/session", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -434,11 +434,14 @@ export const userSlice = createSlice({
     resetUserQuery: (state) => {
       state.queryUsers = [];
     },
+    clearUserState: (state) => {
+      state = { ...initialState, loggedIn: state.loggedIn };
+    },
   },
 });
 
 export const selectUser = (state: RootState): UserState => state.user;
 
-export const { resetError, resetUserQuery } = userSlice.actions;
+export const { resetError, resetUserQuery, clearUserState } = userSlice.actions;
 
 export default userSlice.reducer;

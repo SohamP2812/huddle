@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/teams/{team_id}/events")
+@RequestMapping("/api/teams/{team_id}/events")
 public class EventController {
   @Autowired
   TeamRepository teamRepository;

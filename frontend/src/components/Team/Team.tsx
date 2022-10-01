@@ -103,6 +103,7 @@ export const Team = () => {
       });
     }
     onClose();
+    setUsernameQuery("");
   }, [teams.memberAddedSuccess]);
 
   useEffect(() => {
@@ -309,6 +310,7 @@ export const Team = () => {
                         justify={"space-between"}
                         align="center"
                         direction="row"
+                        key={member.id}
                       >
                         <Text
                           key={member.id}
@@ -472,6 +474,7 @@ export const Team = () => {
                         p={2}
                         _hover={{ cursor: "pointer", bg: "gray.50" }}
                         onClick={(e) => handleAddMember(e, queriedUser.id)}
+                        key={queriedUser.id}
                       >
                         <Text key={queriedUser.id}>{queriedUser.username}</Text>
                         <Divider borderColor={"gray.300"} />

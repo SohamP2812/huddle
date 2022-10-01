@@ -141,7 +141,7 @@ export const Account = () => {
               </FormControl>
               <Spacer h={"xl"} />
               <Button
-                disabled={!isObjectDiff(accountFields, user)}
+                disabled={!isObjectDiff(accountFields, user.user)}
                 type="submit"
                 bg={"black"}
                 color={"white"}

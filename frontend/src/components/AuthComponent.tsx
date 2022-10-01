@@ -1,6 +1,7 @@
 import { useEffect, FC, ReactNode } from "react";
 import { useAppSelector, useAppDispatch } from "redux/hooks";
-import { getSelf, selectUser } from "redux/slices/userSlice";
+import { getSelf, selectUser, clearUserState } from "redux/slices/userSlice";
+import { clearTeamState } from "redux/slices/teamsSlice";
 import { useNavigate, useLocation } from "react-router-dom";
 
 interface IProps {
@@ -27,6 +28,10 @@ export const AuthComponent: FC<IProps> = ({
   }, [location]);
 
   useEffect(() => {
+    if (user.loggedIn === false) {
+      dispatch(clearUserState());
+      dispatch(clearTeamState());
+    }
     if (user.loggedIn === false && location.pathname !== "/" && isProtected)
       navigate("/");
   }, [user.loggedIn]);

@@ -18,10 +18,11 @@ export const BackButton = ({ fallback }: { fallback: string }) => {
       width={"fit-content"}
       border={"1px"}
       borderColor={"gray.400"}
-      bg={"transparent"}
       p={5}
       alignItems={"center"}
       onClick={goBack}
+      bg="blue.50"
+      _hover={{ bg: "blue.300" }}
     >
       <ArrowBackIcon w={5} h={5} />
       Back

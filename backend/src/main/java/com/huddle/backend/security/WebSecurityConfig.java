@@ -40,6 +40,11 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     return new AuthTokenFilter();
   }
 
+  @Bean
+  public StaticContentFilter staticContentFilterBean() {
+    return new StaticContentFilter();
+  }
+
   //  @Override
   //  public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
   //    authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
@@ -113,6 +118,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
       authenticationJwtTokenFilter(),
       UsernamePasswordAuthenticationFilter.class
     );
+
+    http.addFilterBefore(staticContentFilterBean(), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
