@@ -24,7 +24,7 @@ export const LandingPage: FC<{}> = () => {
       <Header />
       <Flex
         minH={"100vh"}
-        pt={{ sm: 0, md: 5 }}
+        pt={{ base: 0, md: 5 }}
         justify={"center"}
         bg={useColorModeValue("gray.50", "gray.800")}
       >
@@ -32,7 +32,7 @@ export const LandingPage: FC<{}> = () => {
           w="100%"
           backgroundRepeat={"no-repeat"}
           objectFit={"cover"}
-          bgImage={{ sm: 'url("/images/NBACourtDark.jpeg")', md: "" }}
+          bgImage={{ base: 'url("/images/NBACourtDark.jpeg")', md: "" }}
           brightness={0.1}
         >
           <Stack
@@ -46,34 +46,34 @@ export const LandingPage: FC<{}> = () => {
               <Flex direction="column" gap={8}>
                 <Flex direction="column">
                   <Heading
-                    color={{ sm: "blue.400", md: "blue.500" }}
-                    fontSize={60}
+                    color={{ base: "blue.400", md: "blue.500" }}
+                    fontSize={50}
                     fontFamily={"Plus Jakarta Sans"}
                     fontWeight={"extrabold"}
                   >
                     Take control
                   </Heading>
                   <Heading
-                    fontSize={60}
+                    fontSize={50}
                     fontFamily={"Plus Jakarta Sans"}
-                    color={{ sm: "white", md: "black" }}
+                    color={{ base: "white", md: "black" }}
                     fontWeight={"extrabold"}
                   >
                     with better team management
                   </Heading>
                 </Flex>
-                <Text fontSize={20} color={{ sm: "white", md: "black" }}>
+                <Text fontSize={16} color={{ base: "white", md: "black" }}>
                   Huddle offers a robust team management solution to ease
                   painpoints and return the focus to good team performance.
                 </Text>
                 <Button
                   border={"1px"}
                   borderColor={"gray.300"}
-                  bg={{ sm: "white", md: "gray.300" }}
+                  bg={{ base: "white", md: "gray.300" }}
                   py={6}
                   alignItems={"center"}
                   _hover={{
-                    sm: { background: "gray.300" },
+                    base: { background: "gray.300" },
                     md: { background: "gray.100" },
                   }}
                   onClick={() =>
@@ -89,10 +89,10 @@ export const LandingPage: FC<{}> = () => {
                 rounded={"2xl"}
                 objectFit={"cover"}
                 src={"/images/NBACourt.jpeg"}
-                display={{ sm: "none", md: "block" }}
+                display={{ base: "none", md: "block" }}
               />
             </Stack>
-          </Stack>{" "}
+          </Stack>
         </Stack>
       </Flex>
     </>

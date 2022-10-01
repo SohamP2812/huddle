@@ -51,7 +51,7 @@ public class StaticContentFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getServletPath();
-        System.out.println(path);
+
         boolean isApi = path.startsWith("/api");
         boolean isResourceFile = !isApi && fileExtensions.stream().anyMatch(path::contains);
 

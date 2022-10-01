@@ -93,7 +93,9 @@ export const SignIn = () => {
       >
         <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
           <Stack align={"center"}>
-            <Heading fontSize={"4xl"}>Sign in to your account</Heading>
+            <Heading fontSize={{ base: "3xl", md: "4xl" }}>
+              Sign in to your account
+            </Heading>
             <Text fontSize={"lg"} color={"gray.600"}>
               to make your life a little bit easier ✌️
             </Text>
