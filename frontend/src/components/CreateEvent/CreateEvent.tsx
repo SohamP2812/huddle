@@ -33,6 +33,8 @@ import dayjs from "dayjs";
 import { eventTypes } from "utils/consts";
 import { useIsMounted } from "hooks/useIsMounted";
 
+import { BackButton } from "components/BackButton/BackButton";
+
 export const CreateEvent = () => {
   const isMounted = useIsMounted();
 
@@ -190,6 +192,7 @@ export const CreateEvent = () => {
         bg={useColorModeValue("gray.50", "gray.800")}
       >
         <Stack spacing={8} mx={"auto"} width={"xl"} py={12} px={6}>
+          <BackButton fallback={`/teams/${team_id}`} />
           <Stack align={"center"}>
             <Heading fontSize={"4xl"}>Create an event</Heading>
           </Stack>

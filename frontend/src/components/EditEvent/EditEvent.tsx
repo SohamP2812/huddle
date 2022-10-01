@@ -36,6 +36,8 @@ import { eventTypes } from "utils/consts";
 import { useIsMounted } from "hooks/useIsMounted";
 import { isObjectDiff } from "utils/misc";
 
+import { BackButton } from "components/BackButton/BackButton";
+
 export const EditEvent = () => {
   const isMounted = useIsMounted();
 
@@ -167,6 +169,7 @@ export const EditEvent = () => {
         bg={useColorModeValue("gray.50", "gray.800")}
       >
         <Stack spacing={8} mx={"auto"} width={"xl"} py={12} px={6}>
+          <BackButton fallback={`/teams/${team_id}/events/${event_id}`} />
           <Stack align={"center"}>
             <Heading fontSize={"4xl"}>Update event</Heading>
           </Stack>

@@ -49,6 +49,7 @@ import { stringToJSDate } from "utils/misc";
 import { useIsMounted } from "hooks/useIsMounted";
 
 import { EventCard } from "components/EventCard/EventCard";
+import { BackButton } from "components/BackButton/BackButton";
 
 export const Team = () => {
   const isMounted = useIsMounted();
@@ -199,264 +200,294 @@ export const Team = () => {
     <>
       <Header />
       <Flex
-        alignItems={"center"}
         minH={"100vh"}
+        pt={10}
+        justify={"center"}
         bg={useColorModeValue("gray.50", "gray.800")}
-        py={20}
-        px={10}
-        direction={"column"}
-        gap={10}
       >
-        <Flex maxW={"1000px"} w={"full"}>
-          <Box
-            height={"fit-content"}
-            w={"full"}
-            bg={useColorModeValue("white", "gray.800")}
-            boxShadow={"2xl"}
-            rounded={"xl"}
-            overflow={"hidden"}
-          >
-            <Box p={6}>
-              <Stack spacing={0} align={"center"} mb={5}>
-                <Heading fontSize={"2xl"} fontWeight={800} fontFamily={"body"}>
-                  {team?.name}
-                </Heading>
-              </Stack>
-              <Divider borderColor={"gray.300"} />
-              <Stack spacing={0} align={"center"} my={5}>
-                <Heading fontSize={"lg"} fontWeight={500} fontFamily={"body"}>
-                  {team?.manager.firstName} {team?.manager.lastName}
-                </Heading>
-                <Text color={"gray.500"}>{team?.manager.username}</Text>
-              </Stack>
-              <Stack align={"center"} justify={"center"} direction={"row"}>
-                <Badge
-                  px={2}
-                  py={1}
-                  bg={useColorModeValue("gray.100", "gray.800")}
-                  fontWeight={"700"}
-                  textTransform={"none"}
-                >
-                  Manager
-                </Badge>
-              </Stack>
-            </Box>
-          </Box>
-        </Flex>
-        <Flex
-          direction={{ sm: "column", md: "row" }}
-          maxW={"1000px"}
-          w={"full"}
-          gap={5}
+        <Stack
+          spacing={8}
+          mx={"auto"}
+          width={"5xl"}
+          py={12}
+          px={6}
+          gap={1}
+          direction={"column"}
         >
-          <Box
-            height={"fit-content"}
-            w={"full"}
-            bg={useColorModeValue("white", "gray.800")}
-            boxShadow={"2xl"}
-            rounded={"xl"}
-            overflow={"hidden"}
-          >
-            <Box p={6}>
-              <Stack
-                direction={"row"}
-                justifyContent="right"
-                color="blue.400"
-                mb={"2"}
-              >
-                {teams.members.find((member) => member.id === user.user.id)
-                  ?.isManager && (
-                  <Flex
-                    gap={2}
-                    alignItems={"center"}
-                    _hover={{
-                      cursor: "pointer",
-                    }}
-                    onClick={onOpen}
+          <BackButton fallback={"/teams"} />
+          <Flex maxW={"1000px"} w={"full"}>
+            <Box
+              height={"fit-content"}
+              w={"full"}
+              bg={useColorModeValue("white", "gray.800")}
+              boxShadow={"2xl"}
+              rounded={"xl"}
+              overflow={"hidden"}
+            >
+              <Box p={6}>
+                <Stack spacing={0} align={"center"} mb={5}>
+                  <Heading
+                    fontSize={"2xl"}
+                    fontWeight={800}
+                    fontFamily={"body"}
                   >
-                    <AddIcon w={3} h={3} />
-                    <Text>Add Member</Text>
-                  </Flex>
-                )}
-              </Stack>
-              <Stack spacing={0} align={"center"} mb={5}>
-                <Heading fontSize={"2xl"} fontWeight={800} fontFamily={"body"}>
-                  Team Members
-                </Heading>
-              </Stack>
-              <Divider borderColor={"gray.300"} />
-              <Stack my={5} gap={2}>
-                {members
-                  .filter((member) => member.id !== user.user.id)
-                  .map((member) => (
-                    <Stack
-                      justify={"space-between"}
-                      align="center"
-                      direction="row"
-                    >
-                      <Text key={member.id} fontWeight={300} color={"gray.600"}>
-                        {member.username}
-                      </Text>
-                      {member.id !== user.user.id &&
-                        teams.members.find(
-                          (member) => member.id === user.user.id
-                        )?.isManager && (
-                          <DeleteIcon
-                            onClick={(e) => {
-                              handleDeleteMember(e, member.id);
-                            }}
-                            _hover={{ cursor: "pointer", color: "red" }}
-                            w={4}
-                            h={4}
-                          />
-                        )}
-                    </Stack>
-                  ))}
-              </Stack>
+                    {team?.name}
+                  </Heading>
+                </Stack>
+                <Divider borderColor={"gray.300"} />
+                <Stack spacing={0} align={"center"} my={5}>
+                  <Heading fontSize={"lg"} fontWeight={500} fontFamily={"body"}>
+                    {team?.manager.firstName} {team?.manager.lastName}
+                  </Heading>
+                  <Text color={"gray.500"}>{team?.manager.username}</Text>
+                </Stack>
+                <Stack align={"center"} justify={"center"} direction={"row"}>
+                  <Badge
+                    px={2}
+                    py={1}
+                    bg={useColorModeValue("gray.100", "gray.800")}
+                    fontWeight={"700"}
+                    textTransform={"none"}
+                  >
+                    Manager
+                  </Badge>
+                </Stack>
+              </Box>
             </Box>
-          </Box>
-          <Box
-            height={"fit-content"}
+          </Flex>
+          <Flex
+            direction={{ sm: "column", md: "row" }}
+            maxW={"1000px"}
             w={"full"}
-            bg={useColorModeValue("white", "gray.800")}
-            boxShadow={"2xl"}
-            rounded={"xl"}
-            overflow={"hidden"}
+            gap={5}
           >
-            <Box p={6}>
-              <Stack
-                direction={"row"}
-                justifyContent="right"
-                color="blue.400"
-                mb={"2"}
-              >
-                {teams.members.find((member) => member.id === user.user.id)
-                  ?.isManager && (
-                  <Flex
-                    gap={2}
-                    alignItems={"center"}
-                    _hover={{
-                      cursor: "pointer",
-                    }}
-                    onClick={handleCreateEvent}
-                  >
-                    <AddIcon w={3} h={3} />
-                    <Text>Create Event</Text>
-                  </Flex>
-                )}
-              </Stack>
-              <Stack spacing={0} align={"center"} mb={5} gap={2}>
-                <Heading fontSize={"2xl"} fontWeight={800} fontFamily={"body"}>
-                  Schedule
-                </Heading>
-                <Checkbox
-                  isChecked={showPastEvents}
-                  onChange={toggleShowPastEvents}
+            <Box
+              height={"fit-content"}
+              w={"full"}
+              bg={useColorModeValue("white", "gray.800")}
+              boxShadow={"2xl"}
+              rounded={"xl"}
+              overflow={"hidden"}
+            >
+              <Box p={6}>
+                <Stack
+                  direction={"row"}
+                  justifyContent="right"
+                  color="blue.400"
+                  mb={"2"}
                 >
-                  Show Past Events
-                </Checkbox>
-              </Stack>
-              <Divider borderColor={"gray.300"} />
-              <Flex direction="column" alignItems={"center"} my={5} gap={5}>
-                {events
-                  .filter(
-                    (event) =>
-                      stringToJSDate(event.endTime) > new Date() ||
-                      showPastEvents
-                  )
-                  .sort(
-                    (a, b) =>
-                      stringToJSDate(b.startTime).getTime() -
-                      stringToJSDate(a.startTime).getTime()
-                  )
-                  .map((event) => (
-                    <EventCard key={event.id} event={event} />
-                  ))}
-              </Flex>
-            </Box>
-          </Box>
-        </Flex>
-        {teams.members.find((member) => member.id === user.user.id)
-          ?.isManager ? (
-          <Button
-            mb={5}
-            p={4}
-            py={6}
-            bg="red"
-            color="white"
-            _hover={{ bg: "red.400" }}
-            onClick={handleDeleteTeam}
-          >
-            Delete Team
-          </Button>
-        ) : (
-          <Button
-            mb={5}
-            p={4}
-            py={6}
-            bg="red"
-            color="white"
-            _hover={{ bg: "red.400" }}
-            onClick={(e) => {
-              handleDeleteMember(e, user.user.id);
-            }}
-          >
-            Leave Team
-          </Button>
-        )}
-
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Update Member List</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <FormControl mb={10} id="participantIds">
-                <FormLabel mb={0}>Username</FormLabel>
-                <Input
-                  type="text"
-                  name="name"
-                  onChange={handleUpdateUsernameQuery}
-                  value={usernameQuery}
-                />
-              </FormControl>
-              <Stack
-                height={"fit-content"}
-                h={"170px"}
-                w={"full"}
-                border={"1px"}
-                borderColor={"gray.300"}
-                rounded={"xl"}
-                overflow={"scroll"}
-                px={5}
-                py={2}
-              >
-                {user.queryUsers
-                  .filter(
-                    (queriedUser) =>
-                      queriedUser.id !== user.user.id &&
-                      !members.some((members) => members.id === queriedUser.id)
-                  )
-                  .map((queriedUser) => (
-                    <Box
-                      p={2}
-                      _hover={{ cursor: "pointer", bg: "gray.50" }}
-                      onClick={(e) => handleAddMember(e, queriedUser.id)}
+                  {teams.members.find((member) => member.id === user.user.id)
+                    ?.isManager && (
+                    <Flex
+                      gap={2}
+                      alignItems={"center"}
+                      _hover={{
+                        cursor: "pointer",
+                      }}
+                      onClick={onOpen}
                     >
-                      <Text key={queriedUser.id}>{queriedUser.username}</Text>
-                      <Divider borderColor={"gray.300"} />
-                    </Box>
-                  ))}
-              </Stack>
-            </ModalBody>
+                      <AddIcon w={3} h={3} />
+                      <Text>Add Member</Text>
+                    </Flex>
+                  )}
+                </Stack>
+                <Stack spacing={0} align={"center"} mb={5}>
+                  <Heading
+                    fontSize={"2xl"}
+                    fontWeight={800}
+                    fontFamily={"body"}
+                  >
+                    Team Members
+                  </Heading>
+                </Stack>
+                <Divider borderColor={"gray.300"} />
+                <Stack my={5} gap={2}>
+                  {members
+                    .filter((member) => member.id !== user.user.id)
+                    .map((member) => (
+                      <Stack
+                        justify={"space-between"}
+                        align="center"
+                        direction="row"
+                      >
+                        <Text
+                          key={member.id}
+                          fontWeight={300}
+                          color={"gray.600"}
+                        >
+                          {member.username}
+                        </Text>
+                        {member.id !== user.user.id &&
+                          teams.members.find(
+                            (member) => member.id === user.user.id
+                          )?.isManager && (
+                            <DeleteIcon
+                              onClick={(e) => {
+                                handleDeleteMember(e, member.id);
+                              }}
+                              _hover={{ cursor: "pointer", color: "red" }}
+                              w={4}
+                              h={4}
+                            />
+                          )}
+                      </Stack>
+                    ))}
+                </Stack>
+              </Box>
+            </Box>
+            <Box
+              height={"fit-content"}
+              w={"full"}
+              bg={useColorModeValue("white", "gray.800")}
+              boxShadow={"2xl"}
+              rounded={"xl"}
+              overflow={"hidden"}
+            >
+              <Box p={6}>
+                <Stack
+                  direction={"row"}
+                  justifyContent="right"
+                  color="blue.400"
+                  mb={"2"}
+                >
+                  {teams.members.find((member) => member.id === user.user.id)
+                    ?.isManager && (
+                    <Flex
+                      gap={2}
+                      alignItems={"center"}
+                      _hover={{
+                        cursor: "pointer",
+                      }}
+                      onClick={handleCreateEvent}
+                    >
+                      <AddIcon w={3} h={3} />
+                      <Text>Create Event</Text>
+                    </Flex>
+                  )}
+                </Stack>
+                <Stack spacing={0} align={"center"} mb={5} gap={2}>
+                  <Heading
+                    fontSize={"2xl"}
+                    fontWeight={800}
+                    fontFamily={"body"}
+                  >
+                    Schedule
+                  </Heading>
+                  <Checkbox
+                    isChecked={showPastEvents}
+                    onChange={toggleShowPastEvents}
+                  >
+                    Show Past Events
+                  </Checkbox>
+                </Stack>
+                <Divider borderColor={"gray.300"} />
+                <Flex direction="column" alignItems={"center"} my={5} gap={5}>
+                  {events
+                    .filter(
+                      (event) =>
+                        stringToJSDate(event.endTime) > new Date() ||
+                        showPastEvents
+                    )
+                    .sort(
+                      (a, b) =>
+                        stringToJSDate(b.startTime).getTime() -
+                        stringToJSDate(a.startTime).getTime()
+                    )
+                    .map((event) => (
+                      <EventCard key={event.id} event={event} />
+                    ))}
+                </Flex>
+              </Box>
+            </Box>
+          </Flex>
+          {teams.members.find((member) => member.id === user.user.id)
+            ?.isManager ? (
+            <Button
+              mb={5}
+              p={4}
+              py={6}
+              bg="red"
+              color="white"
+              _hover={{ bg: "red.400" }}
+              onClick={handleDeleteTeam}
+              width={"fit-content"}
+              alignSelf="center"
+            >
+              Delete Team
+            </Button>
+          ) : (
+            <Button
+              mb={5}
+              p={4}
+              py={6}
+              bg="red"
+              color="white"
+              _hover={{ bg: "red.400" }}
+              onClick={(e) => {
+                handleDeleteMember(e, user.user.id);
+              }}
+              width={"fit-content"}
+              alignSelf="center"
+            >
+              Leave Team
+            </Button>
+          )}
 
-            <ModalFooter>
-              <Button variant="ghost" mr={3} onClick={handleOnClose}>
-                Close
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+          <Modal isOpen={isOpen} onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Update Member List</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <FormControl mb={10} id="participantIds">
+                  <FormLabel mb={0}>Username</FormLabel>
+                  <Input
+                    type="text"
+                    name="name"
+                    onChange={handleUpdateUsernameQuery}
+                    value={usernameQuery}
+                  />
+                </FormControl>
+                <Stack
+                  height={"fit-content"}
+                  h={"170px"}
+                  w={"full"}
+                  border={"1px"}
+                  borderColor={"gray.300"}
+                  rounded={"xl"}
+                  overflow={"scroll"}
+                  px={5}
+                  py={2}
+                >
+                  {user.queryUsers
+                    .filter(
+                      (queriedUser) =>
+                        queriedUser.id !== user.user.id &&
+                        !members.some(
+                          (members) => members.id === queriedUser.id
+                        )
+                    )
+                    .map((queriedUser) => (
+                      <Box
+                        p={2}
+                        _hover={{ cursor: "pointer", bg: "gray.50" }}
+                        onClick={(e) => handleAddMember(e, queriedUser.id)}
+                      >
+                        <Text key={queriedUser.id}>{queriedUser.username}</Text>
+                        <Divider borderColor={"gray.300"} />
+                      </Box>
+                    ))}
+                </Stack>
+              </ModalBody>
+
+              <ModalFooter>
+                <Button variant="ghost" mr={3} onClick={handleOnClose}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        </Stack>
       </Flex>
     </>
   );

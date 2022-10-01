@@ -53,6 +53,8 @@ import { stringToJSDate } from "utils/misc";
 import { isArrayDiff } from "utils/misc";
 import { useIsMounted } from "hooks/useIsMounted";
 
+import { BackButton } from "components/BackButton/BackButton";
+
 export const Event = () => {
   const isMounted = useIsMounted();
 
@@ -299,465 +301,501 @@ export const Event = () => {
     <>
       <Header />
       <Flex
-        alignItems={"center"}
         minH={"100vh"}
+        pt={10}
+        justify={"center"}
         bg={useColorModeValue("gray.50", "gray.800")}
-        py={20}
-        px={10}
-        direction={"column"}
-        gap={10}
       >
-        <Flex maxW={"1000px"} w={"full"}>
-          <Box
-            height={"fit-content"}
-            w={"full"}
-            bg={useColorModeValue("white", "gray.800")}
-            boxShadow={"2xl"}
-            rounded={"xl"}
-            overflow={"hidden"}
-          >
-            <Box p={6}>
-              <Stack
-                direction={"row"}
-                justifyContent="right"
-                color="blue.400"
-                mb={"2"}
-              >
-                {teams.members.find((member) => member.id === user.user.id)
-                  ?.isManager && (
-                  <Flex
-                    gap={2}
-                    alignItems={"center"}
-                    _hover={{
-                      cursor: "pointer",
-                    }}
-                    onClick={toUpdateEvent}
-                  >
-                    <EditIcon w={3} h={3} />
-                    <Text>Edit Event</Text>
-                  </Flex>
-                )}
-              </Stack>
-              <Stack spacing={0} align={"center"} mb={5}>
-                <Heading fontSize={"2xl"} fontWeight={800} fontFamily={"body"}>
-                  {event?.name}
-                </Heading>
-              </Stack>
-              <Stack
-                align={"center"}
-                justify={"center"}
-                direction={"row"}
-                mt={5}
-              >
-                <Badge px={2} py={1} fontWeight={"700"} textTransform={"none"}>
-                  {event?.eventType}
-                </Badge>
-              </Stack>
-            </Box>
-          </Box>
-        </Flex>
-        <Flex
-          direction={{ sm: "column", md: "row" }}
-          maxW={"1000px"}
-          w={"full"}
-          gap={5}
+        <Stack
+          spacing={8}
+          mx={"auto"}
+          width={"5xl"}
+          py={12}
+          px={6}
+          gap={1}
+          direction={"column"}
         >
-          <Box
-            minH={"fit-content"}
-            w={{ sm: "100%", md: "60%" }}
-            bg={useColorModeValue("white", "gray.800")}
-            boxShadow={"2xl"}
-            rounded={"xl"}
-            overflow={"hidden"}
-          >
-            <Box p={6}>
-              <Stack
-                direction={"row"}
-                justifyContent="right"
-                color="blue.400"
-                mb={"2"}
-              ></Stack>
-              <Stack spacing={0} align={"center"} mb={5}>
-                <Heading fontSize={"2xl"} fontWeight={800} fontFamily={"body"}>
-                  Score
-                </Heading>
-              </Stack>
-              <Divider borderColor={"gray.300"} />
-              <Stack
-                justify={"space-evenly"}
-                textAlign={"center"}
-                direction={"row"}
-                mt={7}
-                mb={10}
-              >
-                {stringToJSDate(event?.endTime ?? "") < new Date() ? (
-                  <>
-                    <Stack direction={"column"}>
-                      <Heading fontSize={"xxx-large"}>
-                        {event?.teamScore}
-                      </Heading>
-                      <Text>Team Score</Text>
-                    </Stack>
-                    <Stack direction={"column"}>
-                      <Heading fontSize={"xxx-large"}>
-                        {event?.opponentScore}
-                      </Heading>
-                      <Text>Opponent Score</Text>
-                    </Stack>
-                  </>
-                ) : (
+          <BackButton fallback={`/teams/${team_id}`} />
+          <Flex maxW={"1000px"} w={"full"}>
+            <Box
+              height={"fit-content"}
+              w={"full"}
+              bg={useColorModeValue("white", "gray.800")}
+              boxShadow={"2xl"}
+              rounded={"xl"}
+              overflow={"hidden"}
+            >
+              <Box p={6}>
+                <Stack
+                  direction={"row"}
+                  justifyContent="right"
+                  color="blue.400"
+                  mb={"2"}
+                >
+                  {teams.members.find((member) => member.id === user.user.id)
+                    ?.isManager && (
+                    <Flex
+                      gap={2}
+                      alignItems={"center"}
+                      _hover={{
+                        cursor: "pointer",
+                      }}
+                      onClick={toUpdateEvent}
+                    >
+                      <EditIcon w={3} h={3} />
+                      <Text>Edit Event</Text>
+                    </Flex>
+                  )}
+                </Stack>
+                <Stack spacing={0} align={"center"} mb={5}>
+                  <Heading
+                    fontSize={"2xl"}
+                    fontWeight={800}
+                    fontFamily={"body"}
+                  >
+                    {event?.name}
+                  </Heading>
+                </Stack>
+                <Stack
+                  align={"center"}
+                  justify={"center"}
+                  direction={"row"}
+                  mt={5}
+                >
                   <Badge
                     px={2}
                     py={1}
                     fontWeight={"700"}
                     textTransform={"none"}
                   >
-                    TBD
+                    {event?.eventType}
                   </Badge>
-                )}
-              </Stack>
-              {stringToJSDate(event?.endTime ?? "") < new Date() &&
-                teams.members.find((member) => member.id === user.user.id)
-                  ?.isManager && (
-                  <Flex justifyContent={"center"}>
-                    <Button mb={5} onClick={onUpdateScoreOpen}>
-                      Update Score
-                    </Button>
-                  </Flex>
-                )}
+                </Stack>
+              </Box>
             </Box>
-          </Box>
-          <Box
-            minH={"fit-content"}
-            w={{ sm: "100%", md: "40%" }}
-            bg={useColorModeValue("white", "gray.800")}
-            boxShadow={"2xl"}
-            rounded={"xl"}
-            overflow={"hidden"}
-          >
-            <Stack p={6} h={"full"}>
-              <Stack spacing={0} align={"center"} mb={5}>
-                <Heading fontSize={"2xl"} fontWeight={800} fontFamily={"body"}>
-                  Time
-                </Heading>
-              </Stack>
-              <Divider borderColor={"gray.300"} />
-              <Stack
-                spacing={0}
-                align={"center"}
-                flex={"1 1 auto"}
-                justifyContent={"center"}
-              >
-                <Text color={"gray.500"} fontSize={"xl"}>
-                  Start:{" "}
-                  {stringToJSDate(event?.startTime ?? "").toLocaleString([], {
-                    year: "numeric",
-                    month: "numeric",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </Text>
-                <Text color={"gray.500"} fontSize={"xl"}>
-                  End:{" "}
-                  {stringToJSDate(event?.endTime ?? "").toLocaleString([], {
-                    year: "numeric",
-                    month: "numeric",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </Text>
-              </Stack>
-            </Stack>
-          </Box>
-        </Flex>
-        <Flex
-          direction={{ sm: "column", md: "row" }}
-          maxW={"1000px"}
-          w={"full"}
-          gap={5}
-        >
-          <Box
-            height={"fit-content"}
+          </Flex>
+          <Flex
+            direction={{ sm: "column", md: "row" }}
+            maxW={"1000px"}
             w={"full"}
-            bg={useColorModeValue("white", "gray.800")}
-            boxShadow={"2xl"}
-            rounded={"xl"}
-            overflow={"hidden"}
+            gap={5}
           >
-            <Box p={6}>
-              <Flex direction={"column"} align={"center"} mb={5} gap={5}>
-                <Heading fontSize={"2xl"} fontWeight={800} fontFamily={"body"}>
-                  Participants
-                </Heading>
-                {teams.members.find((member) => member.id === user.user.id)
-                  ?.isManager && (
-                  <Button mb={5} onClick={onOpen}>
-                    Update Participants
-                  </Button>
-                )}
-              </Flex>
-              <Divider borderColor={"gray.300"} />
-              <Stack align={"center"} my={5} gap={5}>
-                <FormControl>
-                  <FormLabel>Your Status</FormLabel>
-                  <Stack direction={"row"}>
-                    <Select onChange={handleChangeStatus} value={status}>
-                      <option key={"UNDECIDED"} value={"UNDECIDED"}>
-                        UNDECIDED
-                      </option>
-                      <option key={"YES"} value={"YES"}>
-                        YES
-                      </option>
-                      <option key={"NO"} value={"NO"}>
-                        NO
-                      </option>
-                    </Select>
-                    <Button
-                      onClick={handleUpdateParticipant}
-                      disabled={status === getPersistentStatus()}
+            <Box
+              minH={"fit-content"}
+              w={{ sm: "100%", md: "60%" }}
+              bg={useColorModeValue("white", "gray.800")}
+              boxShadow={"2xl"}
+              rounded={"xl"}
+              overflow={"hidden"}
+            >
+              <Box p={6}>
+                <Stack
+                  direction={"row"}
+                  justifyContent="right"
+                  color="blue.400"
+                  mb={"2"}
+                ></Stack>
+                <Stack spacing={0} align={"center"} mb={5}>
+                  <Heading
+                    fontSize={"2xl"}
+                    fontWeight={800}
+                    fontFamily={"body"}
+                  >
+                    Score
+                  </Heading>
+                </Stack>
+                <Divider borderColor={"gray.300"} />
+                <Stack
+                  justify={"space-evenly"}
+                  textAlign={"center"}
+                  direction={"row"}
+                  mt={7}
+                  mb={10}
+                >
+                  {stringToJSDate(event?.endTime ?? "") < new Date() ? (
+                    <>
+                      <Stack direction={"column"}>
+                        <Heading fontSize={"xxx-large"}>
+                          {event?.teamScore}
+                        </Heading>
+                        <Text>Team Score</Text>
+                      </Stack>
+                      <Stack direction={"column"}>
+                        <Heading fontSize={"xxx-large"}>
+                          {event?.opponentScore}
+                        </Heading>
+                        <Text>Opponent Score</Text>
+                      </Stack>
+                    </>
+                  ) : (
+                    <Badge
+                      px={2}
+                      py={1}
+                      fontWeight={"700"}
+                      textTransform={"none"}
                     >
-                      Update
+                      TBD
+                    </Badge>
+                  )}
+                </Stack>
+                {stringToJSDate(event?.endTime ?? "") < new Date() &&
+                  teams.members.find((member) => member.id === user.user.id)
+                    ?.isManager && (
+                    <Flex justifyContent={"center"}>
+                      <Button mb={5} onClick={onUpdateScoreOpen}>
+                        Update Score
+                      </Button>
+                    </Flex>
+                  )}
+              </Box>
+            </Box>
+            <Box
+              minH={"fit-content"}
+              w={{ sm: "100%", md: "40%" }}
+              bg={useColorModeValue("white", "gray.800")}
+              boxShadow={"2xl"}
+              rounded={"xl"}
+              overflow={"hidden"}
+            >
+              <Stack p={6} h={"full"}>
+                <Stack spacing={0} align={"center"} mb={5}>
+                  <Heading
+                    fontSize={"2xl"}
+                    fontWeight={800}
+                    fontFamily={"body"}
+                  >
+                    Time
+                  </Heading>
+                </Stack>
+                <Divider borderColor={"gray.300"} />
+                <Stack
+                  spacing={0}
+                  align={"center"}
+                  flex={"1 1 auto"}
+                  justifyContent={"center"}
+                >
+                  <Text color={"gray.500"} fontSize={"xl"}>
+                    Start:{" "}
+                    {stringToJSDate(event?.startTime ?? "").toLocaleString([], {
+                      year: "numeric",
+                      month: "numeric",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </Text>
+                  <Text color={"gray.500"} fontSize={"xl"}>
+                    End:{" "}
+                    {stringToJSDate(event?.endTime ?? "").toLocaleString([], {
+                      year: "numeric",
+                      month: "numeric",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </Text>
+                </Stack>
+              </Stack>
+            </Box>
+          </Flex>
+          <Flex
+            direction={{ sm: "column", md: "row" }}
+            maxW={"1000px"}
+            w={"full"}
+            gap={5}
+          >
+            <Box
+              height={"fit-content"}
+              w={"full"}
+              bg={useColorModeValue("white", "gray.800")}
+              boxShadow={"2xl"}
+              rounded={"xl"}
+              overflow={"hidden"}
+            >
+              <Box p={6}>
+                <Flex direction={"column"} align={"center"} mb={5} gap={5}>
+                  <Heading
+                    fontSize={"2xl"}
+                    fontWeight={800}
+                    fontFamily={"body"}
+                  >
+                    Participants
+                  </Heading>
+                  {teams.members.find((member) => member.id === user.user.id)
+                    ?.isManager && (
+                    <Button mb={5} onClick={onOpen}>
+                      Update Participants
                     </Button>
+                  )}
+                </Flex>
+                <Divider borderColor={"gray.300"} />
+                <Stack align={"center"} my={5} gap={5}>
+                  <FormControl>
+                    <FormLabel>Your Status</FormLabel>
+                    <Stack direction={"row"}>
+                      <Select onChange={handleChangeStatus} value={status}>
+                        <option key={"UNDECIDED"} value={"UNDECIDED"}>
+                          UNDECIDED
+                        </option>
+                        <option key={"YES"} value={"YES"}>
+                          YES
+                        </option>
+                        <option key={"NO"} value={"NO"}>
+                          NO
+                        </option>
+                      </Select>
+                      <Button
+                        onClick={handleUpdateParticipant}
+                        disabled={status === getPersistentStatus()}
+                      >
+                        Update
+                      </Button>
+                    </Stack>
+                  </FormControl>
+                  <Stack
+                    width={"full"}
+                    direction={{ sm: "column", md: "row" }}
+                    justifyContent={"space-evenly"}
+                    textAlign={"center"}
+                    gap={{ sm: 10, md: 5 }}
+                  >
+                    <Stack
+                      w={"full"}
+                      gap={3}
+                      border={"1px"}
+                      borderColor={"gray.300"}
+                      rounded={"xl"}
+                      py={5}
+                    >
+                      <Heading fontSize={"2xl"}>YES</Heading>
+                      <Divider borderColor={"gray.300"} />
+                      {participants
+                        .filter(
+                          (participant) => participant.attendance === "YES"
+                        )
+                        .map((participant) => (
+                          <Text
+                            fontWeight={
+                              participant.user.id === user.user.id ? 600 : 300
+                            }
+                            color={
+                              participant.user.id === user.user.id
+                                ? "gray.900"
+                                : "gray.600"
+                            }
+                          >
+                            {participant.user.username}
+                          </Text>
+                        ))}
+                    </Stack>
+                    <Stack
+                      w={"full"}
+                      gap={3}
+                      border={"1px"}
+                      borderColor={"gray.300"}
+                      rounded={"xl"}
+                      py={5}
+                    >
+                      <Heading fontSize={"2xl"}>NO</Heading>
+                      <Divider borderColor={"gray.300"} />
+                      {participants
+                        .filter(
+                          (participant) => participant.attendance === "NO"
+                        )
+                        .map((participant) => (
+                          <Text
+                            fontWeight={
+                              participant.user.id === user.user.id ? 600 : 300
+                            }
+                            color={
+                              participant.user.id === user.user.id
+                                ? "gray.900"
+                                : "gray.600"
+                            }
+                          >
+                            {participant.user.username}
+                          </Text>
+                        ))}
+                    </Stack>
+                    <Stack
+                      w={"full"}
+                      gap={3}
+                      border={"1px"}
+                      borderColor={"gray.300"}
+                      rounded={"xl"}
+                      py={5}
+                    >
+                      <Heading fontSize={"2xl"}>UNDECIDED</Heading>
+                      <Divider borderColor={"gray.300"} />
+                      {participants
+                        .filter(
+                          (participant) =>
+                            participant.attendance === "UNDECIDED"
+                        )
+                        .map((participant) => (
+                          <Text
+                            fontWeight={
+                              participant.user.id === user.user.id ? 600 : 300
+                            }
+                            color={
+                              participant.user.id === user.user.id
+                                ? "gray.900"
+                                : "gray.600"
+                            }
+                          >
+                            {participant.user.username}
+                          </Text>
+                        ))}
+                    </Stack>
+                  </Stack>
+                </Stack>
+              </Box>
+            </Box>
+          </Flex>
+          {teams.members.find((member) => member.id === user.user.id)
+            ?.isManager && (
+            <Button
+              mb={5}
+              p={4}
+              py={6}
+              bg="red"
+              color="white"
+              _hover={{ bg: "red.400" }}
+              onClick={handleDeleteEvent}
+              width={"fit-content"}
+              alignSelf="center"
+            >
+              Delete Event
+            </Button>
+          )}
+          <Modal isOpen={isUpdateScoreOpen} onClose={onUpdateScoreClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Update Score</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <FormControl id="participantIds">
+                  <FormLabel mb={0}>Team Score</FormLabel>
+                  <NumberInput
+                    value={eventFields.teamScore}
+                    mb={2}
+                    min={0}
+                    onChange={(_, value) => {
+                      setEventFields({ ...eventFields, teamScore: value });
+                    }}
+                  >
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                  <FormLabel mb={0}>Opponent Score</FormLabel>
+                  <NumberInput
+                    value={eventFields.opponentScore}
+                    min={0}
+                    onChange={(_, value) => {
+                      setEventFields({ ...eventFields, opponentScore: value });
+                    }}
+                  >
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                </FormControl>
+              </ModalBody>
+
+              <ModalFooter>
+                <Button variant="ghost" mr={3} onClick={onUpdateScoreClose}>
+                  Close
+                </Button>
+                <Button
+                  disabled={
+                    eventFields.opponentScore === event?.opponentScore &&
+                    eventFields.teamScore === event?.teamScore
+                  }
+                  colorScheme="blue"
+                  onClick={handleUpdateEvent}
+                >
+                  Update
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+
+          <Modal isOpen={isOpen} onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Update Participant List</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <FormControl id="participantIds">
+                  <Flex mb={"0.5rem"}>
+                    <FormLabel mb={0}>Participants</FormLabel>
+                    <Checkbox
+                      isChecked={allSelected}
+                      onChange={handleSelectAllParticipants}
+                    >
+                      Select All
+                    </Checkbox>
+                  </Flex>
+                  <Stack
+                    height={"fit-content"}
+                    minH={"50px"}
+                    maxH={"200px"}
+                    w={"full"}
+                    border={"1px"}
+                    borderColor={"gray.300"}
+                    rounded={"xl"}
+                    overflow={"scroll"}
+                    px={5}
+                    py={2}
+                  >
+                    <CheckboxGroup>
+                      {members
+                        .filter((member) => member.id !== user.user.id)
+                        .map((member) => (
+                          <>
+                            {member.id && (
+                              <Checkbox
+                                name={member.id.toString()}
+                                isChecked={eventFields.participantIds.includes(
+                                  member.id
+                                )}
+                                onChange={handleSelectParticipant}
+                              >
+                                {member.username}
+                              </Checkbox>
+                            )}
+                          </>
+                        ))}
+                    </CheckboxGroup>
                   </Stack>
                 </FormControl>
-                <Stack
-                  width={"full"}
-                  direction={{ sm: "column", md: "row" }}
-                  justifyContent={"space-evenly"}
-                  textAlign={"center"}
-                  gap={{ sm: 10, md: 5 }}
-                >
-                  <Stack
-                    w={"full"}
-                    gap={3}
-                    border={"1px"}
-                    borderColor={"gray.300"}
-                    rounded={"xl"}
-                    py={5}
-                  >
-                    <Heading fontSize={"2xl"}>YES</Heading>
-                    <Divider borderColor={"gray.300"} />
-                    {participants
-                      .filter((participant) => participant.attendance === "YES")
-                      .map((participant) => (
-                        <Text
-                          fontWeight={
-                            participant.user.id === user.user.id ? 600 : 300
-                          }
-                          color={
-                            participant.user.id === user.user.id
-                              ? "gray.900"
-                              : "gray.600"
-                          }
-                        >
-                          {participant.user.username}
-                        </Text>
-                      ))}
-                  </Stack>
-                  <Stack
-                    w={"full"}
-                    gap={3}
-                    border={"1px"}
-                    borderColor={"gray.300"}
-                    rounded={"xl"}
-                    py={5}
-                  >
-                    <Heading fontSize={"2xl"}>NO</Heading>
-                    <Divider borderColor={"gray.300"} />
-                    {participants
-                      .filter((participant) => participant.attendance === "NO")
-                      .map((participant) => (
-                        <Text
-                          fontWeight={
-                            participant.user.id === user.user.id ? 600 : 300
-                          }
-                          color={
-                            participant.user.id === user.user.id
-                              ? "gray.900"
-                              : "gray.600"
-                          }
-                        >
-                          {participant.user.username}
-                        </Text>
-                      ))}
-                  </Stack>
-                  <Stack
-                    w={"full"}
-                    gap={3}
-                    border={"1px"}
-                    borderColor={"gray.300"}
-                    rounded={"xl"}
-                    py={5}
-                  >
-                    <Heading fontSize={"2xl"}>UNDECIDED</Heading>
-                    <Divider borderColor={"gray.300"} />
-                    {participants
-                      .filter(
-                        (participant) => participant.attendance === "UNDECIDED"
-                      )
-                      .map((participant) => (
-                        <Text
-                          fontWeight={
-                            participant.user.id === user.user.id ? 600 : 300
-                          }
-                          color={
-                            participant.user.id === user.user.id
-                              ? "gray.900"
-                              : "gray.600"
-                          }
-                        >
-                          {participant.user.username}
-                        </Text>
-                      ))}
-                  </Stack>
-                </Stack>
-              </Stack>
-            </Box>
-          </Box>
-        </Flex>
-        {teams.members.find((member) => member.id === user.user.id)
-          ?.isManager && (
-          <Button
-            mb={5}
-            p={4}
-            py={6}
-            bg="red"
-            color="white"
-            _hover={{ bg: "red.400" }}
-            onClick={handleDeleteEvent}
-          >
-            Delete Event
-          </Button>
-        )}
-        <Modal isOpen={isUpdateScoreOpen} onClose={onUpdateScoreClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Update Score</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <FormControl id="participantIds">
-                <FormLabel mb={0}>Team Score</FormLabel>
-                <NumberInput
-                  value={eventFields.teamScore}
-                  mb={2}
-                  min={0}
-                  onChange={(_, value) => {
-                    setEventFields({ ...eventFields, teamScore: value });
-                  }}
-                >
-                  <NumberInputField />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
-                <FormLabel mb={0}>Opponent Score</FormLabel>
-                <NumberInput
-                  value={eventFields.opponentScore}
-                  min={0}
-                  onChange={(_, value) => {
-                    setEventFields({ ...eventFields, opponentScore: value });
-                  }}
-                >
-                  <NumberInputField />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
-              </FormControl>
-            </ModalBody>
+              </ModalBody>
 
-            <ModalFooter>
-              <Button variant="ghost" mr={3} onClick={onUpdateScoreClose}>
-                Close
-              </Button>
-              <Button
-                disabled={
-                  eventFields.opponentScore === event?.opponentScore &&
-                  eventFields.teamScore === event?.teamScore
-                }
-                colorScheme="blue"
-                onClick={handleUpdateEvent}
-              >
-                Update
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Update Participant List</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <FormControl id="participantIds">
-                <Flex mb={"0.5rem"}>
-                  <FormLabel mb={0}>Participants</FormLabel>
-                  <Checkbox
-                    isChecked={allSelected}
-                    onChange={handleSelectAllParticipants}
-                  >
-                    Select All
-                  </Checkbox>
-                </Flex>
-                <Stack
-                  height={"fit-content"}
-                  minH={"50px"}
-                  maxH={"200px"}
-                  w={"full"}
-                  border={"1px"}
-                  borderColor={"gray.300"}
-                  rounded={"xl"}
-                  overflow={"scroll"}
-                  px={5}
-                  py={2}
+              <ModalFooter>
+                <Button variant="ghost" mr={3} onClick={handleOnClose}>
+                  Close
+                </Button>
+                <Button
+                  disabled={
+                    !isArrayDiff(
+                      eventFields.participantIds,
+                      participants.map((participant) => participant.user.id)
+                    )
+                  }
+                  colorScheme="blue"
+                  onClick={handleUpdateEvent}
                 >
-                  <CheckboxGroup>
-                    {members
-                      .filter((member) => member.id !== user.user.id)
-                      .map((member) => (
-                        <>
-                          {member.id && (
-                            <Checkbox
-                              name={member.id.toString()}
-                              isChecked={eventFields.participantIds.includes(
-                                member.id
-                              )}
-                              onChange={handleSelectParticipant}
-                            >
-                              {member.username}
-                            </Checkbox>
-                          )}
-                        </>
-                      ))}
-                  </CheckboxGroup>
-                </Stack>
-              </FormControl>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button variant="ghost" mr={3} onClick={handleOnClose}>
-                Close
-              </Button>
-              <Button
-                disabled={
-                  !isArrayDiff(
-                    eventFields.participantIds,
-                    participants.map((participant) => participant.user.id)
-                  )
-                }
-                colorScheme="blue"
-                onClick={handleUpdateEvent}
-              >
-                Update
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+                  Update
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        </Stack>
       </Flex>
     </>
   );

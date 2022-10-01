@@ -15,11 +15,14 @@ import {
   Spacer,
   Select,
 } from "@chakra-ui/react";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 
 import { useIsMounted } from "hooks/useIsMounted";
 
 import { sports } from "utils/consts";
+
+import { BackButton } from "components/BackButton/BackButton";
 
 export const CreateTeam = () => {
   const isMounted = useIsMounted();
@@ -81,6 +84,7 @@ export const CreateTeam = () => {
         bg={useColorModeValue("gray.50", "gray.800")}
       >
         <Stack spacing={8} mx={"auto"} width={"xl"} py={12} px={6}>
+          <BackButton fallback="/teams" />
           <Stack align={"center"}>
             <Heading fontSize={"4xl"}>Create a team</Heading>
           </Stack>
