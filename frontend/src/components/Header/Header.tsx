@@ -38,7 +38,7 @@ export const Header: FC<{}> = () => {
         bg={useColorModeValue("white", "gray.800")}
         color={useColorModeValue("gray.600", "white")}
         py={{ base: 4 }}
-        px={{ sm: 4, md: 10, lg: "10vw" }}
+        px={{ base: 4, md: 10, lg: "10vw" }}
         borderBottom={1}
         borderStyle={"solid"}
         borderColor={useColorModeValue("gray.200", "gray.900")}
