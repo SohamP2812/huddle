@@ -52,7 +52,7 @@ public class StaticContentFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getServletPath();
 
-        boolean isApi = path.startsWith("/api");
+        boolean isApi = path.startsWith("/api") || path.startsWith("/actuator");
         boolean isResourceFile = !isApi && fileExtensions.stream().anyMatch(path::contains);
 
         if (isApi) {

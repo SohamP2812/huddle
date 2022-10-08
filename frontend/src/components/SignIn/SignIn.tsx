@@ -87,7 +87,7 @@ export const SignIn = () => {
       <Header />
       <Flex
         minH={"100vh"}
-        pt={20}
+        pt={{ base: 0, md: 20 }}
         justify={"center"}
         bg={useColorModeValue("gray.50", "gray.800")}
       >

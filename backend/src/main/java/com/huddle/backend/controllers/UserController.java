@@ -56,7 +56,7 @@ public class UserController {
         .body(new MessageResponse("Username is already taken!"));
     }
 
-    if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+    if (userRepository.existsByEmailIgnoreCase(signUpRequest.getEmail())) {
       return ResponseEntity
         .badRequest()
         .body(new MessageResponse("Email is already in use!"));
@@ -85,7 +85,6 @@ public class UserController {
     Cookie jwtTokenCookie = new Cookie("huddle_session", jwt);
 
     jwtTokenCookie.setMaxAge(86400);
-    jwtTokenCookie.setSecure(true);
     jwtTokenCookie.setHttpOnly(true);
 
     response.addCookie(jwtTokenCookie);

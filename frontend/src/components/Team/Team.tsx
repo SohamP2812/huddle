@@ -257,7 +257,7 @@ export const Team = () => {
             </Box>
           </Flex>
           <Flex
-            direction={{ sm: "column", md: "row" }}
+            direction={{ base: "column", md: "row" }}
             maxW={"1000px"}
             w={"full"}
             gap={5}

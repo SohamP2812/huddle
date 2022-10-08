@@ -325,6 +325,12 @@ public class EventController {
       }
     }
 
+    if (eventRequest.getEndTime().compareTo(eventRequest.getStartTime()) <= 0) {
+      return ResponseEntity
+              .badRequest()
+              .body(new MessageResponse("Start time must be before end time."));
+    }
+
     event.get().setEventType(eventRequest.getEventType());
     event.get().setName(eventRequest.getName());
     event.get().setStartTime(eventRequest.getStartTime());

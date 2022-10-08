@@ -12,6 +12,8 @@ import java.util.Optional;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+
+import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -59,7 +61,6 @@ public class SessionController {
     Cookie jwtTokenCookie = new Cookie("huddle_session", jwt);
 
     jwtTokenCookie.setMaxAge(86400);
-    jwtTokenCookie.setSecure(true);
     jwtTokenCookie.setHttpOnly(true);
 
     response.addCookie(jwtTokenCookie);
@@ -102,7 +103,6 @@ public class SessionController {
     Cookie jwtTokenCookie = new Cookie("huddle_session", null);
 
     jwtTokenCookie.setMaxAge(0);
-    jwtTokenCookie.setSecure(true);
     jwtTokenCookie.setHttpOnly(true);
 
     response.addCookie(jwtTokenCookie);

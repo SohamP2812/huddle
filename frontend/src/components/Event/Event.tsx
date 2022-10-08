@@ -375,7 +375,7 @@ export const Event = () => {
             </Box>
           </Flex>
           <Flex
-            direction={{ sm: "column", md: "row" }}
+            direction={{ base: "column", md: "row" }}
             maxW={"1000px"}
             w={"full"}
             gap={5}
@@ -389,12 +389,6 @@ export const Event = () => {
               overflow={"hidden"}
             >
               <Box p={6}>
-                <Stack
-                  direction={"row"}
-                  justifyContent="right"
-                  color="blue.400"
-                  mb={"2"}
-                ></Stack>
                 <Stack spacing={0} align={"center"} mb={5}>
                   <Heading
                     fontSize={"2xl"}
@@ -499,7 +493,7 @@ export const Event = () => {
             </Box>
           </Flex>
           <Flex
-            direction={{ sm: "column", md: "row" }}
+            direction={{ base: "column", md: "row" }}
             maxW={"1000px"}
             w={"full"}
             gap={5}
@@ -554,10 +548,10 @@ export const Event = () => {
                   </FormControl>
                   <Stack
                     width={"full"}
-                    direction={{ sm: "column", md: "row" }}
+                    direction={{ base: "column", md: "row" }}
                     justifyContent={"space-evenly"}
                     textAlign={"center"}
-                    gap={{ sm: 10, md: 5 }}
+                    gap={{ base: 10, md: 5 }}
                   >
                     <Stack
                       w={"full"}

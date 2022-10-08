@@ -15,6 +15,8 @@ import com.huddle.backend.security.services.UserDetailsImpl;
 import java.lang.reflect.Member;
 import java.util.*;
 import javax.validation.Valid;
+
+import io.micrometer.core.annotation.Timed;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

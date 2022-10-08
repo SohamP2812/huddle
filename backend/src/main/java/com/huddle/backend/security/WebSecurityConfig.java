@@ -3,7 +3,15 @@ package com.huddle.backend.security;
 import com.huddle.backend.security.jwt.AuthEntryPointJwt;
 import com.huddle.backend.security.jwt.AuthTokenFilter;
 import com.huddle.backend.security.services.UserDetailsServiceImpl;
+import io.micrometer.core.aop.TimedAspect;
+import io.micrometer.core.instrument.MeterRegistry;
+import org.apache.catalina.Context;
+import org.apache.catalina.connector.Connector;
+import org.apache.tomcat.util.descriptor.web.SecurityCollection;
+import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -34,6 +42,11 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
   @Autowired
   private AuthEntryPointJwt unauthorizedHandler;
+
+  @Bean
+  public TimedAspect timedAspect(MeterRegistry registry) {
+    return new TimedAspect(registry);
+  }
 
   @Bean
   public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -94,6 +107,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
+      .requiresChannel().anyRequest().requiresSecure().and()
       .cors()
       .and()
       .csrf()
@@ -109,6 +123,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
       .permitAll()
       .antMatchers(HttpMethod.POST,"/api/session")
       .permitAll()
+      .antMatchers(HttpMethod.GET,"/actuator/**")
+      .permitAll()
       .anyRequest()
       .authenticated();
 
@@ -122,5 +138,31 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     http.addFilterBefore(staticContentFilterBean(), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
+  }
+
+  @Bean
+  public ServletWebServerFactory servletContainer() {
+    TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory() {
+      @Override
+      protected void postProcessContext(Context context) {
+        SecurityConstraint securityConstraint = new SecurityConstraint();
+        securityConstraint.setUserConstraint("CONFIDENTIAL");
+        SecurityCollection collection = new SecurityCollection();
+        collection.addPattern("/*");
+        securityConstraint.addCollection(collection);
+        context.addConstraint(securityConstraint);
+      }
+    };
+    tomcat.addAdditionalTomcatConnectors(redirectConnector());
+    return tomcat;
+  }
+
+  private Connector redirectConnector() {
+    Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
+    connector.setScheme("http");
+    connector.setPort(80);
+    connector.setSecure(false);
+    connector.setRedirectPort(443);
+    return connector;
   }
 }

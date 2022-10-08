@@ -91,11 +91,18 @@ export const SignUp = () => {
       <Header />
       <Flex
         minH={"100vh"}
-        pt={20}
+        pt={{ base: 0, md: 20 }}
         justify={"center"}
         bg={useColorModeValue("gray.50", "gray.800")}
       >
-        <Stack spacing={8} mx={"auto"} maxW={"lg"} minW={"lg"} py={12} px={6}>
+        <Stack
+          spacing={8}
+          mx={"auto"}
+          maxW={"lg"}
+          minW={{ md: "lg" }}
+          py={12}
+          px={6}
+        >
           <Stack align={"center"}>
             <Heading fontSize={{ base: "3xl", md: "4xl" }}>
               Create your account
