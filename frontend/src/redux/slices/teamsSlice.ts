@@ -48,6 +48,7 @@ export interface TeamsState {
   memberDeletionSuccess: boolean | null;
   eventDeletionSuccess: boolean | null;
   teamDeletionSuccess: boolean | null;
+  participantUpdateSuccess: boolean | null;
   message: string | null;
 }
 
@@ -83,6 +84,7 @@ const initialState: TeamsState = {
   memberDeletionSuccess: null,
   eventDeletionSuccess: null,
   teamDeletionSuccess: null,
+  participantUpdateSuccess: null,
   message: null,
 };
 
@@ -854,13 +856,19 @@ export const teamsSlice = createSlice({
       })
       .addCase(updateParticipant.pending, (state) => {
         state.error = null;
+        state.participantUpdateSuccess = null;
       })
       .addCase(updateParticipant.fulfilled, (state, action) => {
+        state.message = "Updated successfully.";
+        state.participantUpdateSuccess = true;
+
         state.participants = state.participants.map((participant) =>
           participant.id === action.payload.id ? action.payload : participant
         );
       })
       .addCase(updateParticipant.rejected, (state, action) => {
+        state.participantUpdateSuccess = false;
+
         if (action.payload) {
           state.error = action.payload.message;
         } else {

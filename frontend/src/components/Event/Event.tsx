@@ -132,6 +132,18 @@ export const Event = () => {
   }, [teams.eventUpdateSuccess]);
 
   useEffect(() => {
+    if (teams.participantUpdateSuccess && isMounted) {
+      toast({
+        title: teams.message,
+        status: "success",
+        position: "top",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  }, [teams.participantUpdateSuccess]);
+
+  useEffect(() => {
     user.user.id && dispatch(getByUser(user.user.id));
     team_id && dispatch(getMembers(parseInt(team_id)));
     team_id && dispatch(getEvents(parseInt(team_id)));
