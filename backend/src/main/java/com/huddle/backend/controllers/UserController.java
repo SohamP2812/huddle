@@ -70,7 +70,7 @@ public class UserController {
       encoder.encode(signUpRequest.getPassword())
     );
 
-    userRepository.save(user);
+    user = userRepository.save(user);
 
     Authentication authentication = authenticationManager.authenticate(
       new UsernamePasswordAuthenticationToken(
@@ -89,16 +89,8 @@ public class UserController {
 
     response.addCookie(jwtTokenCookie);
 
-    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
     return ResponseEntity.ok(
-      new UserResponse(
-        userDetails.getId(),
-        userDetails.getFirstName(),
-        userDetails.getLastName(),
-        userDetails.getUsername(),
-        userDetails.getEmail()
-      )
+      new UserResponse(user)
     );
   }
 
@@ -110,13 +102,7 @@ public class UserController {
       .stream()
       .map(
         user ->
-          new UserResponse(
-            user.getId(),
-            user.getFirstName(),
-            user.getLastName(),
-            user.getUsername(),
-            user.getEmail()
-          )
+          new UserResponse(user)
       )
       .toList();
 
@@ -132,13 +118,7 @@ public class UserController {
       .body(new MessageResponse("No user exists with this id."));
 
     return ResponseEntity.ok(
-      new UserResponse(
-        user.get().getId(),
-        user.get().getFirstName(),
-        user.get().getLastName(),
-        user.get().getUsername(),
-        user.get().getEmail()
-      )
+      new UserResponse(user.get())
     );
   }
 
@@ -159,13 +139,7 @@ public class UserController {
     userRepository.save(user.get());
 
     return ResponseEntity.ok(
-      new UserResponse(
-        user.get().getId(),
-        user.get().getFirstName(),
-        user.get().getLastName(),
-        user.get().getUsername(),
-        user.get().getEmail()
-      )
+      new UserResponse(user.get())
     );
   }
 
@@ -208,18 +182,7 @@ public class UserController {
       .stream()
       .map(
         team ->
-          new TeamResponse(
-            team.getId(),
-            team.getName(),
-            new UserResponse(
-              team.getManager().getId(),
-              team.getManager().getFirstName(),
-              team.getManager().getLastName(),
-              team.getManager().getUsername(),
-              team.getManager().getEmail()
-            ),
-            team.getSport()
-          )
+          new TeamResponse(team)
       )
       .toList();
 

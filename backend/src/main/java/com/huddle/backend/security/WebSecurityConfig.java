@@ -14,6 +14,7 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -141,6 +142,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
   }
 
   @Bean
+  @Profile("prod")
   public ServletWebServerFactory servletContainer() {
     TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory() {
       @Override
@@ -157,6 +159,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     return tomcat;
   }
 
+  @Profile("prod")
   private Connector redirectConnector() {
     Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
     connector.setScheme("http");

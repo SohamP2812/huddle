@@ -73,18 +73,7 @@ public class TeamController {
     teamMemberRepository.save(teamMember);
 
     return ResponseEntity.ok(
-      new TeamResponse(
-        team.getId(),
-        team.getName(),
-        new UserResponse(
-          team.getManager().getId(),
-          team.getManager().getFirstName(),
-          team.getManager().getLastName(),
-          team.getManager().getUsername(),
-          team.getManager().getEmail()
-        ),
-        team.getSport()
-      )
+      new TeamResponse(team)
     );
   }
 
@@ -105,18 +94,7 @@ public class TeamController {
             .body(new MessageResponse("You are not a member of this team."));
 
     return ResponseEntity.ok(
-      new TeamResponse(
-        team.get().getId(),
-        team.get().getName(),
-        new UserResponse(
-          team.get().getManager().getId(),
-          team.get().getManager().getFirstName(),
-          team.get().getManager().getLastName(),
-          team.get().getManager().getUsername(),
-          team.get().getManager().getEmail()
-        ),
-        team.get().getSport()
-      )
+      new TeamResponse(team.get())
     );
   }
 
@@ -144,18 +122,7 @@ public class TeamController {
     teamRepository.delete(team.get());
 
     return ResponseEntity.ok(
-            new TeamResponse(
-                    team.get().getId(),
-                    team.get().getName(),
-                    new UserResponse(
-                            team.get().getManager().getId(),
-                            team.get().getManager().getFirstName(),
-                            team.get().getManager().getLastName(),
-                            team.get().getManager().getUsername(),
-                            team.get().getManager().getEmail()
-                    ),
-                    team.get().getSport()
-            )
+            new TeamResponse(team.get())
     );
   }
 
@@ -181,14 +148,7 @@ public class TeamController {
       .stream()
       .map(
         member ->
-          new MemberResponse(
-            member.getMember().getId(),
-            member.getMember().getFirstName(),
-            member.getMember().getLastName(),
-            member.getMember().getUsername(),
-            member.getMember().getEmail(),
-            member.isManager()
-          )
+          new MemberResponse(member)
       )
       .toList();
 
@@ -249,11 +209,7 @@ public class TeamController {
     teamMemberRepository.save(teamMember);
 
     return ResponseEntity.ok(new UserResponse(
-            userToAdd.get().getId(),
-            userToAdd.get().getFirstName(),
-            userToAdd.get().getLastName(),
-            userToAdd.get().getUsername(),
-            userToAdd.get().getEmail()
+            userToAdd.get()
     ));
   }
 
@@ -303,11 +259,6 @@ public class TeamController {
 
     teamMemberRepository.deleteByTeamIdAndMemberId(id, user_id); // Should I first get member teams from user then filter by team id?
 
-    return ResponseEntity.ok(new UserResponse(
-            userToDelete.get().getId(),
-            userToDelete.get().getFirstName(),
-            userToDelete.get().getLastName(),
-            userToDelete.get().getUsername(),
-            userToDelete.get().getEmail()));
+    return ResponseEntity.ok(new UserResponse(userToDelete.get()));
   }
 }

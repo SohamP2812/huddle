@@ -11,6 +11,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { extendTheme } from "@chakra-ui/react";
+import ReactGA from "react-ga";
 
 import { AuthComponent } from "components/AuthComponent";
 
@@ -26,6 +27,9 @@ import { Event } from "components/Event/Event";
 import { EditEvent } from "components/EditEvent/EditEvent";
 
 import { theme as baseTheme } from "theme";
+
+ReactGA.initialize("UA-226922633-1");
+ReactGA.pageview(window.location.pathname);
 
 const container = document.getElementById("root")!;
 const root = createRoot(container);

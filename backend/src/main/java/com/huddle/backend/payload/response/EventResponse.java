@@ -1,9 +1,7 @@
 package com.huddle.backend.payload.response;
 
-import com.huddle.backend.models.EEvent;
-import com.huddle.backend.models.ESport;
-import com.huddle.backend.models.Team;
-import com.huddle.backend.models.User;
+import com.huddle.backend.models.*;
+
 import java.time.OffsetDateTime;
 
 public class EventResponse {
@@ -23,23 +21,16 @@ public class EventResponse {
   private Integer opponentScore;
 
   public EventResponse(
-    Long id,
-    String name,
-    TeamResponse team,
-    OffsetDateTime startTime,
-    OffsetDateTime endTime,
-    EEvent eventType,
-    Integer teamScore,
-    Integer opponentScore
+    Event event
   ) {
-    this.id = id;
-    this.name = name;
-    this.team = team;
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.eventType = eventType;
-    this.teamScore = teamScore;
-    this.opponentScore = opponentScore;
+    this.id = event.getId();
+    this.name = event.getName();
+    this.team = new TeamResponse(event.getTeam());
+    this.startTime = event.getStartTime();
+    this.endTime = event.getEndTime();
+    this.eventType = event.getEventType();
+    this.teamScore = event.getTeamScore();
+    this.opponentScore = event.getOpponentScore();
   }
 
   public Long getId() {

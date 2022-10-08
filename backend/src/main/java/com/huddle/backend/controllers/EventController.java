@@ -60,30 +60,7 @@ public class EventController {
 
     List<EventResponse> responseEvents = events
             .stream()
-            .map(
-                    event ->
-                            new EventResponse(
-                                    event.getId(),
-                                    event.getName(),
-                                    new TeamResponse(
-                                            event.getTeam().getId(),
-                                            event.getTeam().getName(),
-                                            new UserResponse(
-                                                    event.getTeam().getManager().getId(),
-                                                    event.getTeam().getManager().getFirstName(),
-                                                    event.getTeam().getManager().getLastName(),
-                                                    event.getTeam().getManager().getUsername(),
-                                                    event.getTeam().getManager().getEmail()
-                                            ),
-                                            event.getTeam().getSport()
-                                    ),
-                                    event.getStartTime(),
-                                    event.getEndTime(),
-                                    event.getEventType(),
-                                    event.getTeamScore(),
-                                    event.getOpponentScore()
-                            )
-            )
+            .map(event -> new EventResponse(event))
             .toList();
 
     return ResponseEntity.ok(new EventsResponse(responseEvents));
@@ -149,29 +126,7 @@ public class EventController {
       eventParticipantRepository.save(eventParticipant);
     }
 
-    return ResponseEntity.ok(
-      new EventResponse(
-        event.getId(),
-        event.getName(),
-        new TeamResponse(
-          team.get().getId(),
-          team.get().getName(),
-          new UserResponse(
-            team.get().getManager().getId(),
-            team.get().getManager().getFirstName(),
-            team.get().getManager().getLastName(),
-            team.get().getManager().getUsername(),
-            team.get().getManager().getEmail()
-          ),
-          team.get().getSport()
-        ),
-        event.getStartTime(),
-        event.getEndTime(),
-        event.getEventType(),
-        event.getTeamScore(),
-        event.getOpponentScore()
-      )
-    );
+    return ResponseEntity.ok(new EventResponse(event));
   }
 
   @GetMapping("/{event_id}")
@@ -205,29 +160,7 @@ public class EventController {
             .badRequest()
             .body(new MessageResponse("You are not a participant of this event."));
 
-    return ResponseEntity.ok(
-      new EventResponse(
-        event.get().getId(),
-        event.get().getName(),
-        new TeamResponse(
-          event.get().getTeam().getId(),
-          event.get().getTeam().getName(),
-          new UserResponse(
-            event.get().getTeam().getManager().getId(),
-            event.get().getTeam().getManager().getFirstName(),
-            event.get().getTeam().getManager().getLastName(),
-            event.get().getTeam().getManager().getUsername(),
-            event.get().getTeam().getManager().getEmail()
-          ),
-          event.get().getTeam().getSport()
-        ),
-        event.get().getStartTime(),
-        event.get().getEndTime(),
-        event.get().getEventType(),
-        event.get().getTeamScore(),
-        event.get().getOpponentScore()
-      )
-    );
+    return ResponseEntity.ok(new EventResponse(event.get()));
   }
 
   @DeleteMapping("{event_id}")
@@ -266,29 +199,7 @@ public class EventController {
 
     eventRepository.delete(event.get());
 
-    return ResponseEntity.ok(
-            new EventResponse(
-                    event.get().getId(),
-                    event.get().getName(),
-                    new TeamResponse(
-                            event.get().getTeam().getId(),
-                            event.get().getTeam().getName(),
-                            new UserResponse(
-                                    event.get().getTeam().getManager().getId(),
-                                    event.get().getTeam().getManager().getFirstName(),
-                                    event.get().getTeam().getManager().getLastName(),
-                                    event.get().getTeam().getManager().getUsername(),
-                                    event.get().getTeam().getManager().getEmail()
-                            ),
-                            event.get().getTeam().getSport()
-                    ),
-                    event.get().getStartTime(),
-                    event.get().getEndTime(),
-                    event.get().getEventType(),
-                    event.get().getTeamScore(),
-                    event.get().getOpponentScore()
-            )
-    );
+    return ResponseEntity.ok(new EventResponse(event.get()));
   }
 
   @PatchMapping("/{event_id}")
@@ -382,27 +293,7 @@ public class EventController {
 
     // Can I return the edited instance or do I need to re-fetch for confirmation
     return ResponseEntity.ok(
-      new EventResponse(
-        event.get().getId(),
-        event.get().getName(),
-        new TeamResponse(
-          event.get().getTeam().getId(),
-          event.get().getTeam().getName(),
-          new UserResponse(
-            event.get().getTeam().getManager().getId(),
-            event.get().getTeam().getManager().getFirstName(),
-            event.get().getTeam().getManager().getLastName(),
-            event.get().getTeam().getManager().getUsername(),
-            event.get().getTeam().getManager().getEmail()
-          ),
-          event.get().getTeam().getSport()
-        ),
-        event.get().getStartTime(),
-        event.get().getEndTime(),
-        event.get().getEventType(),
-        event.get().getTeamScore(),
-        event.get().getOpponentScore()
-      )
+      new EventResponse(event.get())
     );
   }
 
@@ -417,57 +308,7 @@ public class EventController {
 
     List<EventParticipantResponse> responseEventParticipants = eventParticipants
       .stream()
-      .map(
-        eventParticipant ->
-                new EventParticipantResponse(
-                        eventParticipant.getId(),
-                        eventParticipant.getAttendance(),
-                        new UserResponse(
-                                eventParticipant.getParticipant().getId(),
-                                eventParticipant.getParticipant().getFirstName(),
-                                eventParticipant.getParticipant().getLastName(),
-                                eventParticipant.getParticipant().getUsername(),
-                                eventParticipant.getParticipant().getEmail()
-                        ),
-                        new EventResponse(
-                                eventParticipant.getEvent().getId(),
-                                eventParticipant.getEvent().getName(),
-                                new TeamResponse(
-                                        eventParticipant.getEvent().getTeam().getId(),
-                                        eventParticipant.getEvent().getTeam().getName(),
-                                        new UserResponse(
-                                                eventParticipant.getEvent().getTeam().getManager().getId(),
-                                                eventParticipant
-                                                        .getEvent()
-                                                        .getTeam()
-                                                        .getManager()
-                                                        .getFirstName(),
-                                                eventParticipant
-                                                        .getEvent()
-                                                        .getTeam()
-                                                        .getManager()
-                                                        .getLastName(),
-                                                eventParticipant
-                                                        .getEvent()
-                                                        .getTeam()
-                                                        .getManager()
-                                                        .getUsername(),
-                                                eventParticipant
-                                                        .getEvent()
-                                                        .getTeam()
-                                                        .getManager()
-                                                        .getEmail()
-                                        ),
-                                        eventParticipant.getEvent().getTeam().getSport()
-                                ),
-                                eventParticipant.getEvent().getStartTime(),
-                                eventParticipant.getEvent().getEndTime(),
-                                eventParticipant.getEvent().getEventType(),
-                                eventParticipant.getEvent().getTeamScore(),
-                                eventParticipant.getEvent().getOpponentScore()
-                        )
-                )
-      )
+      .map(eventParticipant ->new EventParticipantResponse(eventParticipant))
       .toList();
 
     return ResponseEntity.ok(new EventParticipantsResponse(responseEventParticipants));
@@ -518,64 +359,9 @@ public class EventController {
       .setAttendance(eventParticipantRequest.getAttendance());
 
     eventParticipantRepository.save(eventParticipant.get());
-
-    // No way this is how I should be doing this. Maybe I should either stop sending all objects associated with the main resource
-    // or I can find a better way to construct the response rather than passing every field individually
-    // ^^ I can just make the constructor of response to take in one param -> the actual model. Then constructor binds what it needs.
-    // dependency injection??
+    
     return ResponseEntity.ok(
-      new EventParticipantResponse(
-        eventParticipant.get().getId(),
-        eventParticipant.get().getAttendance(),
-        new UserResponse(
-          eventParticipant.get().getParticipant().getId(),
-          eventParticipant.get().getParticipant().getFirstName(),
-          eventParticipant.get().getParticipant().getLastName(),
-          eventParticipant.get().getParticipant().getUsername(),
-          eventParticipant.get().getParticipant().getEmail()
-        ),
-        new EventResponse(
-          eventParticipant.get().getEvent().getId(),
-          eventParticipant.get().getEvent().getName(),
-          new TeamResponse(
-            eventParticipant.get().getEvent().getTeam().getId(),
-            eventParticipant.get().getEvent().getTeam().getName(),
-            new UserResponse(
-              eventParticipant.get().getEvent().getTeam().getManager().getId(),
-              eventParticipant
-                .get()
-                .getEvent()
-                .getTeam()
-                .getManager()
-                .getFirstName(),
-              eventParticipant
-                .get()
-                .getEvent()
-                .getTeam()
-                .getManager()
-                .getLastName(),
-              eventParticipant
-                .get()
-                .getEvent()
-                .getTeam()
-                .getManager()
-                .getUsername(),
-              eventParticipant
-                .get()
-                .getEvent()
-                .getTeam()
-                .getManager()
-                .getEmail()
-            ),
-            eventParticipant.get().getEvent().getTeam().getSport()
-          ),
-          eventParticipant.get().getEvent().getStartTime(),
-          eventParticipant.get().getEvent().getEndTime(),
-          eventParticipant.get().getEvent().getEventType(),
-          eventParticipant.get().getEvent().getTeamScore(),
-          eventParticipant.get().getEvent().getOpponentScore()
-        )
-      )
+      new EventParticipantResponse(eventParticipant.get())
     );
   }
 }

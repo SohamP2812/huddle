@@ -1,5 +1,7 @@
 package com.huddle.backend.payload.response;
 
+import com.huddle.backend.models.TeamMember;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -15,19 +17,14 @@ public class MemberResponse {
   private Boolean isManager;
 
   public MemberResponse(
-    Long id,
-    String firstName,
-    String lastName,
-    String username,
-    String email,
-    Boolean isManager
+    TeamMember member
   ) {
-    this.id = id;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.username = username;
-    this.email = email;
-    this.isManager = isManager;
+    this.id = member.getMember().getId();
+    this.firstName = member.getMember().getFirstName();
+    this.lastName = member.getMember().getLastName();
+    this.username = member.getMember().getUsername();
+    this.email = member.getMember().getEmail();
+    this.isManager = member.isManager();
   }
 
   public Long getId() {

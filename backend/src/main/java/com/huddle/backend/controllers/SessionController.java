@@ -46,6 +46,7 @@ public class SessionController {
     HttpServletResponse response,
     @Valid @RequestBody LoginRequest loginRequest
   ) {
+    System.out.println("req");
     Authentication authentication = authenticationManager.authenticate(
       new UsernamePasswordAuthenticationToken(
         loginRequest.getUsername(),
@@ -89,11 +90,7 @@ public class SessionController {
 
     return ResponseEntity.ok(
       new UserResponse(
-        user.get().getId(),
-        user.get().getFirstName(),
-        user.get().getLastName(),
-        user.get().getUsername(),
-        user.get().getEmail()
+        user.get()
       )
     );
   }

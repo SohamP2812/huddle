@@ -2,6 +2,7 @@ package com.huddle.backend.payload.response;
 
 import com.huddle.backend.models.EAttendance;
 import com.huddle.backend.models.Event;
+import com.huddle.backend.models.EventParticipant;
 import com.huddle.backend.models.User;
 import javax.persistence.*;
 
@@ -15,15 +16,12 @@ public class EventParticipantResponse {
   private EventResponse event;
 
   public EventParticipantResponse(
-    Long id,
-    EAttendance attendance,
-    UserResponse participant,
-    EventResponse event
+    EventParticipant eventParticipant
   ) {
-    this.id = id;
-    this.attendance = attendance;
-    this.user = participant;
-    this.event = event;
+    this.id = eventParticipant.getId();
+    this.attendance = eventParticipant.getAttendance();
+    this.user = new UserResponse(eventParticipant.getParticipant());
+    this.event = new EventResponse(eventParticipant.getEvent());
   }
 
   public Long getId() {

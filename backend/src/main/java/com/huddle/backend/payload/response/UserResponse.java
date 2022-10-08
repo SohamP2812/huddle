@@ -1,5 +1,7 @@
 package com.huddle.backend.payload.response;
 
+import com.huddle.backend.models.User;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -12,17 +14,13 @@ public class UserResponse {
   private String email;
 
   public UserResponse(
-    Long id,
-    String firstName,
-    String lastName,
-    String username,
-    String email
+    User user
   ) {
-    this.id = id;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.username = username;
-    this.email = email;
+    this.id = user.getId();
+    this.firstName = user.getFirstName();
+    this.lastName = user.getLastName();
+    this.username = user.getUsername();
+    this.email = user.getEmail();
   }
 
   public Long getId() {
