@@ -104,7 +104,7 @@ public class UserController {
 
   @GetMapping("")
   public ResponseEntity<?> getUsers(@RequestParam String username) {
-    List<User> users = userRepository.findByUsernameStartsWith(username);
+    List<User> users = userRepository.findByUsernameStartsWithIgnoreCase(username);
 
     List<UserResponse> responseUsers = users
       .stream()
