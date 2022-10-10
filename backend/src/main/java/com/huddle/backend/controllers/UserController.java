@@ -13,6 +13,7 @@ import com.huddle.backend.security.services.UserDetailsImpl;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -111,15 +112,9 @@ public class UserController {
 
   @GetMapping("/{id}")
   public ResponseEntity<?> getUser(@PathVariable Long id) {
-    Optional<User> user = userRepository.findById(id);
+    User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
-    if (user.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No user exists with this id."));
-
-    return ResponseEntity.ok(
-      new UserResponse(user.get())
-    );
+    return ResponseEntity.ok(new UserResponse(user));
   }
 
   @PatchMapping("/{id}")
@@ -127,20 +122,14 @@ public class UserController {
     @Valid @RequestBody UserRequest userRequest,
     @PathVariable Long id
   ) {
-    Optional<User> user = userRepository.findById(id);
+    User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
-    if (user.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No user exists with this id."));
+    user.setFirstName(userRequest.getFirstName());
+    user.setLastName(userRequest.getLastName());
 
-    user.get().setFirstName(userRequest.getFirstName());
-    user.get().setLastName(userRequest.getLastName());
+    userRepository.save(user);
 
-    userRepository.save(user.get());
-
-    return ResponseEntity.ok(
-      new UserResponse(user.get())
-    );
+    return ResponseEntity.ok(new UserResponse(user));
   }
 
   @DeleteMapping("/{id}")
@@ -162,14 +151,10 @@ public class UserController {
     Authentication authentication,
     @PathVariable Long id
   ) {
-    Optional<User> user = userRepository.findById(id);
-
-    if (user.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No user exists with this id."));
+    User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
     // Which method is better?
-    Set<TeamMember> memberTeams = user.get().getMemberTeams();
+    Set<TeamMember> memberTeams = user.getMemberTeams();
 
     //      List<TeamMember> memberTeams = teamMemberRepository.findAllByMemberId(id);
 

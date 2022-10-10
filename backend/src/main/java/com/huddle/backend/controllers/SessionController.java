@@ -9,6 +9,7 @@ import com.huddle.backend.repository.UserRepository;
 import com.huddle.backend.security.jwt.JwtUtils;
 import com.huddle.backend.security.services.UserDetailsImpl;
 import java.util.Optional;
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -46,7 +47,6 @@ public class SessionController {
     HttpServletResponse response,
     @Valid @RequestBody LoginRequest loginRequest
   ) {
-    System.out.println("req");
     Authentication authentication = authenticationManager.authenticate(
       new UsernamePasswordAuthenticationToken(
         loginRequest.getUsername(),
@@ -82,17 +82,9 @@ public class SessionController {
   public ResponseEntity<?> getSelfFromToken(Authentication authentication) {
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-    Optional<User> user = userRepository.findById(userDetails.getId());
+    User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
-    if (user.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No user exists with this id."));
-
-    return ResponseEntity.ok(
-      new UserResponse(
-        user.get()
-      )
-    );
+    return ResponseEntity.ok(new UserResponse(user));
   }
 
   @DeleteMapping("")

@@ -1,14 +1,17 @@
 package com.huddle.backend.controllers;
 
+import com.huddle.backend.exception.UnauthorizedException;
 import com.huddle.backend.models.*;
 import com.huddle.backend.payload.request.*;
 import com.huddle.backend.payload.response.*;
 import com.huddle.backend.repository.*;
 import java.util.*;
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import com.huddle.backend.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,22 +41,18 @@ public class EventController {
   public ResponseEntity<?> getEvents(Authentication authentication, @PathVariable Long team_id) {
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-    Optional<User> user = userRepository.findById(userDetails.getId());
+    User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
-    Optional<Team> team = teamRepository.findById(team_id);
+    Team team = teamRepository.findById(team_id).orElseThrow(() -> new EntityNotFoundException("No team exists with this id."));
 
-    if(!user.get().getMemberTeams().stream().map(memberTeam -> memberTeam.getTeam().getId()).toList().contains(team_id)) return ResponseEntity
-            .badRequest()
+    if(!user.getMemberTeams().stream().map(memberTeam -> memberTeam.getTeam().getId()).toList().contains(team_id)) return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
             .body(new MessageResponse("You are not a member of this team."));
 
-    if (team.isEmpty()) return ResponseEntity
-            .badRequest()
-            .body(new MessageResponse("No team exists with this id."));
-
-    Set<Event> events = team.get().getEvents();
+    Set<Event> events = team.getEvents();
 
     for(Event event : events) {
-      Optional<EventParticipant> eventParticipant = eventParticipantRepository.findByParticipantIdAndEventId(user.get().getId(), event.getId());
+      Optional<EventParticipant> eventParticipant = eventParticipantRepository.findByParticipantIdAndEventId(user.getId(), event.getId());
 
       if(eventParticipant.isEmpty()) events.remove(event);
     }
@@ -74,18 +73,14 @@ public class EventController {
   ) {
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-    Optional<User> user = userRepository.findById(userDetails.getId());
+    User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
-    Optional<Team> team = teamRepository.findById(team_id);
+    Team team = teamRepository.findById(team_id).orElseThrow(() -> new EntityNotFoundException("No team exists with this id."));
 
-    if (team.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No team exists with this id."));
-
-    for (TeamMember member : user.get().getMemberTeams()) {
-      if (member.getTeam().getId() == team_id && !member.isManager()) {
+    for (TeamMember member : user.getMemberTeams()) {
+      if (member.getTeam().getId().equals(team_id) && !member.isManager()) {
         return ResponseEntity
-                .badRequest()
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(new MessageResponse("You do not have the authority to make this change."));
       }
     }
@@ -99,7 +94,7 @@ public class EventController {
     Event event = new Event(
       eventRequest.getName(),
       eventRequest.getEventType(),
-      team.get(),
+      team,
       eventRequest.getStartTime(),
       eventRequest.getEndTime(),
       eventRequest.getTeamScore(),
@@ -137,30 +132,17 @@ public class EventController {
   ) {
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-    Optional<User> user = userRepository.findById(userDetails.getId());
+    User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
-    Optional<Team> team = teamRepository.findById(team_id);
+    teamRepository.findById(team_id).orElseThrow(() -> new EntityNotFoundException("No team exists with this id."));
 
-    if (team.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No team exists with this id."));
+    Event event = eventRepository.findByIdAndTeamId(event_id, team_id)
+            .orElseThrow(() -> new EntityNotFoundException("No event exists with this id."));
 
-    Optional<Event> event = eventRepository.findByIdAndTeamId(
-      event_id,
-      team_id
-    );
+    eventParticipantRepository.findByParticipantIdAndEventId(user.getId(), event.getId())
+            .orElseThrow(() -> new UnauthorizedException("You are not a participant of this event."));
 
-    if (event.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No event exists with this id on that team."));
-
-    Optional<EventParticipant> eventParticipant = eventParticipantRepository.findByParticipantIdAndEventId(user.get().getId(), event.get().getId());
-
-    if (eventParticipant.isEmpty()) return ResponseEntity
-            .badRequest()
-            .body(new MessageResponse("You are not a participant of this event."));
-
-    return ResponseEntity.ok(new EventResponse(event.get()));
+    return ResponseEntity.ok(new EventResponse(event));
   }
 
   @DeleteMapping("{event_id}")
@@ -172,34 +154,24 @@ public class EventController {
   ) {
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-    Optional<User> user = userRepository.findById(userDetails.getId());
+    User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
-    Optional<Team> team = teamRepository.findById(team_id);
+    teamRepository.findById(team_id).orElseThrow(() -> new EntityNotFoundException("No team exists with this id."));
 
-    if (team.isEmpty()) return ResponseEntity
-            .badRequest()
-            .body(new MessageResponse("No team exists with this id."));
+    Event event = eventRepository.findByIdAndTeamId(event_id, team_id)
+            .orElseThrow(() -> new EntityNotFoundException("No event exists with this id."));
 
-    Optional<Event> event = eventRepository.findByIdAndTeamId(
-            event_id,
-            team_id
-    );
-
-    if (event.isEmpty()) return ResponseEntity
-            .badRequest()
-            .body(new MessageResponse("No event exists with this id on that team."));
-
-    for (TeamMember member : user.get().getMemberTeams()) {
-      if (member.getTeam().getId() == team_id && !member.isManager()) {
+    for (TeamMember member : user.getMemberTeams()) {
+      if (member.getTeam().getId().equals(team_id) && !member.isManager()) {
         return ResponseEntity
                 .badRequest()
                 .body(new MessageResponse("You do not have the authority to make this change."));
       }
     }
 
-    eventRepository.delete(event.get());
+    eventRepository.delete(event);
 
-    return ResponseEntity.ok(new EventResponse(event.get()));
+    return ResponseEntity.ok(new EventResponse(event));
   }
 
   @PatchMapping("/{event_id}")
@@ -211,25 +183,15 @@ public class EventController {
   ) {
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-    Optional<User> user = userRepository.findById(userDetails.getId());
+    User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
-    Optional<Team> team = teamRepository.findById(team_id);
+    teamRepository.findById(team_id).orElseThrow(() -> new EntityNotFoundException("No team exists with this id."));
 
-    if (team.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No team exists with this id."));
+    Event event = eventRepository.findByIdAndTeamId(event_id, team_id).
+            orElseThrow(() -> new EntityNotFoundException("No event exists with this id."));
 
-    Optional<Event> event = eventRepository.findByIdAndTeamId(
-      event_id,
-      team_id
-    );
-
-    if (event.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No event exists with this id on that team."));
-
-    for (TeamMember member : user.get().getMemberTeams()) {
-      if (member.getTeam().getId() == team_id && !member.isManager()) {
+    for (TeamMember member : user.getMemberTeams()) {
+      if (member.getTeam().getId().equals(team_id) && !member.isManager()) {
         return ResponseEntity
                 .badRequest()
                 .body(new MessageResponse("You do not have the authority to make this change."));
@@ -242,14 +204,14 @@ public class EventController {
               .body(new MessageResponse("Start time must be before end time."));
     }
 
-    event.get().setEventType(eventRequest.getEventType());
-    event.get().setName(eventRequest.getName());
-    event.get().setStartTime(eventRequest.getStartTime());
-    event.get().setEndTime(eventRequest.getEndTime());
-    event.get().setTeamScore(eventRequest.getTeamScore());
-    event.get().setOpponentScore(eventRequest.getOpponentScore());
+    event.setEventType(eventRequest.getEventType());
+    event.setName(eventRequest.getName());
+    event.setStartTime(eventRequest.getStartTime());
+    event.setEndTime(eventRequest.getEndTime());
+    event.setTeamScore(eventRequest.getTeamScore());
+    event.setOpponentScore(eventRequest.getOpponentScore());
 
-    eventRepository.save(event.get());
+    eventRepository.save(event);
 
     List<EventParticipant> currentParticipants = eventParticipantRepository.findAllByEventId(
       event_id
@@ -270,7 +232,7 @@ public class EventController {
         EventParticipant eventParticipant = new EventParticipant(
           EAttendance.UNDECIDED,
           participant.get(),
-          event.get()
+          event
         );
 
         eventParticipantRepository.save(eventParticipant);
@@ -293,7 +255,7 @@ public class EventController {
 
     // Can I return the edited instance or do I need to re-fetch for confirmation
     return ResponseEntity.ok(
-      new EventResponse(event.get())
+      new EventResponse(event)
     );
   }
 
@@ -324,44 +286,25 @@ public class EventController {
   ) {
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-    Optional<User> user = userRepository.findById(userDetails.getId());
+    User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
-    if (user.get().getId() != user_id) return ResponseEntity
+    if (!user.getId().equals(user_id)) return ResponseEntity
             .badRequest()
             .body(new MessageResponse("You do not have the authority to make this change."));
 
-    Optional<Team> team = teamRepository.findById(team_id);
+    teamRepository.findById(team_id).orElseThrow(() -> new EntityNotFoundException("No team exists with this id."));
 
-    if (team.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No team exists with this id."));
+    eventRepository.findByIdAndTeamId(event_id, team_id)
+            .orElseThrow(() -> new EntityNotFoundException("No event exists with this id."));
 
-    Optional<Event> event = eventRepository.findByIdAndTeamId(
-      event_id,
-      team_id
-    );
-
-    if (event.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No event exists with this id on that team."));
-
-    Optional<EventParticipant> eventParticipant = eventParticipantRepository.findByParticipantIdAndEventId(
-      user_id,
-      event_id
-    );
-
-    if (eventParticipant.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No participant for that event exists with that user_id"));
+    EventParticipant eventParticipant = eventParticipantRepository
+            .findByParticipantIdAndEventId(user_id, event_id).orElseThrow(() -> new EntityNotFoundException("No participant exists with this id."));
 
     eventParticipant
-      .get()
       .setAttendance(eventParticipantRequest.getAttendance());
 
-    eventParticipantRepository.save(eventParticipant.get());
-    
-    return ResponseEntity.ok(
-      new EventParticipantResponse(eventParticipant.get())
-    );
+    eventParticipantRepository.save(eventParticipant);
+
+    return ResponseEntity.ok(new EventParticipantResponse(eventParticipant));
   }
 }

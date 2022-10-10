@@ -14,11 +14,13 @@ import com.huddle.backend.security.jwt.JwtUtils;
 import com.huddle.backend.security.services.UserDetailsImpl;
 import java.lang.reflect.Member;
 import java.util.*;
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import io.micrometer.core.annotation.Timed;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -50,15 +52,11 @@ public class TeamController {
   ) {
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-    Optional<User> user = userRepository.findById(userDetails.getId());
-
-    if (user.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No user exists with this id."));
+    User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
     Team team = new Team(
       teamRequest.getName(),
-      user.get(),
+      user,
       teamRequest.getSport()
     );
 
@@ -66,7 +64,7 @@ public class TeamController {
 
     TeamMember teamMember = new TeamMember(
       ERole.ROLE_MANAGER,
-      user.get(),
+      user,
       team
     );
 
@@ -81,20 +79,16 @@ public class TeamController {
   public ResponseEntity<?> getTeam(Authentication authentication, @PathVariable Long id) {
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-    Optional<User> user = userRepository.findById(userDetails.getId());
+    User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));;
 
-    Optional<Team> team = teamRepository.findById(id);
+    Team team = teamRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No team exists with this id."));
 
-    if (team.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No team exists with this id."));
-
-    if(!user.get().getMemberTeams().stream().map(memberTeam -> memberTeam.getTeam().getId()).toList().contains(id)) return ResponseEntity
+    if(!user.getMemberTeams().stream().map(memberTeam -> memberTeam.getTeam().getId()).toList().contains(id)) return ResponseEntity
             .badRequest()
             .body(new MessageResponse("You are not a member of this team."));
 
     return ResponseEntity.ok(
-      new TeamResponse(team.get())
+      new TeamResponse(team)
     );
   }
 
@@ -103,26 +97,22 @@ public class TeamController {
   public ResponseEntity<?> deleteTeam(Authentication authentication, @PathVariable Long id) {
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-    Optional<User> user = userRepository.findById(userDetails.getId());
+    User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));;
 
-    Optional<Team> team = teamRepository.findById(id);
+    Team team = teamRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No team exists with this id."));;
 
-    if (team.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No team exists with this id."));
-
-    for (TeamMember member : user.get().getMemberTeams()) {
+    for (TeamMember member : user.getMemberTeams()) {
       if (member.getTeam().getId() == id && !member.isManager()) {
         return ResponseEntity
-                .badRequest()
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(new MessageResponse("You do not have the authority to make this change."));
       }
     }
 
-    teamRepository.delete(team.get());
+    teamRepository.delete(team);
 
     return ResponseEntity.ok(
-            new TeamResponse(team.get())
+            new TeamResponse(team)
     );
   }
 
@@ -130,19 +120,15 @@ public class TeamController {
   public ResponseEntity<?> getMembers(Authentication authentication, @PathVariable Long id) {
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-    Optional<User> user = userRepository.findById(userDetails.getId());
+    User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));;
 
-    Optional<Team> team = teamRepository.findById(id);
+    Team team = teamRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No team exists with this id."));
 
-    if (team.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No team exists with this id."));
-
-    if(!user.get().getMemberTeams().stream().map(memberTeam -> memberTeam.getTeam().getId()).toList().contains(id)) return ResponseEntity
-            .badRequest()
+    if(!user.getMemberTeams().stream().map(memberTeam -> memberTeam.getTeam().getId()).toList().contains(id)) return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
             .body(new MessageResponse("You are not a member of this team."));
 
-    Set<TeamMember> teamMembers = team.get().getTeamMembers();
+    Set<TeamMember> teamMembers = team.getTeamMembers();
 
     List<MemberResponse> responseMembers = teamMembers
       .stream()
@@ -163,54 +149,45 @@ public class TeamController {
   ) {
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-    Optional<User> user = userRepository.findById(userDetails.getId());
 
-    Optional<Team> team = teamRepository.findById(id);
+    User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
-    if (team.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No team exists with this id."));
+    Team team = teamRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No team exists with this id."));
 
-    if(!user.get().getMemberTeams().stream().map(memberTeam -> memberTeam.getTeam().getId()).toList().contains(id)) return ResponseEntity
-            .badRequest()
+    if(!user.getMemberTeams().stream().map(memberTeam -> memberTeam.getTeam().getId()).toList().contains(id)) return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
             .body(new MessageResponse("You are not a member of this team."));
 
-    for (TeamMember member : user.get().getMemberTeams()) {
+    for (TeamMember member : user.getMemberTeams()) {
       if (member.getTeam().getId() == id && !member.isManager()) {
         return ResponseEntity
-                .badRequest()
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(new MessageResponse("You do not have the authority to make this change."));
       }
     }
 
-    Optional<User> userToAdd = userRepository.findById(memberRequest.getId());
+    User userToAdd = userRepository.findById(memberRequest.getId()).orElseThrow(() -> new EntityNotFoundException("No team exists with this id."));
 
-    if (userToAdd.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No user exists with this id."));
-
-    Set<TeamMember> memberTeams = userToAdd.get().getMemberTeams();
+    Set<TeamMember> memberTeams = userToAdd.getMemberTeams();
 
     List<Team> teams = memberTeams
       .stream()
       .map(memberTeam -> memberTeam.getTeam())
       .toList();
 
-    if (teams.contains(team.get())) return ResponseEntity
+    if (teams.contains(team)) return ResponseEntity
       .badRequest()
       .body(new MessageResponse("User is already a member of this team."));
 
     TeamMember teamMember = new TeamMember(
       ERole.ROLE_MEMBER,
-      userToAdd.get(),
-      team.get()
+      userToAdd,
+      team
     );
 
     teamMemberRepository.save(teamMember);
 
-    return ResponseEntity.ok(new UserResponse(
-            userToAdd.get()
-    ));
+    return ResponseEntity.ok(new UserResponse(userToAdd));
   }
 
   @DeleteMapping("/{id}/members/{user_id}")
@@ -222,24 +199,16 @@ public class TeamController {
   ) {
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-    Optional<User> user = userRepository.findById(userDetails.getId());
+    User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
-    Optional<Team> team = teamRepository.findById(id);
+    teamRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No team exists with this id."));
 
-    if (team.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No team exists with this id."));
+    User userToDelete = userRepository.findById(user_id).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
-    Optional<User> userToDelete = userRepository.findById(user_id);
-
-    if (userToDelete.isEmpty()) return ResponseEntity
-      .badRequest()
-      .body(new MessageResponse("No user exists with this id."));
-
-    for (TeamMember member : user.get().getMemberTeams()) {
+    for (TeamMember member : user.getMemberTeams()) {
       if (member.getTeam().getId() == id && !member.isManager() && member.getMember().getId() != user_id) {
         return ResponseEntity
-                .badRequest()
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(new MessageResponse("You do not have the authority to make this change."));
       }
     }
@@ -259,6 +228,6 @@ public class TeamController {
 
     teamMemberRepository.deleteByTeamIdAndMemberId(id, user_id); // Should I first get member teams from user then filter by team id?
 
-    return ResponseEntity.ok(new UserResponse(userToDelete.get()));
+    return ResponseEntity.ok(new UserResponse(userToDelete));
   }
 }

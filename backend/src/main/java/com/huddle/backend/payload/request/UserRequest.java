@@ -5,11 +5,11 @@ import javax.validation.constraints.*;
 public class UserRequest {
 
   @NotEmpty(message = "First name must not be empty")
-  @Size(max = 20)
+  @Size(max = 20, message = "Max length is 20 characters")
   private String firstName;
 
   @NotEmpty(message = "Last name must not be empty")
-  @Size(max = 20)
+  @Size(max = 20, message = "Max length is 20 characters")
   private String lastName;
 
   public String getFirstName() {

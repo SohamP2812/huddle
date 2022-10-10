@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../redux/store";
 
+import ReactGA from "react-ga";
+
 export interface User {
   id: number | null;
   username: string;
@@ -383,6 +385,8 @@ export const userSlice = createSlice({
         state.loggedIn = true;
 
         state.user = action.payload;
+
+        ReactGA.set({ userId: action.payload.id });
       })
       .addCase(getSelf.rejected, (state) => {
         state.loggedIn = false;
