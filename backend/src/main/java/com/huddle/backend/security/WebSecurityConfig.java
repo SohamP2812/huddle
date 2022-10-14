@@ -17,6 +17,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.data.auditing.DateTimeProvider;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -35,7 +37,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import java.time.OffsetDateTime;
+import java.util.Optional;
+
 @Configuration
+@EnableJpaAuditing(dateTimeProviderRef = "auditingDateTimeProvider")
 @EnableGlobalMethodSecurity(
   // securedEnabled = true,
   // jsr250Enabled = true,
@@ -61,6 +67,11 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
   @Bean
   public StaticContentFilter staticContentFilterBean() {
     return new StaticContentFilter();
+  }
+
+  @Bean(name = "auditingDateTimeProvider")
+  public DateTimeProvider dateTimeProvider() {
+    return () -> Optional.of(OffsetDateTime.now());
   }
 
   //  @Override

@@ -26,7 +26,7 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useAppSelector } from "redux/hooks";
 import { selectUser } from "redux/slices/userSlice";
 
-export const Header: FC<{}> = () => {
+export const Header: FC = () => {
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
 

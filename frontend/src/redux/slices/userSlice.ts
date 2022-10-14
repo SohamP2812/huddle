@@ -9,6 +9,7 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
+  createdAt: string;
 }
 
 export interface LoginCredentials {
@@ -42,7 +43,14 @@ export interface APIError {
 }
 
 const initialState: UserState = {
-  user: { id: null, firstName: "", lastName: "", username: "", email: "" },
+  user: {
+    id: null,
+    firstName: "",
+    lastName: "",
+    username: "",
+    email: "",
+    createdAt: "",
+  },
   loggedIn: null,
   error: null,
   message: null,
@@ -79,7 +87,7 @@ export const getUsersByQuery = createAsyncThunk<
 
     return data;
   } catch (err) {
-    let error: APIError = err;
+    const error: APIError = err;
 
     if (!error.message) {
       throw err;
@@ -119,7 +127,7 @@ export const getSelf = createAsyncThunk<
 
     return data;
   } catch (err) {
-    let error: APIError = err;
+    const error: APIError = err;
 
     if (!error.message) {
       throw err;
@@ -164,7 +172,7 @@ export const login = createAsyncThunk<
 
     return data;
   } catch (err) {
-    let error: APIError = err;
+    const error: APIError = err;
 
     if (!error.message) {
       throw err;
@@ -211,7 +219,7 @@ export const createAccount = createAsyncThunk<
 
       return data;
     } catch (err) {
-      let error: APIError = err;
+      const error: APIError = err;
 
       if (!error.message) {
         throw err;
@@ -260,7 +268,7 @@ export const updateUser = createAsyncThunk<
 
     return data;
   } catch (err) {
-    let error: APIError = err;
+    const error: APIError = err;
 
     if (!error.message) {
       throw err;
@@ -304,7 +312,7 @@ export const logout = createAsyncThunk<
 
     return data.message;
   } catch (err) {
-    let error: APIError = err;
+    const error: APIError = err;
 
     if (!error.message) {
       throw err;
@@ -391,7 +399,6 @@ export const userSlice = createSlice({
       .addCase(getSelf.rejected, (state) => {
         state.loggedIn = false;
       })
-      .addCase(logout.pending, (state) => {})
       .addCase(logout.fulfilled, (state, action) => {
         state.loggedIn = false;
 
@@ -401,6 +408,7 @@ export const userSlice = createSlice({
           lastName: "",
           username: "",
           email: "",
+          createdAt: "",
         };
       })
       .addCase(logout.rejected, (state, action) => {

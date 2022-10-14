@@ -4,15 +4,12 @@ import { useAppSelector, useAppDispatch } from "redux/hooks";
 import { logout, updateUser, selectUser } from "redux/slices/userSlice";
 import {
   Flex,
-  Box,
   FormControl,
   FormLabel,
   Input,
   Stack,
-  Link,
   Button,
   Heading,
-  Text,
   useColorModeValue,
   useToast,
   Spacer,

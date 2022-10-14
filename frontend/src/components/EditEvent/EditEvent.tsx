@@ -22,8 +22,6 @@ import {
   useToast,
   Spacer,
   Select,
-  Checkbox,
-  CheckboxGroup,
 } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import TextField from "@mui/material/TextField";

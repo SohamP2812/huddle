@@ -16,7 +16,7 @@ import { EditEvent } from "components/EditEvent/EditEvent";
 
 import { useAnalytics } from "hooks/useAnalytics";
 
-export const App: FC<{}> = () => {
+export const App: FC = () => {
   useAnalytics();
 
   return (

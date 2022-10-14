@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Heading, Box, Flex, Text, Stack, Badge } from "@chakra-ui/react";
+import { Heading, Box, Text, Stack, Badge } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { stringToJSDate } from "utils/misc";
 

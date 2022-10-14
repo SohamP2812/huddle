@@ -1,8 +1,11 @@
 package com.huddle.backend.models;
 
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.*;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "team_members")
 public class TeamMember {
   @Id

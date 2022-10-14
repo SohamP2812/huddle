@@ -1,6 +1,9 @@
 package com.huddle.backend.models;
 
 import com.huddle.backend.payload.response.TeamResponse;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,11 +12,15 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "events")
 public class Event {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @CreatedDate
+  private OffsetDateTime createdAt;
 
   @NotNull
   @Size(max = 20)

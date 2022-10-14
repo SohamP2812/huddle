@@ -8,6 +8,7 @@ export interface User {
   lastName: string;
   email: string;
   isManager?: boolean;
+  createdAt: string;
 }
 
 export interface Team {
@@ -15,6 +16,7 @@ export interface Team {
   name: string;
   manager: User;
   sport: string;
+  createdAt: string;
 }
 
 export interface Event {
@@ -26,6 +28,7 @@ export interface Event {
   eventType: string;
   teamScore: number;
   opponentScore: number;
+  createdAt: string;
 }
 
 export interface Participant {
@@ -125,7 +128,7 @@ export const createTeam = createAsyncThunk<
 
       return data;
     } catch (err) {
-      let error: APIError = err;
+      const error: APIError = err;
 
       if (!error.message) {
         throw err;
@@ -170,7 +173,7 @@ export const deleteTeam = createAsyncThunk<
 
     return data;
   } catch (err) {
-    let error: APIError = err;
+    const error: APIError = err;
 
     if (!error.message) {
       throw err;
@@ -217,7 +220,7 @@ export const addMember = createAsyncThunk<
 
       return data;
     } catch (err) {
-      let error: APIError = err;
+      const error: APIError = err;
 
       if (!error.message) {
         throw err;
@@ -262,7 +265,7 @@ export const getByUser = createAsyncThunk<
 
     return data;
   } catch (err) {
-    let error: APIError = err;
+    const error: APIError = err;
 
     if (!error.message) {
       throw err;
@@ -306,7 +309,7 @@ export const getMembers = createAsyncThunk<
 
     return data;
   } catch (err) {
-    let error: APIError = err;
+    const error: APIError = err;
 
     if (!error.message) {
       throw err;
@@ -352,7 +355,7 @@ export const deleteMember = createAsyncThunk<
 
       return data;
     } catch (err) {
-      let error: APIError = err;
+      const error: APIError = err;
 
       if (!error.message) {
         throw err;
@@ -397,7 +400,7 @@ export const getEvents = createAsyncThunk<
 
     return data;
   } catch (err) {
-    let error: APIError = err;
+    const error: APIError = err;
 
     if (!error.message) {
       throw err;
@@ -443,7 +446,7 @@ export const deleteEvent = createAsyncThunk<
 
       return data;
     } catch (err) {
-      let error: APIError = err;
+      const error: APIError = err;
 
       if (!error.message) {
         throw err;
@@ -491,7 +494,7 @@ export const createEvent = createAsyncThunk<
 
       return data;
     } catch (err) {
-      let error: APIError = err;
+      const error: APIError = err;
 
       if (!error.message) {
         throw err;
@@ -542,7 +545,7 @@ export const updateEvent = createAsyncThunk<
 
       return data;
     } catch (err) {
-      let error: APIError = err;
+      const error: APIError = err;
 
       if (!error.message) {
         throw err;
@@ -592,7 +595,7 @@ export const getParticipants = createAsyncThunk<
 
       return data;
     } catch (err) {
-      let error: APIError = err;
+      const error: APIError = err;
 
       if (!error.message) {
         throw err;
@@ -651,7 +654,7 @@ export const updateParticipant = createAsyncThunk<
 
       return data;
     } catch (err) {
-      let error: APIError = err;
+      const error: APIError = err;
 
       if (!error.message) {
         throw err;

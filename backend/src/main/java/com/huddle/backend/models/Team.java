@@ -1,5 +1,10 @@
 package com.huddle.backend.models;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
@@ -7,11 +12,15 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "teams")
 public class Team {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @CreatedDate
+  private OffsetDateTime createdAt;
 
   @NotNull
   @Size(max = 20)
@@ -85,5 +94,13 @@ public class Team {
 
   public void setSport(ESport sport) {
     this.sport = sport;
+  }
+
+  public OffsetDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(OffsetDateTime createdAt) {
+    this.createdAt = createdAt;
   }
 }

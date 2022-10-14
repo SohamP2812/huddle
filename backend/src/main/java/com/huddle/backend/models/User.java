@@ -1,5 +1,8 @@
 package com.huddle.backend.models;
 
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
@@ -19,6 +22,9 @@ public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @CreatedDate
+  private OffsetDateTime createdAt;
 
   @NotNull
   @Size(max = 20)

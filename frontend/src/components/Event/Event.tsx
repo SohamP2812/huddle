@@ -581,6 +581,7 @@ export const Event = () => {
                         )
                         .map((participant) => (
                           <Text
+                            key={participant.id}
                             fontWeight={
                               participant.user.id === user.user.id ? 600 : 300
                             }
@@ -610,6 +611,7 @@ export const Event = () => {
                         )
                         .map((participant) => (
                           <Text
+                            key={participant.id}
                             fontWeight={
                               participant.user.id === user.user.id ? 600 : 300
                             }
@@ -640,6 +642,7 @@ export const Event = () => {
                         )
                         .map((participant) => (
                           <Text
+                            key={participant.id}
                             fontWeight={
                               participant.user.id === user.user.id ? 600 : 300
                             }

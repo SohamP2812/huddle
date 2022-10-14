@@ -1,19 +1,16 @@
-import { Dayjs } from "dayjs";
-
-export const allFieldsFilled = (object: Object): boolean => {
+export const allFieldsFilled = <T>(object: T): boolean => {
   for (const property in object) {
-    if (!object[property as keyof typeof object]) return false;
+    if (!object[property as keyof T]) return false;
   }
 
   return true;
 };
 
-export const isObjectDiff = (object1: Object, object2: Object): boolean => {
+export const isObjectDiff = <T>(object1: T, object2: T): boolean => {
   for (const property in object1) {
     if (
       property in object2 &&
-      object1[property as keyof typeof object1] !==
-        object2[property as keyof typeof object2]
+      object1[property as keyof T] !== object2[property as keyof T]
     ) {
       return true;
     }
@@ -41,7 +38,7 @@ export const stringToJSDate = (dateString: string) => {
 };
 
 export const toIsoString = (date: Date) => {
-  var tzo = -date.getTimezoneOffset(),
+  const tzo = -date.getTimezoneOffset(),
     dif = tzo >= 0 ? "+" : "-",
     pad = function (num: number) {
       return (num < 10 ? "0" : "") + num;

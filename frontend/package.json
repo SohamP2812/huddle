@@ -33,16 +33,29 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "BUILD_PATH='../backend/src/main/resources/static' react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",  
+    "lint" : "eslint ./src/**/*.{tsx,ts}"
   },
   "eslintConfig": {
+    "plugins": [
+      "react",
+      "@typescript-eslint"
+    ],
     "extends": [
       "react-app",
-      "react-app/jest"
-    ]
-  },
+      "react-app/jest",
+      "plugin:react/recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:react/jsx-runtime"
+    ],
+    "rules": {
+      "react/no-children-prop": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
+      "react-hooks/exhaustive-deps": "off"
+    }
+  }, 
   "browserslist": {
     "production": [
       ">0.2%",

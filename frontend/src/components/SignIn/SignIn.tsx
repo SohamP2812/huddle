@@ -142,7 +142,7 @@ export const SignIn = () => {
                   </Button>
                 </Stack>
                 <Link as={RouterLink} to="/sign-up" color={"blue.400"}>
-                  Don't have an account? Sign up.
+                  Don&apos;t have an account? Sign up.
                 </Link>
               </Stack>
             </form>

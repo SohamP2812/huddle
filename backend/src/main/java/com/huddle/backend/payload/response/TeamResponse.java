@@ -4,6 +4,9 @@ import com.huddle.backend.models.ESport;
 import com.huddle.backend.models.Team;
 import com.huddle.backend.models.User;
 
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+
 public class TeamResponse {
   private Long id;
   private String name;
@@ -12,6 +15,8 @@ public class TeamResponse {
 
   private ESport sport;
 
+  private OffsetDateTime createdAt;
+
   public TeamResponse(
     Team team
   ) {
@@ -19,6 +24,7 @@ public class TeamResponse {
     this.name = team.getName();
     this.manager = new UserResponse(team.getManager());
     this.sport = team.getSport();
+    this.createdAt = team.getCreatedAt();
   }
 
   public Long getId() {
@@ -51,5 +57,13 @@ public class TeamResponse {
 
   public void setSport(ESport sport) {
     this.sport = sport;
+  }
+
+  public OffsetDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(OffsetDateTime createdAt) {
+    this.createdAt = createdAt;
   }
 }

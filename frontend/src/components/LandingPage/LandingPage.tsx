@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { Header } from "components/Header/Header";
-export const LandingPage: FC<{}> = () => {
+export const LandingPage: FC = () => {
   const navigate = useNavigate();
 
   const user = useAppSelector(selectUser);
