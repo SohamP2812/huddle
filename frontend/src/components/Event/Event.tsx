@@ -240,7 +240,9 @@ export const Event = () => {
         participantIds: [],
       });
     } else {
-      const allMembersIds = members.map((member) => member.id);
+      const allMembersIds = members
+        .filter((member) => member.id !== user.user.id)
+        .map((member) => member.id);
 
       setEventFields({
         ...eventFields,
