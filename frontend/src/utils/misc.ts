@@ -20,6 +20,8 @@ export const isObjectDiff = <T>(object1: T, object2: T): boolean => {
 };
 
 export const isArrayDiff = <T>(array1: Array<T>, array2: Array<T>) => {
+  if (array1.length === 0 && array2.length === 0) return false;
+
   if (array1.length === array2.length) {
     return array1.every((element) => {
       if (array2.includes(element)) {

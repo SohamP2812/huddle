@@ -123,7 +123,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
-      .requiresChannel().anyRequest().requiresSecure().and()
+//      .requiresChannel().anyRequest().requiresSecure().and()
       .cors()
       .and()
       .csrf()

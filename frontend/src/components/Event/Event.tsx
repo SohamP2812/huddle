@@ -159,25 +159,25 @@ export const Event = () => {
 
   useEffect(() => {
     event &&
-      setEventFields({
-        ...eventFields,
+      setEventFields((prevState) => ({
+        ...prevState,
         name: event.name,
         startTime: event.startTime,
         endTime: event.endTime,
         eventType: event.eventType,
         teamScore: event.teamScore,
         opponentScore: event.opponentScore,
-      });
+      }));
   }, [event]);
 
   useEffect(() => {
     setStatus(getPersistentStatus());
-    setEventFields({
-      ...eventFields,
+    setEventFields((prevState) => ({
+      ...prevState,
       participantIds: participants
-        .filter((member) => member.id !== user.user.id)
+        .filter((member) => member.user.id !== user.user.id)
         .map((participant) => participant.user.id),
-    });
+    }));
   }, [participants]);
 
   const getPersistentStatus = () => {
@@ -792,8 +792,12 @@ export const Event = () => {
                 <Button
                   disabled={
                     !isArrayDiff(
-                      eventFields.participantIds,
-                      participants.map((participant) => participant.user.id)
+                      eventFields.participantIds.filter(
+                        (id) => id !== user.user.id
+                      ),
+                      participants
+                        .filter((member) => member.user.id !== user.user.id)
+                        .map((participant) => participant.user.id)
                     )
                   }
                   colorScheme="blue"
