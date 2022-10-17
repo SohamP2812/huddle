@@ -21,8 +21,9 @@ jobs:
           java-version: '18'
           distribution: 'adopt'
       - name: Build Frontend
-	working-directory: ./frontend
-        run: npm run build
+	run: |
+          cd ./backend
+          npm run build
       - name: Cache Maven packages
 	working-directory: ./backend
         uses: actions/cache@v1
@@ -31,8 +32,9 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Package with Maven
-	working-directory: ./backend
-        run: mvn package -Dmaven.test.skip  
+        run: |
+          cd ./backend
+          mvn package -Dmaven.test.skip  
       - name: docker login
         env:
           DOCKER_USER: ${{secrets.DOCKER_USER}}
@@ -40,9 +42,11 @@ jobs:
         run: |
           docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
       - name: Build the Docker image
-        working-directory: ./backend
-        run: docker build . --file Dockerfile --tag sohamp1228/huddle:$(date +%s)
+        run: |
+          cd ./backend
+          docker build . --file Dockerfile --tag sohamp1228/huddle:$(date +%s)
       - name: Docker Push
-        working-directory: ./backend
-        run: docker push sohamp1228/huddle
+        run: |
+          cd ./backend
+          docker push sohamp1228/huddle
 
