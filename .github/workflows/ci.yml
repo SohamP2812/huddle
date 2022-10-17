@@ -22,7 +22,7 @@ jobs:
           distribution: 'adopt'
       - name: Build Frontend
         run: |
-          cd ./backend
+          cd ./frontend
           npm run build
       - name: Cache Maven 
         uses: actions/cache@v1
