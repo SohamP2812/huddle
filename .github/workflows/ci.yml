@@ -53,3 +53,14 @@ jobs:
         run: |
           cd ./backend
           docker push sohamp1228/huddle:$TAG
+      - name: Connect to Digital Ocean and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+            host: ${{ secrets.DO_HOST }}
+            username: ${{ secrets.DO_USERNAME }}
+            key: ${{ secrets.DO_KEY }}
+            passphrase: ${{secrets.DO_PASSPHRASE}}
+            script: |
+              docker pull sohamp1228/huddle:$TAG
+              docker rm -f sohamp1228/huddle
+              docker run -d sohamp1228/huddle -p 8080:8080 -p 80:80 -p 443:443 sohamp1228/huddle:$TAG
