@@ -23,6 +23,8 @@ jobs:
       - name: Build Frontend
         run: |
           cd ./frontend
+          rm -rf node_modules/
+          npm ci
           npm run build
       - name: Cache Maven 
         uses: actions/cache@v1
