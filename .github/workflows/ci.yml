@@ -61,7 +61,6 @@ jobs:
             key: ${{ secrets.DO_KEY }}
             passphrase: ${{secrets.DO_PASSPHRASE}}
             script: |
-              echo ${{env.TAG}}
               docker rm -f sohamp1228/huddle
               docker pull sohamp1228/huddle:${{env.TAG}}
-              docker run -d sohamp1228/huddle -p 8080:8080 -p 80:80 -p 443:443 sohamp1228/huddle:${{env.TAG}}
+              docker run -d --name huddle -p 8080:8080 -p 80:80 -p 443:443 sohamp1228/huddle:${{env.TAG}}
