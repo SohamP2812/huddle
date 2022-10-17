@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.core.env.Environment;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.http.HttpMethod;
@@ -38,6 +39,7 @@ import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 
 @Configuration
@@ -47,7 +49,9 @@ import java.util.Optional;
   // jsr250Enabled = true,
   prePostEnabled = true
 )
-public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
+  @Autowired
+  Environment environment;
   @Autowired
   UserDetailsServiceImpl userDetailsService;
 
@@ -74,11 +78,6 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     return () -> Optional.of(OffsetDateTime.now());
   }
 
-  //  @Override
-  //  public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-  //    authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-  //  }
-
   @Bean
   public DaoAuthenticationProvider authenticationProvider() {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -88,12 +87,6 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
     return authProvider;
   }
-
-  //  @Bean
-  //  @Override
-  //  public AuthenticationManager authenticationManagerBean() throws Exception {
-  //    return super.authenticationManagerBean();
-  //  }
 
   @Bean
   public AuthenticationManager authenticationManager(
@@ -108,22 +101,13 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     return new BCryptPasswordEncoder();
   }
 
-  //  @Override
-  //  protected void configure(HttpSecurity http) throws Exception {
-  //    http.cors().and().csrf().disable()
-  //      .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-  //      .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-  //      .authorizeRequests().antMatchers("/api/auth/**").permitAll()
-  //      .antMatchers("/api/test/**").permitAll()
-  //      .anyRequest().authenticated();
-  //
-  //    http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-  //  }
-
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    if(Arrays.toString(environment.getActiveProfiles()).contains("prod")) {
+      http.requiresChannel().anyRequest().requiresSecure();
+    }
+
     http
-      .requiresChannel().anyRequest().requiresSecure().and()
       .cors()
       .and()
       .csrf()
