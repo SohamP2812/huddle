@@ -36,16 +36,19 @@ jobs:
         run: |
           cd ./backend
           mvn package -Dmaven.test.skip  
+      - name: Generate Docker Tag Based on Timestamp
+        run: echo TAG=$(date +%s) >> $GITHUB_ENV
       - name: docker login
         env:
           DOCKER_USER: ${{secrets.DOCKER_USER}}
           DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+          TAG: ${{env.TAG}}
         run: |
           docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
       - name: Build the Docker image
         run: |
           cd ./backend
-          docker build . --file Dockerfile --tag sohamp1228/huddle:$(date +%s)
+          docker build . --file Dockerfile --tag sohamp1228/huddle:$TAG
       - name: Docker Push
         run: |
           cd ./backend
