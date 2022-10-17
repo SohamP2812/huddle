@@ -52,4 +52,4 @@ jobs:
       - name: Docker Push
         run: |
           cd ./backend
-          docker push sohamp1228/huddle
+          docker push sohamp1228/huddle:$TAG
