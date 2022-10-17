@@ -38,7 +38,7 @@ jobs:
           mvn package -Dmaven.test.skip  
       - name: Generate Docker Tag Based on Timestamp
         run: echo TAG=$(date +%s) >> $GITHUB_ENV
-      - name: docker login
+      - name: Docker Login
         env:
           DOCKER_USER: ${{secrets.DOCKER_USER}}
           DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
@@ -63,5 +63,6 @@ jobs:
             script: |
               docker stop huddle
               docker rm -f huddle
+              docker image prune -a
               docker pull sohamp1228/huddle:${{env.TAG}}
               docker run -d --name huddle -p 8080:8080 -p 80:80 -p 443:443 --net=host sohamp1228/huddle:${{env.TAG}}
