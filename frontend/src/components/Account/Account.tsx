@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { Header } from "components/Header/Header";
-import { useAppSelector, useAppDispatch } from "redux/hooks";
-import { logout, updateUser, selectUser } from "redux/slices/userSlice";
+import React, { useState, useEffect } from 'react';
+import { Header } from 'components/Header/Header';
+import { useAppSelector, useAppDispatch } from 'redux/hooks';
+import { logout, updateUser, selectUser } from 'redux/slices/userSlice';
 import {
   Flex,
   FormControl,
@@ -12,11 +12,11 @@ import {
   Heading,
   useColorModeValue,
   useToast,
-  Spacer,
-} from "@chakra-ui/react";
+  Spacer
+} from '@chakra-ui/react';
 
-import { useIsMounted } from "hooks/useIsMounted";
-import { isObjectDiff } from "utils/misc";
+import { useIsMounted } from 'hooks/useIsMounted';
+import { isObjectDiff } from 'utils/misc';
 
 export const Account = () => {
   const isMounted = useIsMounted();
@@ -31,10 +31,10 @@ export const Account = () => {
     if (user.message && isMounted) {
       toast({
         title: user.message,
-        status: "success",
-        position: "top",
+        status: 'success',
+        position: 'top',
         duration: 5000,
-        isClosable: true,
+        isClosable: true
       });
     }
   }, [user.message]);
@@ -42,12 +42,12 @@ export const Account = () => {
   useEffect(() => {
     if (user.error && isMounted) {
       toast({
-        title: "An error occurred!",
+        title: 'An error occurred!',
         description: user.error,
-        status: "error",
-        position: "top",
+        status: 'error',
+        position: 'top',
         duration: 5000,
-        isClosable: true,
+        isClosable: true
       });
     }
   }, [user.error]);
@@ -56,21 +56,17 @@ export const Account = () => {
     username: user.user.username,
     firstName: user.user.firstName,
     lastName: user.user.lastName,
-    email: user.user.email,
+    email: user.user.email
   });
 
-  const handleChangeSignupFields = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ): void => {
+  const handleChangeSignupFields = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setAccountFields({
       ...accountFields,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
-  const handleLogout = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ): void => {
+  const handleLogout = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     e.preventDefault();
     dispatch(logout());
   };
@@ -86,15 +82,10 @@ export const Account = () => {
   return (
     <>
       <Header />
-      <Flex
-        minH={"100vh"}
-        pt={10}
-        justify={"center"}
-        bg={useColorModeValue("gray.50", "gray.800")}
-      >
-        <Stack spacing={8} mx={"auto"} width={"xl"} py={12} px={6}>
-          <Stack align={"center"}>
-            <Heading fontSize={"4xl"}>Account</Heading>
+      <Flex minH={'100vh'} pt={10} justify={'center'} bg={useColorModeValue('gray.50', 'gray.800')}>
+        <Stack spacing={8} mx={'auto'} width={'xl'} py={12} px={6}>
+          <Stack align={'center'}>
+            <Heading fontSize={'4xl'}>Account</Heading>
           </Stack>
           <form onSubmit={handleUpdateUser}>
             <Stack spacing={4}>
@@ -136,26 +127,26 @@ export const Account = () => {
                   value={accountFields.email}
                 />
               </FormControl>
-              <Spacer h={"xl"} />
+              <Spacer h={'xl'} />
               <Button
                 disabled={!isObjectDiff(accountFields, user.user)}
                 type="submit"
-                bg={"black"}
-                color={"white"}
+                bg={'black'}
+                color={'white'}
                 _hover={{
-                  bg: "gray.600",
+                  bg: 'gray.600'
                 }}
               >
                 Update
               </Button>
               <Button
                 onClick={handleLogout}
-                bg={"transparent"}
-                color={"black"}
-                border={"1px"}
-                borderColor={"black"}
+                bg={'transparent'}
+                color={'black'}
+                border={'1px'}
+                borderColor={'black'}
                 _hover={{
-                  bg: "gray.200",
+                  bg: 'gray.200'
                 }}
               >
                 Logout

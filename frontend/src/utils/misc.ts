@@ -8,10 +8,7 @@ export const allFieldsFilled = <T>(object: T): boolean => {
 
 export const isObjectDiff = <T>(object1: T, object2: T): boolean => {
   for (const property in object1) {
-    if (
-      property in object2 &&
-      object1[property as keyof T] !== object2[property as keyof T]
-    ) {
+    if (property in object2 && object1[property as keyof T] !== object2[property as keyof T]) {
       return true;
     }
   }
@@ -41,26 +38,26 @@ export const stringToJSDate = (dateString: string) => {
 
 export const toIsoString = (date: Date) => {
   const tzo = -date.getTimezoneOffset(),
-    dif = tzo >= 0 ? "+" : "-",
+    dif = tzo >= 0 ? '+' : '-',
     pad = function (num: number) {
-      return (num < 10 ? "0" : "") + num;
+      return (num < 10 ? '0' : '') + num;
     };
 
   return (
     date.getFullYear() +
-    "-" +
+    '-' +
     pad(date.getMonth() + 1) +
-    "-" +
+    '-' +
     pad(date.getDate()) +
-    "T" +
+    'T' +
     pad(date.getHours()) +
-    ":" +
+    ':' +
     pad(date.getMinutes()) +
-    ":" +
+    ':' +
     pad(date.getSeconds()) +
     dif +
     pad(Math.floor(Math.abs(tzo) / 60)) +
-    ":" +
+    ':' +
     pad(Math.abs(tzo) % 60)
   );
 };

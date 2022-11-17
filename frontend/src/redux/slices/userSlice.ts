@@ -1,7 +1,7 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { RootState } from "../../redux/store";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { RootState } from '../../redux/store';
 
-import ReactGA from "react-ga";
+import ReactGA from 'react-ga';
 
 export interface User {
   id: number | null;
@@ -45,16 +45,16 @@ export interface APIError {
 const initialState: UserState = {
   user: {
     id: null,
-    firstName: "",
-    lastName: "",
-    username: "",
-    email: "",
-    createdAt: "",
+    firstName: '',
+    lastName: '',
+    username: '',
+    email: '',
+    createdAt: ''
   },
   loggedIn: null,
   error: null,
   message: null,
-  queryUsers: [],
+  queryUsers: []
 };
 
 export const getUsersByQuery = createAsyncThunk<
@@ -64,15 +64,15 @@ export const getUsersByQuery = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->("user/getUsersByQuery", async (username, { rejectWithValue }) => {
+>('user/getUsersByQuery', async (username, { rejectWithValue }) => {
   try {
     const response = await fetch(`/api/users?username=${username}`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-        accepts: "application/json",
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
       },
-      credentials: "include",
+      credentials: 'include'
     });
 
     const data = await response.json();
@@ -104,15 +104,15 @@ export const getSelf = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->("user/getSelf", async (_, { getState, rejectWithValue }) => {
+>('user/getSelf', async (_, { getState, rejectWithValue }) => {
   try {
-    const response = await fetch("/api/session", {
-      method: "GET",
+    const response = await fetch('/api/session', {
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-        accepts: "application/json",
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
       },
-      credentials: "include",
+      credentials: 'include'
     });
 
     const data = await response.json();
@@ -144,20 +144,20 @@ export const login = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->("user/login", async (loginCredentials, { rejectWithValue, getState }) => {
+>('user/login', async (loginCredentials, { rejectWithValue, getState }) => {
   try {
     const { loggedIn } = getState().user;
 
     if (loggedIn) return;
 
-    const response = await fetch("/api/session", {
-      method: "POST",
+    const response = await fetch('/api/session', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        accepts: "application/json",
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
       },
-      credentials: "include",
-      body: JSON.stringify(loginCredentials),
+      credentials: 'include',
+      body: JSON.stringify(loginCredentials)
     });
 
     const data = await response.json();
@@ -189,46 +189,43 @@ export const createAccount = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->(
-  "user/createAccount",
-  async (accountCreationInfo, { rejectWithValue, getState }) => {
-    try {
-      const { loggedIn } = getState().user;
+>('user/createAccount', async (accountCreationInfo, { rejectWithValue, getState }) => {
+  try {
+    const { loggedIn } = getState().user;
 
-      if (loggedIn) return;
+    if (loggedIn) return;
 
-      const response = await fetch("/api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          accepts: "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(accountCreationInfo),
-      });
+    const response = await fetch('/api/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify(accountCreationInfo)
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.status !== 200) {
-        if (data.errors && data.errors.length && response.status === 400) {
-          data.message = data.errors[0].defaultMessage;
-        }
-
-        throw data;
+    if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
       }
 
-      return data;
-    } catch (err) {
-      const error: APIError = err;
-
-      if (!error.message) {
-        throw err;
-      }
-
-      return rejectWithValue(error);
+      throw data;
     }
+
+    return data;
+  } catch (err) {
+    const error: APIError = err;
+
+    if (!error.message) {
+      throw err;
+    }
+
+    return rejectWithValue(error);
   }
-);
+});
 
 export const updateUser = createAsyncThunk<
   User,
@@ -237,23 +234,23 @@ export const updateUser = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->("user/updateUser", async (userUpdateInfo, { rejectWithValue, getState }) => {
+>('user/updateUser', async (userUpdateInfo, { rejectWithValue, getState }) => {
   try {
     const {
       loggedIn,
-      user: { id },
+      user: { id }
     } = getState().user;
 
     if (!loggedIn) return;
 
     const response = await fetch(`/api/users/${id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "Content-Type": "application/json",
-        accepts: "application/json",
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
       },
-      credentials: "include",
-      body: JSON.stringify(userUpdateInfo),
+      credentials: 'include',
+      body: JSON.stringify(userUpdateInfo)
     });
 
     const data = await response.json();
@@ -285,19 +282,19 @@ export const logout = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->("user/logout", async (_, { getState, rejectWithValue }) => {
+>('user/logout', async (_, { getState, rejectWithValue }) => {
   try {
     const { loggedIn } = getState().user;
 
     if (!loggedIn) return;
 
-    const response = await fetch("/api/session", {
-      method: "DELETE",
+    const response = await fetch('/api/session', {
+      method: 'DELETE',
       headers: {
-        "Content-Type": "application/json",
-        accepts: "application/json",
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
       },
-      credentials: "include",
+      credentials: 'include'
     });
 
     const data = await response.json();
@@ -323,7 +320,7 @@ export const logout = createAsyncThunk<
 });
 
 export const userSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   extraReducers: (builder) => {
     builder
@@ -342,9 +339,7 @@ export const userSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       })
       .addCase(createAccount.pending, (state) => {
@@ -362,9 +357,7 @@ export const userSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       })
       .addCase(updateUser.pending, (state) => {
@@ -372,7 +365,7 @@ export const userSlice = createSlice({
         state.message = null;
       })
       .addCase(updateUser.fulfilled, (state, action) => {
-        state.message = "Updated successfully.";
+        state.message = 'Updated successfully.';
 
         state.user = action.payload;
       })
@@ -380,9 +373,7 @@ export const userSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       })
       .addCase(getSelf.pending, (state) => {
@@ -404,11 +395,11 @@ export const userSlice = createSlice({
 
         state.user = {
           id: null,
-          firstName: "",
-          lastName: "",
-          username: "",
-          email: "",
-          createdAt: "",
+          firstName: '',
+          lastName: '',
+          username: '',
+          email: '',
+          createdAt: ''
         };
       })
       .addCase(logout.rejected, (state, action) => {
@@ -417,9 +408,7 @@ export const userSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       })
       .addCase(getUsersByQuery.pending, (state) => {
@@ -433,23 +422,21 @@ export const userSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       });
   },
   reducers: {
     resetError: (state) => {
-      state.error = "";
+      state.error = '';
     },
     resetUserQuery: (state) => {
       state.queryUsers = [];
     },
     clearUserState: (state) => {
       state = { ...initialState, loggedIn: state.loggedIn };
-    },
-  },
+    }
+  }
 });
 
 export const selectUser = (state: RootState): UserState => state.user;

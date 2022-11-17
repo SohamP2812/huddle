@@ -1,8 +1,8 @@
-import { screen } from "@testing-library/react";
-import { renderWithRouter } from "utils/testing";
+import { screen } from '@testing-library/react';
+import { renderWithRouter } from 'utils/testing';
 
-import { Teams } from "components/Teams/Teams";
+import { Teams } from 'components/Teams/Teams';
 
-it("renders without crashing", () => {
+it('renders without crashing', () => {
   renderWithRouter(<Teams />);
 });

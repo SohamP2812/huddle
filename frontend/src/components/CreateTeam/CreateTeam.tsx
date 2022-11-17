@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { Header } from "components/Header/Header";
-import { useAppSelector, useAppDispatch } from "redux/hooks";
-import { createTeam, selectTeams } from "redux/slices/teamsSlice";
+import React, { useState, useEffect } from 'react';
+import { Header } from 'components/Header/Header';
+import { useAppSelector, useAppDispatch } from 'redux/hooks';
+import { createTeam, selectTeams } from 'redux/slices/teamsSlice';
 import {
   Flex,
   FormControl,
@@ -13,16 +13,16 @@ import {
   useColorModeValue,
   useToast,
   Spacer,
-  Select,
-} from "@chakra-ui/react";
+  Select
+} from '@chakra-ui/react';
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
-import { useIsMounted } from "hooks/useIsMounted";
+import { useIsMounted } from 'hooks/useIsMounted';
 
-import { sports } from "utils/consts";
+import { sports } from 'utils/consts';
 
-import { BackButton } from "components/BackButton/BackButton";
+import { BackButton } from 'components/BackButton/BackButton';
 
 export const CreateTeam = () => {
   const isMounted = useIsMounted();
@@ -36,36 +36,34 @@ export const CreateTeam = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (teams.teamCreationSuccess && isMounted) navigate("/teams");
+    if (teams.teamCreationSuccess && isMounted) navigate('/teams');
   }, [teams.teamCreationSuccess]);
 
   useEffect(() => {
     if (teams.error && isMounted) {
       toast({
-        title: "An error occurred!",
+        title: 'An error occurred!',
         description: teams.error,
-        status: "error",
-        position: "top",
+        status: 'error',
+        position: 'top',
         duration: 5000,
-        isClosable: true,
+        isClosable: true
       });
     }
   }, [teams.error]);
 
   const [teamFields, setTeamFields] = useState({
-    name: "",
-    sport: "BASKETBALL",
+    name: '',
+    sport: 'BASKETBALL'
   });
 
   const handleChangeTeamFields = (
-    e:
-      | React.ChangeEvent<HTMLSelectElement>
-      | React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLSelectElement> | React.ChangeEvent<HTMLInputElement>
   ): void => {
     e.preventDefault();
     setTeamFields({
       ...teamFields,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
@@ -77,16 +75,11 @@ export const CreateTeam = () => {
   return (
     <>
       <Header />
-      <Flex
-        minH={"100vh"}
-        pt={10}
-        justify={"center"}
-        bg={useColorModeValue("gray.50", "gray.800")}
-      >
-        <Stack spacing={8} mx={"auto"} width={"xl"} py={12} px={6}>
+      <Flex minH={'100vh'} pt={10} justify={'center'} bg={useColorModeValue('gray.50', 'gray.800')}>
+        <Stack spacing={8} mx={'auto'} width={'xl'} py={12} px={6}>
           <BackButton fallback="/teams" />
-          <Stack align={"center"}>
-            <Heading fontSize={"4xl"}>Create a team</Heading>
+          <Stack align={'center'}>
+            <Heading fontSize={'4xl'}>Create a team</Heading>
           </Stack>
           <form onSubmit={handleCreateTeam}>
             <Stack spacing={4}>
@@ -101,30 +94,24 @@ export const CreateTeam = () => {
               </FormControl>
               <FormControl id="sport">
                 <FormLabel>Sport</FormLabel>
-                <Select
-                  name="sport"
-                  onChange={handleChangeTeamFields}
-                  value={teamFields.sport}
-                >
+                <Select name="sport" onChange={handleChangeTeamFields} value={teamFields.sport}>
                   {Object.keys(sports.nameToKey).map((sport) => (
                     <option
                       key={sport}
-                      value={
-                        sports.nameToKey[sport as keyof typeof sports.nameToKey]
-                      }
+                      value={sports.nameToKey[sport as keyof typeof sports.nameToKey]}
                     >
                       {sport}
                     </option>
                   ))}
                 </Select>
               </FormControl>
-              <Spacer h={"xl"} />
+              <Spacer h={'xl'} />
               <Button
                 type="submit"
-                bg={"black"}
-                color={"white"}
+                bg={'black'}
+                color={'white'}
                 _hover={{
-                  bg: "gray.600",
+                  bg: 'gray.600'
                 }}
               >
                 Submit

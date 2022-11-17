@@ -1,12 +1,12 @@
-import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
-import userReducer from "redux/slices/userSlice";
-import teamsReducer from "redux/slices/teamsSlice";
+import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
+import userReducer from 'redux/slices/userSlice';
+import teamsReducer from 'redux/slices/teamsSlice';
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
-    teams: teamsReducer,
-  },
+    teams: teamsReducer
+  }
 });
 
 export type AppDispatch = typeof store.dispatch;

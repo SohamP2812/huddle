@@ -1,18 +1,15 @@
-import { useEffect, FC, ReactNode } from "react";
-import { useAppSelector, useAppDispatch } from "redux/hooks";
-import { getSelf, selectUser, clearUserState } from "redux/slices/userSlice";
-import { clearTeamState } from "redux/slices/teamsSlice";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, FC, ReactNode } from 'react';
+import { useAppSelector, useAppDispatch } from 'redux/hooks';
+import { getSelf, selectUser, clearUserState } from 'redux/slices/userSlice';
+import { clearTeamState } from 'redux/slices/teamsSlice';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface IProps {
   children: ReactNode;
   isProtected?: boolean;
 }
 
-export const AuthComponent: FC<IProps> = ({
-  children,
-  isProtected = false,
-}): JSX.Element => {
+export const AuthComponent: FC<IProps> = ({ children, isProtected = false }) => {
   const location = useLocation();
 
   const navigate = useNavigate();
@@ -23,8 +20,7 @@ export const AuthComponent: FC<IProps> = ({
 
   useEffect(() => {
     if (user.loggedIn == null) dispatch(getSelf());
-    if (user.loggedIn === false && location.pathname !== "/" && isProtected)
-      navigate("/");
+    if (user.loggedIn === false && location.pathname !== '/' && isProtected) navigate('/');
   }, [location]);
 
   useEffect(() => {
@@ -32,8 +28,7 @@ export const AuthComponent: FC<IProps> = ({
       dispatch(clearUserState());
       dispatch(clearTeamState());
     }
-    if (user.loggedIn === false && location.pathname !== "/" && isProtected)
-      navigate("/");
+    if (user.loggedIn === false && location.pathname !== '/' && isProtected) navigate('/');
   }, [user.loggedIn]);
 
   if (!user.loggedIn && isProtected) {

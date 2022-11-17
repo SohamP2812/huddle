@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useAppSelector, useAppDispatch } from "redux/hooks";
-import { createAccount, selectUser } from "redux/slices/userSlice";
+import React, { useEffect, useState } from 'react';
+import { useAppSelector, useAppDispatch } from 'redux/hooks';
+import { createAccount, selectUser } from 'redux/slices/userSlice';
 import {
   Flex,
   Box,
@@ -14,15 +14,15 @@ import {
   Text,
   useColorModeValue,
   useToast,
-  Spacer,
-} from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
-import { Link as RouterLink } from "react-router-dom";
+  Spacer
+} from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
-import { allFieldsFilled } from "utils/misc";
-import { useIsMounted } from "hooks/useIsMounted";
+import { allFieldsFilled } from 'utils/misc';
+import { useIsMounted } from 'hooks/useIsMounted';
 
-import { Header } from "components/Header/Header";
+import { Header } from 'components/Header/Header';
 
 export const SignUp = () => {
   const isMounted = useIsMounted();
@@ -36,17 +36,17 @@ export const SignUp = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (user.loggedIn) navigate("/");
+    if (user.loggedIn) navigate('/');
   }, [user.loggedIn]);
 
   useEffect(() => {
     if (user.message && isMounted) {
       toast({
         title: user.message,
-        status: "success",
-        position: "top",
+        status: 'success',
+        position: 'top',
         duration: 5000,
-        isClosable: true,
+        isClosable: true
       });
     }
   }, [user.message]);
@@ -54,30 +54,28 @@ export const SignUp = () => {
   useEffect(() => {
     if (user.error && isMounted) {
       toast({
-        title: "An error occurred!",
+        title: 'An error occurred!',
         description: user.error,
-        status: "error",
-        position: "top",
+        status: 'error',
+        position: 'top',
         duration: 5000,
-        isClosable: true,
+        isClosable: true
       });
     }
   }, [user.error]);
 
   const [signupFields, setSignupFields] = useState({
-    username: "",
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
+    username: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: ''
   });
 
-  const handleChangeSignupFields = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ): void => {
+  const handleChangeSignupFields = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setSignupFields({
       ...signupFields,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
@@ -90,33 +88,19 @@ export const SignUp = () => {
     <>
       <Header />
       <Flex
-        minH={"100vh"}
+        minH={'100vh'}
         pt={{ base: 0, md: 20 }}
-        justify={"center"}
-        bg={useColorModeValue("gray.50", "gray.800")}
+        justify={'center'}
+        bg={useColorModeValue('gray.50', 'gray.800')}
       >
-        <Stack
-          spacing={8}
-          mx={"auto"}
-          maxW={"lg"}
-          minW={{ md: "lg" }}
-          py={12}
-          px={6}
-        >
-          <Stack align={"center"}>
-            <Heading fontSize={{ base: "3xl", md: "4xl" }}>
-              Create your account
-            </Heading>
-            <Text fontSize={"lg"} color={"gray.600"}>
+        <Stack spacing={8} mx={'auto'} maxW={'lg'} minW={{ md: 'lg' }} py={12} px={6}>
+          <Stack align={'center'}>
+            <Heading fontSize={{ base: '3xl', md: '4xl' }}>Create your account</Heading>
+            <Text fontSize={'lg'} color={'gray.600'}>
               to make your life a little bit easier ✌️
             </Text>
           </Stack>
-          <Box
-            rounded={"lg"}
-            bg={useColorModeValue("white", "gray.700")}
-            boxShadow={"lg"}
-            p={8}
-          >
+          <Box rounded={'lg'} bg={useColorModeValue('white', 'gray.700')} boxShadow={'lg'} p={8}>
             <form onSubmit={handleSignup}>
               <Stack spacing={4}>
                 <FormControl id="username">
@@ -167,16 +151,16 @@ export const SignUp = () => {
                 <Spacer />
                 <Button
                   type="submit"
-                  bg={"black"}
-                  color={"white"}
+                  bg={'black'}
+                  color={'white'}
                   _hover={{
-                    bg: "gray.600",
+                    bg: 'gray.600'
                   }}
                   disabled={!allFieldsFilled(signupFields)}
                 >
                   Sign Up
                 </Button>
-                <Link as={RouterLink} to="/sign-in" color={"blue.400"}>
+                <Link as={RouterLink} to="/sign-in" color={'blue.400'}>
                   Already have an account? Login.
                 </Link>
               </Stack>

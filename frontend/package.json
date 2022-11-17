@@ -33,10 +33,12 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "BUILD_PATH='../backend/src/main/resources/static' react-scripts build",
+    "build": "tsc && npm run prettier && BUILD_PATH='../backend/src/main/resources/static' react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",  
-    "lint" : "eslint ./src/**/*.{tsx,ts}"
+    "eject": "react-scripts eject",
+    "lint": "eslint ./src/**/*.{tsx,ts}",
+    "prettier": "npx prettier . --check",
+    "prettier:fix": "npm run prettier -- --write"
   },
   "eslintConfig": {
     "plugins": [
@@ -46,16 +48,22 @@
     "extends": [
       "react-app",
       "react-app/jest",
-      "plugin:react/recommended",
       "plugin:@typescript-eslint/recommended",
-      "plugin:react/jsx-runtime"
+      "plugin:react/jsx-runtime",
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "plugin:react-hooks/recommended"
     ],
     "rules": {
       "react/no-children-prop": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
-      "react-hooks/exhaustive-deps": "off"
+      "react-hooks/exhaustive-deps": "off",
+      "react/react-in-jsx-scope": "off"
     }
-  }, 
+  },
+  "eslintIgnore": [
+    "*.test.tsx"
+  ],
   "browserslist": {
     "production": [
       ">0.2%",

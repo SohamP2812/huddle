@@ -1,29 +1,29 @@
-import "@fontsource/plus-jakarta-sans/800.css";
+import '@fontsource/plus-jakarta-sans/800.css';
 
-import React from "react";
-import { createRoot } from "react-dom/client";
-import { Provider } from "react-redux";
-import { store } from "./redux/store";
-import reportWebVitals from "./reportWebVitals";
-import "./index.css";
-import { ChakraProvider } from "@chakra-ui/react";
-import CssBaseline from "@mui/material/CssBaseline";
-import { ThemeProvider } from "@mui/material/styles";
-import { extendTheme } from "@chakra-ui/react";
-import { BrowserRouter } from "react-router-dom";
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
+import { store } from './redux/store';
+import reportWebVitals from './reportWebVitals';
+import './index.css';
+import { ChakraProvider } from '@chakra-ui/react';
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider } from '@mui/material/styles';
+import { extendTheme } from '@chakra-ui/react';
+import { BrowserRouter } from 'react-router-dom';
 
-import { App } from "App";
+import { App } from 'App';
 
-import { theme as baseTheme } from "theme";
+import { theme as baseTheme } from 'theme';
 
-const container = document.getElementById("root")!;
+const container = document.getElementById('root')!;
 const root = createRoot(container);
 
 const theme = extendTheme(
   {
     fonts: {
-      heading: `'Plus Jakarta Sans', sans-serif`,
-    },
+      heading: `'Plus Jakarta Sans', sans-serif`
+    }
   },
   baseTheme
 );

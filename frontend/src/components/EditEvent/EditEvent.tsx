@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { Header } from "components/Header/Header";
-import { useAppSelector, useAppDispatch } from "redux/hooks";
+import React, { useState, useEffect } from 'react';
+import { Header } from 'components/Header/Header';
+import { useAppSelector, useAppDispatch } from 'redux/hooks';
 import {
   getMembers,
   getEvents,
@@ -8,8 +8,8 @@ import {
   updateEvent,
   selectEventById,
   selectParticipants,
-  selectTeams,
-} from "redux/slices/teamsSlice";
+  selectTeams
+} from 'redux/slices/teamsSlice';
 import {
   Flex,
   FormControl,
@@ -21,20 +21,20 @@ import {
   useColorModeValue,
   useToast,
   Spacer,
-  Select,
-} from "@chakra-ui/react";
-import { useNavigate, useParams } from "react-router-dom";
-import TextField from "@mui/material/TextField";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import dayjs from "dayjs";
+  Select
+} from '@chakra-ui/react';
+import { useNavigate, useParams } from 'react-router-dom';
+import TextField from '@mui/material/TextField';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import dayjs from 'dayjs';
 
-import { eventTypes } from "utils/consts";
-import { useIsMounted } from "hooks/useIsMounted";
-import { isObjectDiff } from "utils/misc";
+import { eventTypes } from 'utils/consts';
+import { useIsMounted } from 'hooks/useIsMounted';
+import { isObjectDiff } from 'utils/misc';
 
-import { BackButton } from "components/BackButton/BackButton";
+import { BackButton } from 'components/BackButton/BackButton';
 
 export const EditEvent = () => {
   const isMounted = useIsMounted();
@@ -60,12 +60,12 @@ export const EditEvent = () => {
     teamScore: number;
     opponentScore: number;
   }>({
-    name: "",
-    startTime: dayjs().set("seconds", 0).format(),
-    endTime: dayjs().set("seconds", 0).add(30, "minutes").format(),
-    eventType: "GAME",
+    name: '',
+    startTime: dayjs().set('seconds', 0).format(),
+    endTime: dayjs().set('seconds', 0).add(30, 'minutes').format(),
+    eventType: 'GAME',
     teamScore: 0,
-    opponentScore: 0,
+    opponentScore: 0
   });
 
   useEffect(() => {
@@ -76,25 +76,24 @@ export const EditEvent = () => {
       dispatch(
         getParticipants({
           team_id: parseInt(team_id),
-          event_id: parseInt(event_id),
+          event_id: parseInt(event_id)
         })
       );
   }, []);
 
   useEffect(() => {
-    if (teams.eventUpdateSuccess && isMounted)
-      navigate(`/teams/${team_id}/events/${event_id}`);
+    if (teams.eventUpdateSuccess && isMounted) navigate(`/teams/${team_id}/events/${event_id}`);
   }, [teams.eventUpdateSuccess]);
 
   useEffect(() => {
     if (teams.error && isMounted) {
       toast({
-        title: "An error occurred!",
+        title: 'An error occurred!',
         description: teams.error,
-        status: "error",
-        position: "top",
+        status: 'error',
+        position: 'top',
         duration: 5000,
-        isClosable: true,
+        isClosable: true
       });
     }
   }, [teams.error]);
@@ -108,19 +107,17 @@ export const EditEvent = () => {
         endTime: event.endTime,
         eventType: event.eventType,
         teamScore: event.teamScore,
-        opponentScore: event.opponentScore,
+        opponentScore: event.opponentScore
       });
   }, [event]);
 
   const handleChangeEventFields = (
-    e:
-      | React.ChangeEvent<HTMLSelectElement>
-      | React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLSelectElement> | React.ChangeEvent<HTMLInputElement>
   ): void => {
     e.preventDefault();
     setEventFields({
       ...eventFields,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
@@ -133,10 +130,8 @@ export const EditEvent = () => {
           event_id: parseInt(event_id),
           eventUpdateInfo: {
             ...eventFields,
-            participantIds: participants.map(
-              (participant) => participant.user.id
-            ),
-          },
+            participantIds: participants.map((participant) => participant.user.id)
+          }
         })
       );
   };
@@ -145,7 +140,7 @@ export const EditEvent = () => {
     newTime &&
       setEventFields({
         ...eventFields,
-        startTime: dayjs(newTime).set("seconds", 0).format(),
+        startTime: dayjs(newTime).set('seconds', 0).format()
       });
   };
 
@@ -153,23 +148,18 @@ export const EditEvent = () => {
     newTime &&
       setEventFields({
         ...eventFields,
-        endTime: dayjs(newTime).set("seconds", 0).format(),
+        endTime: dayjs(newTime).set('seconds', 0).format()
       });
   };
 
   return (
     <>
       <Header />
-      <Flex
-        minH={"100vh"}
-        pt={10}
-        justify={"center"}
-        bg={useColorModeValue("gray.50", "gray.800")}
-      >
-        <Stack spacing={8} mx={"auto"} width={"xl"} py={12} px={6}>
+      <Flex minH={'100vh'} pt={10} justify={'center'} bg={useColorModeValue('gray.50', 'gray.800')}>
+        <Stack spacing={8} mx={'auto'} width={'xl'} py={12} px={6}>
           <BackButton fallback={`/teams/${team_id}/events/${event_id}`} />
-          <Stack align={"center"}>
-            <Heading fontSize={"4xl"}>Update event</Heading>
+          <Stack align={'center'}>
+            <Heading fontSize={'4xl'}>Update event</Heading>
           </Stack>
           <form onSubmit={handleUpdateEvent}>
             <Stack spacing={4}>
@@ -192,11 +182,7 @@ export const EditEvent = () => {
                   {Object.keys(eventTypes.nameToKey).map((eventType) => (
                     <option
                       key={eventType}
-                      value={
-                        eventTypes.nameToKey[
-                          eventType as keyof typeof eventTypes.nameToKey
-                        ]
-                      }
+                      value={eventTypes.nameToKey[eventType as keyof typeof eventTypes.nameToKey]}
                     >
                       {eventType}
                     </option>
@@ -205,7 +191,7 @@ export const EditEvent = () => {
               </FormControl>
               <FormControl id="times">
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <Stack direction={{ sm: "column", md: "row" }} gap={2} mt={3}>
+                  <Stack direction={{ sm: 'column', md: 'row' }} gap={2} mt={3}>
                     <Stack w="full">
                       <DateTimePicker
                         label="Start Time"
@@ -225,13 +211,13 @@ export const EditEvent = () => {
                   </Stack>
                 </LocalizationProvider>
               </FormControl>
-              <Spacer h={"xl"} />
+              <Spacer h={'xl'} />
               <Button
                 type="submit"
-                bg={"black"}
-                color={"white"}
+                bg={'black'}
+                color={'white'}
                 _hover={{
-                  bg: "gray.600",
+                  bg: 'gray.600'
                 }}
                 disabled={
                   !isObjectDiff(eventFields, {
@@ -240,7 +226,7 @@ export const EditEvent = () => {
                     endTime: event?.endTime,
                     eventType: event?.eventType,
                     teamScore: event?.teamScore,
-                    opponentScore: event?.opponentScore,
+                    opponentScore: event?.opponentScore
                   })
                 }
               >

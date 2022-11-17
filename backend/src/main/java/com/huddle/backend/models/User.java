@@ -127,4 +127,12 @@ public class User {
   public void setMemberTeams(Set<TeamMember> memberTeams) {
     this.memberTeams = memberTeams;
   }
+
+  public OffsetDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(OffsetDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
 }

@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { RootState } from "../store";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { RootState } from '../store';
 
 export interface User {
   id: number | null;
@@ -88,7 +88,7 @@ const initialState: TeamsState = {
   eventDeletionSuccess: null,
   teamDeletionSuccess: null,
   participantUpdateSuccess: null,
-  message: null,
+  message: null
 };
 
 export const createTeam = createAsyncThunk<
@@ -98,46 +98,43 @@ export const createTeam = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->(
-  "teams/createTeam",
-  async (teamCreationInfo, { rejectWithValue, getState }) => {
-    try {
-      const { loggedIn } = getState().user;
+>('teams/createTeam', async (teamCreationInfo, { rejectWithValue, getState }) => {
+  try {
+    const { loggedIn } = getState().user;
 
-      if (!loggedIn) return;
+    if (!loggedIn) return;
 
-      const response = await fetch("/api/teams", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          accepts: "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(teamCreationInfo),
-      });
+    const response = await fetch('/api/teams', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify(teamCreationInfo)
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.status !== 200) {
-        if (data.errors && data.errors.length && response.status === 400) {
-          data.message = data.errors[0].defaultMessage;
-        }
-
-        throw data;
+    if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
       }
 
-      return data;
-    } catch (err) {
-      const error: APIError = err;
-
-      if (!error.message) {
-        throw err;
-      }
-
-      return rejectWithValue(error);
+      throw data;
     }
+
+    return data;
+  } catch (err) {
+    const error: APIError = err;
+
+    if (!error.message) {
+      throw err;
+    }
+
+    return rejectWithValue(error);
   }
-);
+});
 
 export const deleteTeam = createAsyncThunk<
   Event,
@@ -146,19 +143,19 @@ export const deleteTeam = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->("teams/deleteTeam", async (team_id, { rejectWithValue, getState }) => {
+>('teams/deleteTeam', async (team_id, { rejectWithValue, getState }) => {
   try {
     const { loggedIn } = getState().user;
 
     if (!loggedIn) return;
 
     const response = await fetch(`/api/teams/${team_id}`, {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
-        "Content-Type": "application/json",
-        accepts: "application/json",
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
       },
-      credentials: "include",
+      credentials: 'include'
     });
 
     const data = await response.json();
@@ -190,46 +187,43 @@ export const addMember = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->(
-  "teams/addMember",
-  async ({ team_id, teamMemberInfo }, { rejectWithValue, getState }) => {
-    try {
-      const { loggedIn } = getState().user;
+>('teams/addMember', async ({ team_id, teamMemberInfo }, { rejectWithValue, getState }) => {
+  try {
+    const { loggedIn } = getState().user;
 
-      if (!loggedIn) return;
+    if (!loggedIn) return;
 
-      const response = await fetch(`/api/teams/${team_id}/members`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          accepts: "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(teamMemberInfo),
-      });
+    const response = await fetch(`/api/teams/${team_id}/members`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify(teamMemberInfo)
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.status !== 200) {
-        if (data.errors && data.errors.length && response.status === 400) {
-          data.message = data.errors[0].defaultMessage;
-        }
-
-        throw data;
+    if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
       }
 
-      return data;
-    } catch (err) {
-      const error: APIError = err;
-
-      if (!error.message) {
-        throw err;
-      }
-
-      return rejectWithValue(error);
+      throw data;
     }
+
+    return data;
+  } catch (err) {
+    const error: APIError = err;
+
+    if (!error.message) {
+      throw err;
+    }
+
+    return rejectWithValue(error);
   }
-);
+});
 
 export const getByUser = createAsyncThunk<
   { teams: Team[] },
@@ -238,19 +232,19 @@ export const getByUser = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->("teams/getByUser", async (id, { rejectWithValue, getState }) => {
+>('teams/getByUser', async (id, { rejectWithValue, getState }) => {
   try {
     const { loggedIn } = getState().user;
 
     if (!loggedIn) return;
 
     const response = await fetch(`/api/users/${id}/teams`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-        accepts: "application/json",
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
       },
-      credentials: "include",
+      credentials: 'include'
     });
 
     const data = await response.json();
@@ -282,19 +276,19 @@ export const getMembers = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->("teams/getMembers", async (id, { rejectWithValue, getState }) => {
+>('teams/getMembers', async (id, { rejectWithValue, getState }) => {
   try {
     const { loggedIn } = getState().user;
 
     if (!loggedIn) return;
 
     const response = await fetch(`/api/teams/${id}/members`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-        accepts: "application/json",
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
       },
-      credentials: "include",
+      credentials: 'include'
     });
 
     const data = await response.json();
@@ -326,45 +320,42 @@ export const deleteMember = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->(
-  "teams/deleteMember",
-  async ({ user_id, team_id }, { rejectWithValue, getState }) => {
-    try {
-      const { loggedIn } = getState().user;
+>('teams/deleteMember', async ({ user_id, team_id }, { rejectWithValue, getState }) => {
+  try {
+    const { loggedIn } = getState().user;
 
-      if (!loggedIn) return;
+    if (!loggedIn) return;
 
-      const response = await fetch(`/api/teams/${team_id}/members/${user_id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          accepts: "application/json",
-        },
-        credentials: "include",
-      });
+    const response = await fetch(`/api/teams/${team_id}/members/${user_id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
+      },
+      credentials: 'include'
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.status !== 200) {
-        if (data.errors && data.errors.length && response.status === 400) {
-          data.message = data.errors[0].defaultMessage;
-        }
-
-        throw data;
+    if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
       }
 
-      return data;
-    } catch (err) {
-      const error: APIError = err;
-
-      if (!error.message) {
-        throw err;
-      }
-
-      return rejectWithValue(error);
+      throw data;
     }
+
+    return data;
+  } catch (err) {
+    const error: APIError = err;
+
+    if (!error.message) {
+      throw err;
+    }
+
+    return rejectWithValue(error);
   }
-);
+});
 
 export const getEvents = createAsyncThunk<
   { events: Event[] },
@@ -373,19 +364,19 @@ export const getEvents = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->("teams/getEvents", async (id, { rejectWithValue, getState }) => {
+>('teams/getEvents', async (id, { rejectWithValue, getState }) => {
   try {
     const { loggedIn } = getState().user;
 
     if (!loggedIn) return;
 
     const response = await fetch(`/api/teams/${id}/events`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-        accepts: "application/json",
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
       },
-      credentials: "include",
+      credentials: 'include'
     });
 
     const data = await response.json();
@@ -417,45 +408,42 @@ export const deleteEvent = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->(
-  "teams/deleteEvent",
-  async ({ team_id, event_id }, { rejectWithValue, getState }) => {
-    try {
-      const { loggedIn } = getState().user;
+>('teams/deleteEvent', async ({ team_id, event_id }, { rejectWithValue, getState }) => {
+  try {
+    const { loggedIn } = getState().user;
 
-      if (!loggedIn) return;
+    if (!loggedIn) return;
 
-      const response = await fetch(`/api/teams/${team_id}/events/${event_id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          accepts: "application/json",
-        },
-        credentials: "include",
-      });
+    const response = await fetch(`/api/teams/${team_id}/events/${event_id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
+      },
+      credentials: 'include'
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.status !== 200) {
-        if (data.errors && data.errors.length && response.status === 400) {
-          data.message = data.errors[0].defaultMessage;
-        }
-
-        throw data;
+    if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
       }
 
-      return data;
-    } catch (err) {
-      const error: APIError = err;
-
-      if (!error.message) {
-        throw err;
-      }
-
-      return rejectWithValue(error);
+      throw data;
     }
+
+    return data;
+  } catch (err) {
+    const error: APIError = err;
+
+    if (!error.message) {
+      throw err;
+    }
+
+    return rejectWithValue(error);
   }
-);
+});
 
 export const createEvent = createAsyncThunk<
   Event,
@@ -464,46 +452,43 @@ export const createEvent = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->(
-  "teams/createEvent",
-  async ({ id, eventCreationInfo }, { rejectWithValue, getState }) => {
-    try {
-      const { loggedIn } = getState().user;
+>('teams/createEvent', async ({ id, eventCreationInfo }, { rejectWithValue, getState }) => {
+  try {
+    const { loggedIn } = getState().user;
 
-      if (!loggedIn) return;
+    if (!loggedIn) return;
 
-      const response = await fetch(`/api/teams/${id}/events`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          accepts: "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(eventCreationInfo),
-      });
+    const response = await fetch(`/api/teams/${id}/events`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify(eventCreationInfo)
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.status !== 200) {
-        if (data.errors && data.errors.length && response.status === 400) {
-          data.message = data.errors[0].defaultMessage;
-        }
-
-        throw data;
+    if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
       }
 
-      return data;
-    } catch (err) {
-      const error: APIError = err;
-
-      if (!error.message) {
-        throw err;
-      }
-
-      return rejectWithValue(error);
+      throw data;
     }
+
+    return data;
+  } catch (err) {
+    const error: APIError = err;
+
+    if (!error.message) {
+      throw err;
+    }
+
+    return rejectWithValue(error);
   }
-);
+});
 
 export const updateEvent = createAsyncThunk<
   Event,
@@ -513,24 +498,21 @@ export const updateEvent = createAsyncThunk<
     rejectValue: APIError;
   }
 >(
-  "teams/updateEvent",
-  async (
-    { team_id, event_id, eventUpdateInfo },
-    { rejectWithValue, getState }
-  ) => {
+  'teams/updateEvent',
+  async ({ team_id, event_id, eventUpdateInfo }, { rejectWithValue, getState }) => {
     try {
       const { loggedIn } = getState().user;
 
       if (!loggedIn) return;
 
       const response = await fetch(`/api/teams/${team_id}/events/${event_id}`, {
-        method: "PATCH",
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
-          accepts: "application/json",
+          'Content-Type': 'application/json',
+          accepts: 'application/json'
         },
-        credentials: "include",
-        body: JSON.stringify(eventUpdateInfo),
+        credentials: 'include',
+        body: JSON.stringify(eventUpdateInfo)
       });
 
       const data = await response.json();
@@ -563,48 +545,42 @@ export const getParticipants = createAsyncThunk<
     state: RootState;
     rejectValue: APIError;
   }
->(
-  "teams/getParticipants",
-  async ({ team_id, event_id }, { rejectWithValue, getState }) => {
-    try {
-      const { loggedIn } = getState().user;
+>('teams/getParticipants', async ({ team_id, event_id }, { rejectWithValue, getState }) => {
+  try {
+    const { loggedIn } = getState().user;
 
-      if (!loggedIn) return;
+    if (!loggedIn) return;
 
-      const response = await fetch(
-        `/api/teams/${team_id}/events/${event_id}/participants`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            accepts: "application/json",
-          },
-          credentials: "include",
-        }
-      );
+    const response = await fetch(`/api/teams/${team_id}/events/${event_id}/participants`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        accepts: 'application/json'
+      },
+      credentials: 'include'
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.status !== 200) {
-        if (data.errors && data.errors.length && response.status === 400) {
-          data.message = data.errors[0].defaultMessage;
-        }
-
-        throw data;
+    if (response.status !== 200) {
+      if (data.errors && data.errors.length && response.status === 400) {
+        data.message = data.errors[0].defaultMessage;
       }
 
-      return data;
-    } catch (err) {
-      const error: APIError = err;
-
-      if (!error.message) {
-        throw err;
-      }
-
-      return rejectWithValue(error);
+      throw data;
     }
+
+    return data;
+  } catch (err) {
+    const error: APIError = err;
+
+    if (!error.message) {
+      throw err;
+    }
+
+    return rejectWithValue(error);
   }
-);
+});
 
 export const updateParticipant = createAsyncThunk<
   Participant,
@@ -619,11 +595,8 @@ export const updateParticipant = createAsyncThunk<
     rejectValue: APIError;
   }
 >(
-  "teams/updateParticipant",
-  async (
-    { team_id, event_id, user_id, participantUpdateInfo },
-    { rejectWithValue, getState }
-  ) => {
+  'teams/updateParticipant',
+  async ({ team_id, event_id, user_id, participantUpdateInfo }, { rejectWithValue, getState }) => {
     try {
       const { loggedIn } = getState().user;
 
@@ -632,13 +605,13 @@ export const updateParticipant = createAsyncThunk<
       const response = await fetch(
         `/api/teams/${team_id}/events/${event_id}/participants/${user_id}`,
         {
-          method: "PATCH",
+          method: 'PATCH',
           headers: {
-            "Content-Type": "application/json",
-            accepts: "application/json",
+            'Content-Type': 'application/json',
+            accepts: 'application/json'
           },
-          credentials: "include",
-          body: JSON.stringify(participantUpdateInfo),
+          credentials: 'include',
+          body: JSON.stringify(participantUpdateInfo)
         }
       );
 
@@ -666,7 +639,7 @@ export const updateParticipant = createAsyncThunk<
 );
 
 export const teamsSlice = createSlice({
-  name: "teams",
+  name: 'teams',
   initialState,
   extraReducers: (builder) => {
     builder
@@ -685,9 +658,7 @@ export const teamsSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       })
       .addCase(deleteTeam.pending, (state) => {
@@ -695,10 +666,8 @@ export const teamsSlice = createSlice({
         state.teamDeletionSuccess = null;
       })
       .addCase(deleteTeam.fulfilled, (state, action) => {
-        state.teams = state.teams.filter(
-          (team) => team.id !== action.payload.id
-        );
-        state.message = "Team deleted successfully.";
+        state.teams = state.teams.filter((team) => team.id !== action.payload.id);
+        state.message = 'Team deleted successfully.';
         state.teamDeletionSuccess = true;
       })
       .addCase(deleteTeam.rejected, (state, action) => {
@@ -706,9 +675,7 @@ export const teamsSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       })
       .addCase(getByUser.pending, (state) => {
@@ -721,9 +688,7 @@ export const teamsSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       })
       .addCase(getMembers.pending, (state) => {
@@ -736,9 +701,7 @@ export const teamsSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       })
       .addCase(deleteMember.pending, (state) => {
@@ -746,10 +709,8 @@ export const teamsSlice = createSlice({
         state.memberDeletionSuccess = null;
       })
       .addCase(deleteMember.fulfilled, (state, action) => {
-        state.members = state.members.filter(
-          (member) => member.id !== action.payload.id
-        );
-        state.message = "Member removed successfully.";
+        state.members = state.members.filter((member) => member.id !== action.payload.id);
+        state.message = 'Member removed successfully.';
         state.memberDeletionSuccess = true;
       })
       .addCase(deleteMember.rejected, (state, action) => {
@@ -757,9 +718,7 @@ export const teamsSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       })
       .addCase(getEvents.pending, (state) => {
@@ -772,9 +731,7 @@ export const teamsSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       })
       .addCase(deleteEvent.pending, (state) => {
@@ -782,10 +739,8 @@ export const teamsSlice = createSlice({
         state.eventDeletionSuccess = null;
       })
       .addCase(deleteEvent.fulfilled, (state, action) => {
-        state.events = state.events.filter(
-          (event) => event.id !== action.payload.id
-        );
-        state.message = "Event deleted successfully.";
+        state.events = state.events.filter((event) => event.id !== action.payload.id);
+        state.message = 'Event deleted successfully.';
         state.eventDeletionSuccess = true;
       })
       .addCase(deleteEvent.rejected, (state, action) => {
@@ -793,9 +748,7 @@ export const teamsSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       })
       .addCase(createEvent.pending, (state) => {
@@ -803,7 +756,7 @@ export const teamsSlice = createSlice({
         state.eventCreationSuccess = null;
       })
       .addCase(createEvent.fulfilled, (state, action) => {
-        state.message = "Event created successfully.";
+        state.message = 'Event created successfully.';
         state.eventCreationSuccess = true;
 
         state.events.push(action.payload);
@@ -814,9 +767,7 @@ export const teamsSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       })
       .addCase(updateEvent.pending, (state) => {
@@ -824,7 +775,7 @@ export const teamsSlice = createSlice({
         state.eventUpdateSuccess = null;
       })
       .addCase(updateEvent.fulfilled, (state, action) => {
-        state.message = "Updated successfully.";
+        state.message = 'Updated successfully.';
         state.eventUpdateSuccess = true;
 
         state.events = state.events.map((event) =>
@@ -837,9 +788,7 @@ export const teamsSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       })
       .addCase(getParticipants.pending, (state) => {
@@ -852,9 +801,7 @@ export const teamsSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       })
       .addCase(updateParticipant.pending, (state) => {
@@ -862,7 +809,7 @@ export const teamsSlice = createSlice({
         state.participantUpdateSuccess = null;
       })
       .addCase(updateParticipant.fulfilled, (state, action) => {
-        state.message = "Updated successfully.";
+        state.message = 'Updated successfully.';
         state.participantUpdateSuccess = true;
 
         state.participants = state.participants.map((participant) =>
@@ -875,9 +822,7 @@ export const teamsSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       })
       .addCase(addMember.pending, (state) => {
@@ -885,7 +830,7 @@ export const teamsSlice = createSlice({
         state.memberAddedSuccess = null;
       })
       .addCase(addMember.fulfilled, (state, action) => {
-        state.message = "Added successfully.";
+        state.message = 'Added successfully.';
         state.memberAddedSuccess = true;
 
         state.members.push(action.payload);
@@ -896,20 +841,18 @@ export const teamsSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message;
         } else {
-          state.error =
-            action.error.message ??
-            "An unknown error occurred. Please try again.";
+          state.error = action.error.message ?? 'An unknown error occurred. Please try again.';
         }
       });
   },
   reducers: {
     resetError: (state) => {
-      state.error = "";
+      state.error = '';
     },
     clearTeamState: (state) => {
       state = initialState;
-    },
-  },
+    }
+  }
 });
 
 export const selectTeams = (state: RootState): TeamsState => state.teams;
@@ -918,19 +861,12 @@ export const selectMembers = (state: RootState): User[] => state.teams.members;
 
 export const selectEvents = (state: RootState): Event[] => state.teams.events;
 
-export const selectParticipants = (state: RootState): Participant[] =>
-  state.teams.participants;
+export const selectParticipants = (state: RootState): Participant[] => state.teams.participants;
 
-export const selectTeamById = (
-  state: RootState,
-  id?: number
-): Team | null | undefined =>
+export const selectTeamById = (state: RootState, id?: number): Team | null | undefined =>
   id ? state.teams.teams.find((team) => team.id === id) : null;
 
-export const selectEventById = (
-  state: RootState,
-  id?: number
-): Event | null | undefined =>
+export const selectEventById = (state: RootState, id?: number): Event | null | undefined =>
   id ? state.teams.events.find((event) => event.id === id) : null;
 
 export const { resetError, clearTeamState } = teamsSlice.actions;

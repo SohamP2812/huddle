@@ -1,13 +1,8 @@
-import { useState, useEffect } from "react";
-import { Header } from "components/Header/Header";
-import { selectUser } from "redux/slices/userSlice";
-import { useAppSelector, useAppDispatch } from "redux/hooks";
-import {
-  createEvent,
-  getMembers,
-  selectTeams,
-  selectMembers,
-} from "redux/slices/teamsSlice";
+import React, { useState, useEffect } from 'react';
+import { Header } from 'components/Header/Header';
+import { selectUser } from 'redux/slices/userSlice';
+import { useAppSelector, useAppDispatch } from 'redux/hooks';
+import { createEvent, getMembers, selectTeams, selectMembers } from 'redux/slices/teamsSlice';
 import {
   Flex,
   FormControl,
@@ -21,19 +16,19 @@ import {
   Spacer,
   Select,
   Checkbox,
-  CheckboxGroup,
-} from "@chakra-ui/react";
-import { useNavigate, useParams } from "react-router-dom";
-import TextField from "@mui/material/TextField";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import dayjs from "dayjs";
+  CheckboxGroup
+} from '@chakra-ui/react';
+import { useNavigate, useParams } from 'react-router-dom';
+import TextField from '@mui/material/TextField';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import dayjs from 'dayjs';
 
-import { eventTypes } from "utils/consts";
-import { useIsMounted } from "hooks/useIsMounted";
+import { eventTypes } from 'utils/consts';
+import { useIsMounted } from 'hooks/useIsMounted';
 
-import { BackButton } from "components/BackButton/BackButton";
+import { BackButton } from 'components/BackButton/BackButton';
 
 export const CreateEvent = () => {
   const isMounted = useIsMounted();
@@ -60,13 +55,13 @@ export const CreateEvent = () => {
     opponentScore: number;
     participantIds: (number | null)[];
   }>({
-    name: "",
-    startTime: dayjs().set("seconds", 0).format(),
-    endTime: dayjs().set("seconds", 0).add(30, "minutes").format(),
-    eventType: "GAME",
+    name: '',
+    startTime: dayjs().set('seconds', 0).format(),
+    endTime: dayjs().set('seconds', 0).add(30, 'minutes').format(),
+    eventType: 'GAME',
     teamScore: 0,
     opponentScore: 0,
-    participantIds: [],
+    participantIds: []
   });
 
   useEffect(() => {
@@ -77,10 +72,10 @@ export const CreateEvent = () => {
     if (teams.eventCreationSuccess && isMounted) {
       toast({
         title: teams.message,
-        status: "success",
-        position: "top",
+        status: 'success',
+        position: 'top',
         duration: 5000,
-        isClosable: true,
+        isClosable: true
       });
       navigate(`/teams/${team_id}`);
     }
@@ -89,25 +84,23 @@ export const CreateEvent = () => {
   useEffect(() => {
     if (teams.error && isMounted) {
       toast({
-        title: "An error occurred!",
+        title: 'An error occurred!',
         description: teams.error,
-        status: "error",
-        position: "top",
+        status: 'error',
+        position: 'top',
         duration: 5000,
-        isClosable: true,
+        isClosable: true
       });
     }
   }, [teams.error]);
 
   const handleChangeEventFields = (
-    e:
-      | React.ChangeEvent<HTMLSelectElement>
-      | React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLSelectElement> | React.ChangeEvent<HTMLInputElement>
   ): void => {
     e.preventDefault();
     setEventFields({
       ...eventFields,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
@@ -119,27 +112,23 @@ export const CreateEvent = () => {
     let tempParticipantIds = eventFields.participantIds;
 
     if (tempParticipantIds.includes(parseInt(e.target.name))) {
-      tempParticipantIds = tempParticipantIds.filter(
-        (id) => id !== parseInt(e.target.name)
-      );
+      tempParticipantIds = tempParticipantIds.filter((id) => id !== parseInt(e.target.name));
     } else {
       tempParticipantIds.push(parseInt(e.target.name));
     }
 
     setEventFields({
       ...eventFields,
-      participantIds: tempParticipantIds,
+      participantIds: tempParticipantIds
     });
   };
 
-  const handleSelectAllParticipants = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleSelectAllParticipants = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     if (allSelected) {
       setEventFields({
         ...eventFields,
-        participantIds: [],
+        participantIds: []
       });
     } else {
       const allMembersIds = members
@@ -148,7 +137,7 @@ export const CreateEvent = () => {
 
       setEventFields({
         ...eventFields,
-        participantIds: allMembersIds,
+        participantIds: allMembersIds
       });
     }
     setAllSelected(!allSelected);
@@ -162,8 +151,8 @@ export const CreateEvent = () => {
           id: parseInt(team_id),
           eventCreationInfo: {
             ...eventFields,
-            participantIds: [...eventFields.participantIds, user.user.id],
-          },
+            participantIds: [...eventFields.participantIds, user.user.id]
+          }
         })
       );
   };
@@ -172,7 +161,7 @@ export const CreateEvent = () => {
     newTime &&
       setEventFields({
         ...eventFields,
-        startTime: dayjs(newTime).set("seconds", 0).format(),
+        startTime: dayjs(newTime).set('seconds', 0).format()
       });
   };
 
@@ -180,23 +169,18 @@ export const CreateEvent = () => {
     newTime &&
       setEventFields({
         ...eventFields,
-        endTime: dayjs(newTime).set("seconds", 0).format(),
+        endTime: dayjs(newTime).set('seconds', 0).format()
       });
   };
 
   return (
     <>
       <Header />
-      <Flex
-        minH={"100vh"}
-        pt={10}
-        justify={"center"}
-        bg={useColorModeValue("gray.50", "gray.800")}
-      >
-        <Stack spacing={8} mx={"auto"} width={"xl"} py={12} px={6}>
+      <Flex minH={'100vh'} pt={10} justify={'center'} bg={useColorModeValue('gray.50', 'gray.800')}>
+        <Stack spacing={8} mx={'auto'} width={'xl'} py={12} px={6}>
           <BackButton fallback={`/teams/${team_id}`} />
-          <Stack align={"center"}>
-            <Heading fontSize={"4xl"}>Create an event</Heading>
+          <Stack align={'center'}>
+            <Heading fontSize={'4xl'}>Create an event</Heading>
           </Stack>
           <form onSubmit={handleCreateEvent}>
             <Stack spacing={4}>
@@ -219,11 +203,7 @@ export const CreateEvent = () => {
                   {Object.keys(eventTypes.nameToKey).map((eventType) => (
                     <option
                       key={eventType}
-                      value={
-                        eventTypes.nameToKey[
-                          eventType as keyof typeof eventTypes.nameToKey
-                        ]
-                      }
+                      value={eventTypes.nameToKey[eventType as keyof typeof eventTypes.nameToKey]}
                     >
                       {eventType}
                     </option>
@@ -231,24 +211,21 @@ export const CreateEvent = () => {
                 </Select>
               </FormControl>
               <FormControl id="participantIds">
-                <Flex mb={"0.5rem"}>
+                <Flex mb={'0.5rem'}>
                   <FormLabel mb={0}>Participants</FormLabel>
-                  <Checkbox
-                    isChecked={allSelected}
-                    onChange={handleSelectAllParticipants}
-                  >
+                  <Checkbox isChecked={allSelected} onChange={handleSelectAllParticipants}>
                     Select All
                   </Checkbox>
                 </Flex>
                 <Stack
-                  height={"fit-content"}
-                  minH={"50px"}
-                  maxH={"200px"}
-                  w={"full"}
-                  border={"1px"}
-                  borderColor={"gray.300"}
-                  rounded={"xl"}
-                  overflow={"scroll"}
+                  height={'fit-content'}
+                  minH={'50px'}
+                  maxH={'200px'}
+                  w={'full'}
+                  border={'1px'}
+                  borderColor={'gray.300'}
+                  rounded={'xl'}
+                  overflow={'scroll'}
                   px={5}
                   py={2}
                 >
@@ -260,9 +237,7 @@ export const CreateEvent = () => {
                           {member.id && (
                             <Checkbox
                               name={member.id.toString()}
-                              isChecked={eventFields.participantIds.includes(
-                                member.id
-                              )}
+                              isChecked={eventFields.participantIds.includes(member.id)}
                               onChange={handleSelectParticipant}
                             >
                               {member.username}
@@ -275,7 +250,7 @@ export const CreateEvent = () => {
               </FormControl>
               <FormControl id="times">
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <Stack direction={{ sm: "column", md: "row" }} gap={2} mt={3}>
+                  <Stack direction={{ sm: 'column', md: 'row' }} gap={2} mt={3}>
                     <Stack w="full">
                       <DateTimePicker
                         label="Start Time"
@@ -295,13 +270,13 @@ export const CreateEvent = () => {
                   </Stack>
                 </LocalizationProvider>
               </FormControl>
-              <Spacer h={"xl"} />
+              <Spacer h={'xl'} />
               <Button
                 type="submit"
-                bg={"black"}
-                color={"white"}
+                bg={'black'}
+                color={'white'}
                 _hover={{
-                  bg: "gray.600",
+                  bg: 'gray.600'
                 }}
               >
                 Submit

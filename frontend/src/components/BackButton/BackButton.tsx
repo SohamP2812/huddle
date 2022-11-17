@@ -1,6 +1,7 @@
-import { Button } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
-import { ArrowBackIcon } from "@chakra-ui/icons";
+import React from 'react';
+import { Button } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowBackIcon } from '@chakra-ui/icons';
 
 export const BackButton = ({ fallback }: { fallback: string }) => {
   const navigate = useNavigate();
@@ -15,14 +16,14 @@ export const BackButton = ({ fallback }: { fallback: string }) => {
 
   return (
     <Button
-      width={"fit-content"}
-      border={"1px"}
-      borderColor={"gray.400"}
+      width={'fit-content'}
+      border={'1px'}
+      borderColor={'gray.400'}
       p={5}
-      alignItems={"center"}
+      alignItems={'center'}
       onClick={goBack}
       bg="blue.50"
-      _hover={{ bg: "blue.300" }}
+      _hover={{ bg: 'blue.300' }}
     >
       <ArrowBackIcon w={5} h={5} />
       Back

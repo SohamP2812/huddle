@@ -1,8 +1,9 @@
-import { Header } from "components/Header/Header";
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useAppSelector, useAppDispatch } from "redux/hooks";
-import { selectUser } from "redux/slices/userSlice";
+import React from 'react';
+import { Header } from 'components/Header/Header';
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useAppSelector, useAppDispatch } from 'redux/hooks';
+import { selectUser } from 'redux/slices/userSlice';
 import {
   getByUser,
   getMembers,
@@ -14,8 +15,8 @@ import {
   selectEventById,
   selectMembers,
   selectParticipants,
-  selectTeams,
-} from "redux/slices/teamsSlice";
+  selectTeams
+} from 'redux/slices/teamsSlice';
 import {
   Heading,
   Box,
@@ -44,16 +45,16 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
-  useToast,
-} from "@chakra-ui/react";
-import { EditIcon } from "@chakra-ui/icons";
-import dayjs from "dayjs";
+  useToast
+} from '@chakra-ui/react';
+import { EditIcon } from '@chakra-ui/icons';
+import dayjs from 'dayjs';
 
-import { stringToJSDate } from "utils/misc";
-import { isArrayDiff } from "utils/misc";
-import { useIsMounted } from "hooks/useIsMounted";
+import { stringToJSDate } from 'utils/misc';
+import { isArrayDiff } from 'utils/misc';
+import { useIsMounted } from 'hooks/useIsMounted';
 
-import { BackButton } from "components/BackButton/BackButton";
+import { BackButton } from 'components/BackButton/BackButton';
 
 export const Event = () => {
   const isMounted = useIsMounted();
@@ -69,26 +70,26 @@ export const Event = () => {
     opponentScore: number;
     participantIds: (number | null)[];
   }>({
-    name: "",
-    startTime: dayjs().set("seconds", 0).format(),
-    endTime: dayjs().set("seconds", 0).add(30, "minutes").format(),
-    eventType: "GAME",
+    name: '',
+    startTime: dayjs().set('seconds', 0).format(),
+    endTime: dayjs().set('seconds', 0).add(30, 'minutes').format(),
+    eventType: 'GAME',
     teamScore: 0,
     opponentScore: 0,
-    participantIds: [],
+    participantIds: []
   });
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isUpdateScoreOpen,
     onOpen: onUpdateScoreOpen,
-    onClose: onUpdateScoreClose,
+    onClose: onUpdateScoreClose
   } = useDisclosure();
 
   const navigate = useNavigate();
   const { team_id, event_id } = useParams();
 
-  const [status, setStatus] = useState<string>("UNDECIDED");
+  const [status, setStatus] = useState<string>('UNDECIDED');
 
   const user = useAppSelector(selectUser);
   const event = useAppSelector((state) =>
@@ -105,12 +106,12 @@ export const Event = () => {
   useEffect(() => {
     if (teams.error && isMounted) {
       toast({
-        title: "An error occurred!",
+        title: 'An error occurred!',
         description: teams.error,
-        status: "error",
-        position: "top",
+        status: 'error',
+        position: 'top',
         duration: 5000,
-        isClosable: true,
+        isClosable: true
       });
     }
   }, [teams.error]);
@@ -123,10 +124,10 @@ export const Event = () => {
     if (teams.eventUpdateSuccess && isMounted) {
       toast({
         title: teams.message,
-        status: "success",
-        position: "top",
+        status: 'success',
+        position: 'top',
         duration: 5000,
-        isClosable: true,
+        isClosable: true
       });
     }
   }, [teams.eventUpdateSuccess]);
@@ -135,10 +136,10 @@ export const Event = () => {
     if (teams.participantUpdateSuccess && isMounted) {
       toast({
         title: teams.message,
-        status: "success",
-        position: "top",
+        status: 'success',
+        position: 'top',
         duration: 5000,
-        isClosable: true,
+        isClosable: true
       });
     }
   }, [teams.participantUpdateSuccess]);
@@ -152,7 +153,7 @@ export const Event = () => {
       dispatch(
         getParticipants({
           team_id: parseInt(team_id),
-          event_id: parseInt(event_id),
+          event_id: parseInt(event_id)
         })
       );
   }, []);
@@ -166,7 +167,7 @@ export const Event = () => {
         endTime: event.endTime,
         eventType: event.eventType,
         teamScore: event.teamScore,
-        opponentScore: event.opponentScore,
+        opponentScore: event.opponentScore
       }));
   }, [event]);
 
@@ -176,14 +177,14 @@ export const Event = () => {
       ...prevState,
       participantIds: participants
         .filter((member) => member.user.id !== user.user.id)
-        .map((participant) => participant.user.id),
+        .map((participant) => participant.user.id)
     }));
   }, [participants]);
 
   const getPersistentStatus = () => {
     return (
-      participants.find((participant) => participant.user.id === user.user.id)
-        ?.attendance ?? "UNDECIDED"
+      participants.find((participant) => participant.user.id === user.user.id)?.attendance ??
+      'UNDECIDED'
     );
   };
 
@@ -192,9 +193,7 @@ export const Event = () => {
     setStatus(e.target.value);
   };
 
-  const handleUpdateParticipant = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
+  const handleUpdateParticipant = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     team_id &&
       event_id &&
@@ -204,7 +203,7 @@ export const Event = () => {
           team_id: parseInt(team_id),
           event_id: parseInt(event_id),
           user_id: user.user.id,
-          participantUpdateInfo: { attendance: status },
+          participantUpdateInfo: { attendance: status }
         })
       );
   };
@@ -217,27 +216,23 @@ export const Event = () => {
     let tempParticipantIds = eventFields.participantIds;
 
     if (tempParticipantIds.includes(parseInt(e.target.name))) {
-      tempParticipantIds = tempParticipantIds.filter(
-        (id) => id !== parseInt(e.target.name)
-      );
+      tempParticipantIds = tempParticipantIds.filter((id) => id !== parseInt(e.target.name));
     } else {
       tempParticipantIds.push(parseInt(e.target.name));
     }
 
     setEventFields({
       ...eventFields,
-      participantIds: tempParticipantIds,
+      participantIds: tempParticipantIds
     });
   };
 
-  const handleSelectAllParticipants = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleSelectAllParticipants = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     if (allSelected) {
       setEventFields({
         ...eventFields,
-        participantIds: [],
+        participantIds: []
       });
     } else {
       const allMembersIds = members
@@ -246,27 +241,23 @@ export const Event = () => {
 
       setEventFields({
         ...eventFields,
-        participantIds: allMembersIds,
+        participantIds: allMembersIds
       });
     }
     setAllSelected(!allSelected);
   };
 
-  const handleOnClose = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
+  const handleOnClose = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     setAllSelected(false);
     setEventFields({
       ...eventFields,
-      participantIds: participants.map((participant) => participant.user.id),
+      participantIds: participants.map((participant) => participant.user.id)
     });
     onClose();
   };
 
-  const handleUpdateEvent = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
+  const handleUpdateEvent = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     if (team_id && event_id) {
       const result = await dispatch(
@@ -275,15 +266,15 @@ export const Event = () => {
           event_id: parseInt(event_id),
           eventUpdateInfo: {
             ...eventFields,
-            participantIds: [...eventFields.participantIds, user.user.id],
-          },
+            participantIds: [...eventFields.participantIds, user.user.id]
+          }
         })
       );
       if (updateEvent.fulfilled.match(result)) {
         await dispatch(
           getParticipants({
             team_id: parseInt(team_id),
-            event_id: parseInt(event_id),
+            event_id: parseInt(event_id)
           })
         );
         onClose();
@@ -294,19 +285,17 @@ export const Event = () => {
 
   const toUpdateEvent = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.preventDefault();
-    navigate("edit");
+    navigate('edit');
   };
 
-  const handleDeleteEvent = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
+  const handleDeleteEvent = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     team_id &&
       event_id &&
       dispatch(
         deleteEvent({
           team_id: parseInt(team_id),
-          event_id: parseInt(event_id),
+          event_id: parseInt(event_id)
         })
       );
   };
@@ -314,45 +303,26 @@ export const Event = () => {
   return (
     <>
       <Header />
-      <Flex
-        minH={"100vh"}
-        pt={10}
-        justify={"center"}
-        bg={useColorModeValue("gray.50", "gray.800")}
-      >
-        <Stack
-          spacing={8}
-          mx={"auto"}
-          width={"5xl"}
-          py={12}
-          px={6}
-          gap={1}
-          direction={"column"}
-        >
+      <Flex minH={'100vh'} pt={10} justify={'center'} bg={useColorModeValue('gray.50', 'gray.800')}>
+        <Stack spacing={8} mx={'auto'} width={'5xl'} py={12} px={6} gap={1} direction={'column'}>
           <BackButton fallback={`/teams/${team_id}`} />
-          <Flex maxW={"1000px"} w={"full"}>
+          <Flex maxW={'1000px'} w={'full'}>
             <Box
-              height={"fit-content"}
-              w={"full"}
-              bg={useColorModeValue("white", "gray.800")}
-              boxShadow={"2xl"}
-              rounded={"xl"}
-              overflow={"hidden"}
+              height={'fit-content'}
+              w={'full'}
+              bg={useColorModeValue('white', 'gray.800')}
+              boxShadow={'2xl'}
+              rounded={'xl'}
+              overflow={'hidden'}
             >
               <Box p={6}>
-                <Stack
-                  direction={"row"}
-                  justifyContent="right"
-                  color="blue.400"
-                  mb={"2"}
-                >
-                  {teams.members.find((member) => member.id === user.user.id)
-                    ?.isManager && (
+                <Stack direction={'row'} justifyContent="right" color="blue.400" mb={'2'}>
+                  {teams.members.find((member) => member.id === user.user.id)?.isManager && (
                     <Flex
                       gap={2}
-                      alignItems={"center"}
+                      alignItems={'center'}
                       _hover={{
-                        cursor: "pointer",
+                        cursor: 'pointer'
                       }}
                       onClick={toUpdateEvent}
                     >
@@ -361,95 +331,62 @@ export const Event = () => {
                     </Flex>
                   )}
                 </Stack>
-                <Stack spacing={0} align={"center"} mb={5}>
-                  <Heading
-                    fontSize={"2xl"}
-                    fontWeight={800}
-                    fontFamily={"body"}
-                  >
+                <Stack spacing={0} align={'center'} mb={5}>
+                  <Heading fontSize={'2xl'} fontWeight={800} fontFamily={'body'}>
                     {event?.name}
                   </Heading>
                 </Stack>
-                <Stack
-                  align={"center"}
-                  justify={"center"}
-                  direction={"row"}
-                  mt={5}
-                >
-                  <Badge
-                    px={2}
-                    py={1}
-                    fontWeight={"700"}
-                    textTransform={"none"}
-                  >
+                <Stack align={'center'} justify={'center'} direction={'row'} mt={5}>
+                  <Badge px={2} py={1} fontWeight={'700'} textTransform={'none'}>
                     {event?.eventType}
                   </Badge>
                 </Stack>
               </Box>
             </Box>
           </Flex>
-          <Flex
-            direction={{ base: "column", md: "row" }}
-            maxW={"1000px"}
-            w={"full"}
-            gap={5}
-          >
+          <Flex direction={{ base: 'column', md: 'row' }} maxW={'1000px'} w={'full'} gap={5}>
             <Box
-              minH={"fit-content"}
-              w={{ sm: "100%", md: "60%" }}
-              bg={useColorModeValue("white", "gray.800")}
-              boxShadow={"2xl"}
-              rounded={"xl"}
-              overflow={"hidden"}
+              minH={'fit-content'}
+              w={{ sm: '100%', md: '60%' }}
+              bg={useColorModeValue('white', 'gray.800')}
+              boxShadow={'2xl'}
+              rounded={'xl'}
+              overflow={'hidden'}
             >
               <Box p={6}>
-                <Stack spacing={0} align={"center"} mb={5}>
-                  <Heading
-                    fontSize={"2xl"}
-                    fontWeight={800}
-                    fontFamily={"body"}
-                  >
+                <Stack spacing={0} align={'center'} mb={5}>
+                  <Heading fontSize={'2xl'} fontWeight={800} fontFamily={'body'}>
                     Score
                   </Heading>
                 </Stack>
-                <Divider borderColor={"gray.300"} />
+                <Divider borderColor={'gray.300'} />
                 <Stack
-                  justify={"space-evenly"}
-                  textAlign={"center"}
-                  direction={"row"}
+                  justify={'space-evenly'}
+                  textAlign={'center'}
+                  direction={'row'}
                   mt={7}
                   mb={10}
                 >
-                  {stringToJSDate(event?.endTime ?? "") < new Date() ? (
+                  {stringToJSDate(event?.endTime ?? '') < new Date() ? (
                     <>
-                      <Stack direction={"column"}>
-                        <Heading fontSize={"xxx-large"}>
-                          {event?.teamScore}
-                        </Heading>
+                      <Stack direction={'column'}>
+                        <Heading fontSize={'xxx-large'}>{event?.teamScore}</Heading>
                         <Text>Team Score</Text>
                       </Stack>
-                      <Stack direction={"column"}>
-                        <Heading fontSize={"xxx-large"}>
-                          {event?.opponentScore}
-                        </Heading>
+                      <Stack direction={'column'}>
+                        <Heading fontSize={'xxx-large'}>{event?.opponentScore}</Heading>
                         <Text>Opponent Score</Text>
                       </Stack>
                     </>
                   ) : (
-                    <Badge
-                      px={2}
-                      py={1}
-                      fontWeight={"700"}
-                      textTransform={"none"}
-                    >
+                    <Badge px={2} py={1} fontWeight={'700'} textTransform={'none'}>
                       TBD
                     </Badge>
                   )}
                 </Stack>
-                {stringToJSDate(event?.endTime ?? "") < new Date() &&
-                  teams.members.find((member) => member.id === user.user.id)
-                    ?.isManager && (
-                    <Flex justifyContent={"center"}>
+                {stringToJSDate(event?.endTime ?? '') < new Date() &&
+                  teams.members.find((member) => member.id === user.user.id)?.isManager && (
+                    <Flex justifyContent={'center'}>
                       <Button mb={5} onClick={onUpdateScoreOpen}>
                         Update Score
                       </Button>
@@ -458,97 +395,78 @@ export const Event = () => {
               </Box>
             </Box>
             <Box
-              minH={"fit-content"}
-              w={{ sm: "100%", md: "40%" }}
-              bg={useColorModeValue("white", "gray.800")}
-              boxShadow={"2xl"}
-              rounded={"xl"}
-              overflow={"hidden"}
+              minH={'fit-content'}
+              w={{ sm: '100%', md: '40%' }}
+              bg={useColorModeValue('white', 'gray.800')}
+              boxShadow={'2xl'}
+              rounded={'xl'}
+              overflow={'hidden'}
             >
-              <Stack p={6} h={"full"}>
-                <Stack spacing={0} align={"center"} mb={5}>
-                  <Heading
-                    fontSize={"2xl"}
-                    fontWeight={800}
-                    fontFamily={"body"}
-                  >
+              <Stack p={6} h={'full'}>
+                <Stack spacing={0} align={'center'} mb={5}>
+                  <Heading fontSize={'2xl'} fontWeight={800} fontFamily={'body'}>
                     Time
                   </Heading>
                 </Stack>
-                <Divider borderColor={"gray.300"} />
-                <Stack
-                  spacing={0}
-                  align={"center"}
-                  flex={"1 1 auto"}
-                  justifyContent={"center"}
-                >
-                  <Text color={"gray.500"} fontSize={"xl"}>
-                    Start:{" "}
-                    {stringToJSDate(event?.startTime ?? "").toLocaleString([], {
-                      year: "numeric",
-                      month: "numeric",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
+                <Divider borderColor={'gray.300'} />
+                <Stack spacing={0} align={'center'} flex={'1 1 auto'} justifyContent={'center'}>
+                  <Text color={'gray.500'} fontSize={'xl'}>
+                    Start:{' '}
+                    {stringToJSDate(event?.startTime ?? '').toLocaleString([], {
+                      year: 'numeric',
+                      month: 'numeric',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
                     })}
                   </Text>
-                  <Text color={"gray.500"} fontSize={"xl"}>
-                    End:{" "}
-                    {stringToJSDate(event?.endTime ?? "").toLocaleString([], {
-                      year: "numeric",
-                      month: "numeric",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
+                  <Text color={'gray.500'} fontSize={'xl'}>
+                    End:{' '}
+                    {stringToJSDate(event?.endTime ?? '').toLocaleString([], {
+                      year: 'numeric',
+                      month: 'numeric',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
                     })}
                   </Text>
                 </Stack>
               </Stack>
             </Box>
           </Flex>
-          <Flex
-            direction={{ base: "column", md: "row" }}
-            maxW={"1000px"}
-            w={"full"}
-            gap={5}
-          >
+          <Flex direction={{ base: 'column', md: 'row' }} maxW={'1000px'} w={'full'} gap={5}>
             <Box
-              height={"fit-content"}
-              w={"full"}
-              bg={useColorModeValue("white", "gray.800")}
-              boxShadow={"2xl"}
-              rounded={"xl"}
-              overflow={"hidden"}
+              height={'fit-content'}
+              w={'full'}
+              bg={useColorModeValue('white', 'gray.800')}
+              boxShadow={'2xl'}
+              rounded={'xl'}
+              overflow={'hidden'}
             >
               <Box p={6}>
-                <Flex direction={"column"} align={"center"} mb={5} gap={5}>
-                  <Heading
-                    fontSize={"2xl"}
-                    fontWeight={800}
-                    fontFamily={"body"}
-                  >
+                <Flex direction={'column'} align={'center'} mb={5} gap={5}>
+                  <Heading fontSize={'2xl'} fontWeight={800} fontFamily={'body'}>
                     Participants
                   </Heading>
-                  {teams.members.find((member) => member.id === user.user.id)
-                    ?.isManager && (
+                  {teams.members.find((member) => member.id === user.user.id)?.isManager && (
                     <Button mb={5} onClick={onOpen}>
                       Update Participants
                     </Button>
                   )}
                 </Flex>
-                <Divider borderColor={"gray.300"} />
-                <Stack align={"center"} my={5} gap={5}>
+                <Divider borderColor={'gray.300'} />
+                <Stack align={'center'} my={5} gap={5}>
                   <FormControl>
                     <FormLabel>Your Status</FormLabel>
-                    <Stack direction={"row"}>
+                    <Stack direction={'row'}>
                       <Select onChange={handleChangeStatus} value={status}>
-                        <option key={"UNDECIDED"} value={"UNDECIDED"}>
+                        <option key={'UNDECIDED'} value={'UNDECIDED'}>
                           UNDECIDED
                         </option>
-                        <option key={"YES"} value={"YES"}>
+                        <option key={'YES'} value={'YES'}>
                           YES
                         </option>
-                        <option key={"NO"} value={"NO"}>
+                        <option key={'NO'} value={'NO'}>
                           NO
                         </option>
                       </Select>
@@ -561,98 +479,73 @@ export const Event = () => {
                     </Stack>
                   </FormControl>
                   <Stack
-                    width={"full"}
-                    direction={{ base: "column", md: "row" }}
-                    justifyContent={"space-evenly"}
-                    textAlign={"center"}
+                    width={'full'}
+                    direction={{ base: 'column', md: 'row' }}
+                    justifyContent={'space-evenly'}
+                    textAlign={'center'}
                     gap={{ base: 10, md: 5 }}
                   >
                     <Stack
-                      w={"full"}
+                      w={'full'}
                       gap={3}
-                      border={"1px"}
-                      borderColor={"gray.300"}
-                      rounded={"xl"}
+                      border={'1px'}
+                      borderColor={'gray.300'}
+                      rounded={'xl'}
                       py={5}
                     >
-                      <Heading fontSize={"2xl"}>YES</Heading>
-                      <Divider borderColor={"gray.300"} />
+                      <Heading fontSize={'2xl'}>YES</Heading>
+                      <Divider borderColor={'gray.300'} />
                       {participants
-                        .filter(
-                          (participant) => participant.attendance === "YES"
-                        )
+                        .filter((participant) => participant.attendance === 'YES')
                         .map((participant) => (
                           <Text
                             key={participant.id}
-                            fontWeight={
-                              participant.user.id === user.user.id ? 600 : 300
-                            }
-                            color={
-                              participant.user.id === user.user.id
-                                ? "gray.900"
-                                : "gray.600"
-                            }
+                            fontWeight={participant.user.id === user.user.id ? 600 : 300}
+                            color={participant.user.id === user.user.id ? 'gray.900' : 'gray.600'}
                           >
                             {participant.user.username}
                           </Text>
                         ))}
                     </Stack>
                     <Stack
-                      w={"full"}
+                      w={'full'}
                       gap={3}
-                      border={"1px"}
-                      borderColor={"gray.300"}
-                      rounded={"xl"}
+                      border={'1px'}
+                      borderColor={'gray.300'}
+                      rounded={'xl'}
                       py={5}
                     >
-                      <Heading fontSize={"2xl"}>NO</Heading>
-                      <Divider borderColor={"gray.300"} />
+                      <Heading fontSize={'2xl'}>NO</Heading>
+                      <Divider borderColor={'gray.300'} />
                       {participants
-                        .filter(
-                          (participant) => participant.attendance === "NO"
-                        )
+                        .filter((participant) => participant.attendance === 'NO')
                         .map((participant) => (
                           <Text
                             key={participant.id}
-                            fontWeight={
-                              participant.user.id === user.user.id ? 600 : 300
-                            }
-                            color={
-                              participant.user.id === user.user.id
-                                ? "gray.900"
-                                : "gray.600"
-                            }
+                            fontWeight={participant.user.id === user.user.id ? 600 : 300}
+                            color={participant.user.id === user.user.id ? 'gray.900' : 'gray.600'}
                           >
                             {participant.user.username}
                           </Text>
                         ))}
                     </Stack>
                     <Stack
-                      w={"full"}
+                      w={'full'}
                       gap={3}
-                      border={"1px"}
-                      borderColor={"gray.300"}
-                      rounded={"xl"}
+                      border={'1px'}
+                      borderColor={'gray.300'}
+                      rounded={'xl'}
                       py={5}
                     >
-                      <Heading fontSize={"2xl"}>UNDECIDED</Heading>
-                      <Divider borderColor={"gray.300"} />
+                      <Heading fontSize={'2xl'}>UNDECIDED</Heading>
+                      <Divider borderColor={'gray.300'} />
                       {participants
-                        .filter(
-                          (participant) =>
-                            participant.attendance === "UNDECIDED"
-                        )
+                        .filter((participant) => participant.attendance === 'UNDECIDED')
                         .map((participant) => (
                           <Text
                             key={participant.id}
-                            fontWeight={
-                              participant.user.id === user.user.id ? 600 : 300
-                            }
-                            color={
-                              participant.user.id === user.user.id
-                                ? "gray.900"
-                                : "gray.600"
-                            }
+                            fontWeight={participant.user.id === user.user.id ? 600 : 300}
+                            color={participant.user.id === user.user.id ? 'gray.900' : 'gray.600'}
                           >
                             {participant.user.username}
                           </Text>
@@ -663,17 +556,16 @@ export const Event = () => {
               </Box>
             </Box>
           </Flex>
-          {teams.members.find((member) => member.id === user.user.id)
-            ?.isManager && (
+          {teams.members.find((member) => member.id === user.user.id)?.isManager && (
             <Button
               mb={5}
               p={4}
               py={6}
               bg="red"
               color="white"
-              _hover={{ bg: "red.400" }}
+              _hover={{ bg: 'red.400' }}
               onClick={handleDeleteEvent}
-              width={"fit-content"}
+              width={'fit-content'}
               alignSelf="center"
             >
               Delete Event
@@ -743,24 +635,21 @@ export const Event = () => {
               <ModalCloseButton />
               <ModalBody>
                 <FormControl id="participantIds">
-                  <Flex mb={"0.5rem"}>
+                  <Flex mb={'0.5rem'}>
                     <FormLabel mb={0}>Participants</FormLabel>
-                    <Checkbox
-                      isChecked={allSelected}
-                      onChange={handleSelectAllParticipants}
-                    >
+                    <Checkbox isChecked={allSelected} onChange={handleSelectAllParticipants}>
                       Select All
                     </Checkbox>
                   </Flex>
                   <Stack
-                    height={"fit-content"}
-                    minH={"50px"}
-                    maxH={"200px"}
-                    w={"full"}
-                    border={"1px"}
-                    borderColor={"gray.300"}
-                    rounded={"xl"}
-                    overflow={"scroll"}
+                    height={'fit-content'}
+                    minH={'50px'}
+                    maxH={'200px'}
+                    w={'full'}
+                    border={'1px'}
+                    borderColor={'gray.300'}
+                    rounded={'xl'}
+                    overflow={'scroll'}
                     px={5}
                     py={2}
                   >
@@ -772,9 +661,7 @@ export const Event = () => {
                             {member.id && (
                               <Checkbox
                                 name={member.id.toString()}
-                                isChecked={eventFields.participantIds.includes(
-                                  member.id
-                                )}
+                                isChecked={eventFields.participantIds.includes(member.id)}
                                 onChange={handleSelectParticipant}
                               >
                                 {member.username}
@@ -794,9 +681,7 @@ export const Event = () => {
                 <Button
                   disabled={
                     !isArrayDiff(
-                      eventFields.participantIds.filter(
-                        (id) => id !== user.user.id
-                      ),
+                      eventFields.participantIds.filter((id) => id !== user.user.id),
                       participants
                         .filter((member) => member.user.id !== user.user.id)
                         .map((participant) => participant.user.id)
