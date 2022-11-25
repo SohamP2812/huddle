@@ -1,19 +1,19 @@
 package com.huddle.backend.repository;
 
 import com.huddle.backend.models.User;
-
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-  Optional<User> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
-  Boolean existsByUsername(String username);
+    Boolean existsByUsername(String username);
 
-  Boolean existsByEmailIgnoreCase(String email);
+    Boolean existsByEmailIgnoreCase(String email);
 
-  List<User> findByUsernameStartsWithIgnoreCase(String username);
+    List<User> findByUsernameStartsWithIgnoreCase(String username);
 }

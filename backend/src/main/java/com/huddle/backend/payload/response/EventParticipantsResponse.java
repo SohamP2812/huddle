@@ -1,6 +1,5 @@
 package com.huddle.backend.payload.response;
 
-import com.huddle.backend.payload.response.EventParticipantResponse;
 import java.util.List;
 
 public class EventParticipantsResponse {

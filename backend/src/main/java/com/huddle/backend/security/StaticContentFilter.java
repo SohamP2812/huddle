@@ -10,8 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Component
@@ -35,6 +36,7 @@ public class StaticContentFilter extends OncePerRequestFilter {
         put("gif", "image/gif");
         put("ico", "image/vnd.microsoft.icon");
     }};
+
     private void resourceToResponse(String resourcePath, HttpServletResponse response) throws IOException {
         InputStream inputStream = Thread.currentThread()
                 .getContextClassLoader()

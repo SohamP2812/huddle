@@ -1,14 +1,6 @@
 package com.huddle.backend.security.jwt;
 
 import com.huddle.backend.security.services.UserDetailsServiceImpl;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,72 +8,78 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Optional;
+
 public class AuthTokenFilter extends OncePerRequestFilter {
-  @Autowired
-  private JwtUtils jwtUtils;
+    private static final Logger logger = LoggerFactory.getLogger(
+            AuthTokenFilter.class
+    );
+    @Autowired
+    private JwtUtils jwtUtils;
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
 
-  @Autowired
-  private UserDetailsServiceImpl userDetailsService;
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    )
+            throws ServletException, IOException {
+        try {
+            String jwt = parseJwt(request);
+            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+                String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
-  private static final Logger logger = LoggerFactory.getLogger(
-    AuthTokenFilter.class
-  );
+                UserDetails userDetails = userDetailsService.loadUserByUsername(
+                        username
+                );
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
+                authentication.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
 
-  @Override
-  protected void doFilterInternal(
-    HttpServletRequest request,
-    HttpServletResponse response,
-    FilterChain filterChain
-  )
-    throws ServletException, IOException {
-    try {
-      String jwt = parseJwt(request);
-      if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-        String username = jwtUtils.getUserNameFromJwtToken(jwt);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        } catch (Exception e) {
+            Cookie jwtTokenCookie = new Cookie("huddle_session", null);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(
-          username
-        );
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-          userDetails,
-          null,
-          userDetails.getAuthorities()
-        );
-        authentication.setDetails(
-          new WebAuthenticationDetailsSource().buildDetails(request)
-        );
+            jwtTokenCookie.setMaxAge(0);
+            jwtTokenCookie.setSecure(true);
+            jwtTokenCookie.setHttpOnly(true);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-      }
-    } catch (Exception e) {
-      Cookie jwtTokenCookie = new Cookie("huddle_session", null);
+            response.addCookie(jwtTokenCookie);
+        }
 
-      jwtTokenCookie.setMaxAge(0);
-      jwtTokenCookie.setSecure(true);
-      jwtTokenCookie.setHttpOnly(true);
-
-      response.addCookie(jwtTokenCookie);
+        filterChain.doFilter(request, response);
     }
 
-    filterChain.doFilter(request, response);
-  }
+    private String parseJwt(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+        if (request.getCookies().length == 0) return null;
 
-  private String parseJwt(HttpServletRequest request) {
-    if(request.getCookies() == null) return null;
-    if(request.getCookies().length == 0) return null;
+        Optional<String> token = Arrays.stream(request.getCookies())
+                .filter(cookie -> "huddle_session".equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findAny();
 
-    Optional<String> token = Arrays.stream(request.getCookies())
-            .filter(cookie -> "huddle_session".equals(cookie.getName()))
-            .map(Cookie::getValue)
-            .findAny();
+        if (!token.isEmpty()) {
+            return token.get();
+        }
 
-    if (!token.isEmpty()) {
-      return token.get();
+        return null;
     }
-
-    return null;
-  }
 }

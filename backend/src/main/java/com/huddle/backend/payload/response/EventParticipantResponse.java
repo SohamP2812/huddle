@@ -1,56 +1,55 @@
 package com.huddle.backend.payload.response;
 
 import com.huddle.backend.models.EAttendance;
-import com.huddle.backend.models.Event;
 import com.huddle.backend.models.EventParticipant;
-import com.huddle.backend.models.User;
-import javax.persistence.*;
 
 public class EventParticipantResponse {
-  private Long id;
+    private Long id;
 
-  private EAttendance attendance;
+    private EAttendance attendance;
 
-  private UserResponse user;
+    private UserResponse user;
 
-  private EventResponse event;
+    private EventResponse event;
 
-  public EventParticipantResponse(
-    EventParticipant eventParticipant
-  ) {
-    this.id = eventParticipant.getId();
-    this.attendance = eventParticipant.getAttendance();
-    this.user = new UserResponse(eventParticipant.getParticipant());
-    this.event = new EventResponse(eventParticipant.getEvent());
-  }
+    public EventParticipantResponse(
+            EventParticipant eventParticipant
+    ) {
+        this.id = eventParticipant.getId();
+        this.attendance = eventParticipant.getAttendance();
+        this.user = new UserResponse(eventParticipant.getParticipant());
+        this.event = new EventResponse(eventParticipant.getEvent());
+    }
 
-  public Long getId() {
-    return id;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public EAttendance getAttendance() {
-    return attendance;
-  }
+    public EAttendance getAttendance() {
+        return attendance;
+    }
 
-  public void setAttendance(EAttendance attendance) {
-    this.attendance = attendance;
-  }
+    public void setAttendance(EAttendance attendance) {
+        this.attendance = attendance;
+    }
 
-  public UserResponse getUser() { return user; }
+    public UserResponse getUser() {
+        return user;
+    }
 
-  public void setUser(UserResponse user) {
-    this.user = user;
-  }
+    public void setUser(UserResponse user) {
+        this.user = user;
+    }
 
-  public EventResponse getEvent() {
-    return event;
-  }
+    public EventResponse getEvent() {
+        return event;
+    }
 
-  public void setEvent(EventResponse event) {
-    this.event = event;
-  }
+    public void setEvent(EventResponse event) {
+        this.event = event;
+    }
 }
