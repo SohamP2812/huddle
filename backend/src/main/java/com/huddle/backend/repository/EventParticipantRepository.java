@@ -17,4 +17,9 @@ public interface EventParticipantRepository
   List<EventParticipant> findAllByEventId(Long event_id);
 
   void deleteAllByEventId(Long event_id);
+
+  void deleteByParticipantIdAndEventId(
+    Long user_id,
+    Long event_id
+  );
 }

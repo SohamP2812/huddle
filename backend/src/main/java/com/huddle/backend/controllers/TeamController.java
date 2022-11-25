@@ -6,10 +6,7 @@ import com.huddle.backend.payload.request.MemberRequest;
 import com.huddle.backend.payload.request.SignupRequest;
 import com.huddle.backend.payload.request.TeamRequest;
 import com.huddle.backend.payload.response.*;
-import com.huddle.backend.repository.EventRepository;
-import com.huddle.backend.repository.TeamMemberRepository;
-import com.huddle.backend.repository.TeamRepository;
-import com.huddle.backend.repository.UserRepository;
+import com.huddle.backend.repository.*;
 import com.huddle.backend.security.jwt.JwtUtils;
 import com.huddle.backend.security.services.UserDetailsImpl;
 import java.lang.reflect.Member;
@@ -44,6 +41,9 @@ public class TeamController {
 
   @Autowired
   EventRepository eventRepository;
+
+  @Autowired
+  EventParticipantRepository eventParticipantRepository;
 
   @PostMapping("")
   public ResponseEntity<?> createTeam(
@@ -201,7 +201,7 @@ public class TeamController {
 
     User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
-    teamRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No team exists with this id."));
+    Team team = teamRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No team exists with this id."));
 
     User userToDelete = userRepository.findById(user_id).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
@@ -227,6 +227,11 @@ public class TeamController {
       .body(new MessageResponse("You cannot delete the manager from a team."));
 
     teamMemberRepository.deleteByTeamIdAndMemberId(id, user_id); // Should I first get member teams from user then filter by team id?
+
+    // Is this the most effective way? Instead should we be hiding the non-members on the get request for event participants?
+    for (Event event : team.getEvents()) {
+      eventParticipantRepository.deleteByParticipantIdAndEventId(user_id, event.getId());
+    }
 
     return ResponseEntity.ok(new UserResponse(userToDelete));
   }
