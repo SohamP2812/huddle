@@ -99,7 +99,7 @@ export const Event = () => {
     }
   );
   const members = membersResponse?.members ?? [];
-  const { data: participantsResponse } = useGetParticipantsQuery({
+  const { data: participantsResponse, isLoading: isParticipantsLoading } = useGetParticipantsQuery({
     teamId: team_id ? parseInt(team_id) : 0,
     eventId: event_id ? parseInt(event_id) : 0
   });
@@ -502,103 +502,111 @@ export const Event = () => {
                 </Flex>
                 <Divider borderColor={'gray.300'} />
                 <Stack align={'center'} my={5} gap={5}>
-                  <FormControl>
-                    <FormLabel>Your Status</FormLabel>
-                    <Stack direction={'row'}>
-                      <Select onChange={handleChangeStatus} value={status}>
-                        <option key={'UNDECIDED'} value={'UNDECIDED'}>
-                          UNDECIDED
-                        </option>
-                        <option key={'YES'} value={'YES'}>
-                          YES
-                        </option>
-                        <option key={'NO'} value={'NO'}>
-                          NO
-                        </option>
-                      </Select>
-                      <Button
-                        isLoading={isUpdateParticipantLoading}
-                        onClick={handleUpdateParticipant}
-                        disabled={status === getPersistentStatus()}
+                  {isParticipantsLoading ? (
+                    <Center>
+                      <Spinner size={'xl'} />
+                    </Center>
+                  ) : (
+                    <>
+                      <FormControl>
+                        <FormLabel>Your Status</FormLabel>
+                        <Stack direction={'row'}>
+                          <Select onChange={handleChangeStatus} value={status}>
+                            <option key={'UNDECIDED'} value={'UNDECIDED'}>
+                              UNDECIDED
+                            </option>
+                            <option key={'YES'} value={'YES'}>
+                              YES
+                            </option>
+                            <option key={'NO'} value={'NO'}>
+                              NO
+                            </option>
+                          </Select>
+                          <Button
+                            isLoading={isUpdateParticipantLoading}
+                            onClick={handleUpdateParticipant}
+                            disabled={status === getPersistentStatus()}
+                          >
+                            Update
+                          </Button>
+                        </Stack>
+                      </FormControl>
+                      <Stack
+                        width={'full'}
+                        direction={{ base: 'column', md: 'row' }}
+                        justifyContent={'space-evenly'}
+                        textAlign={'center'}
+                        gap={{ base: 10, md: 5 }}
                       >
-                        Update
-                      </Button>
-                    </Stack>
-                  </FormControl>
-                  <Stack
-                    width={'full'}
-                    direction={{ base: 'column', md: 'row' }}
-                    justifyContent={'space-evenly'}
-                    textAlign={'center'}
-                    gap={{ base: 10, md: 5 }}
-                  >
-                    <Stack
-                      w={'full'}
-                      gap={3}
-                      border={'1px'}
-                      borderColor={'gray.300'}
-                      rounded={'xl'}
-                      py={5}
-                    >
-                      <Heading fontSize={'2xl'}>YES</Heading>
-                      <Divider borderColor={'gray.300'} />
-                      {participants
-                        .filter((participant) => participant.attendance === 'YES')
-                        .map((participant) => (
-                          <Text
-                            key={participant.id}
-                            fontWeight={participant.user.id === user?.id ? 600 : 300}
-                            color={participant.user.id === user?.id ? 'gray.900' : 'gray.600'}
-                          >
-                            {participant.user.username}
-                          </Text>
-                        ))}
-                    </Stack>
-                    <Stack
-                      w={'full'}
-                      gap={3}
-                      border={'1px'}
-                      borderColor={'gray.300'}
-                      rounded={'xl'}
-                      py={5}
-                    >
-                      <Heading fontSize={'2xl'}>NO</Heading>
-                      <Divider borderColor={'gray.300'} />
-                      {participants
-                        .filter((participant) => participant.attendance === 'NO')
-                        .map((participant) => (
-                          <Text
-                            key={participant.id}
-                            fontWeight={participant.user.id === user?.id ? 600 : 300}
-                            color={participant.user.id === user?.id ? 'gray.900' : 'gray.600'}
-                          >
-                            {participant.user.username}
-                          </Text>
-                        ))}
-                    </Stack>
-                    <Stack
-                      w={'full'}
-                      gap={3}
-                      border={'1px'}
-                      borderColor={'gray.300'}
-                      rounded={'xl'}
-                      py={5}
-                    >
-                      <Heading fontSize={'2xl'}>UNDECIDED</Heading>
-                      <Divider borderColor={'gray.300'} />
-                      {participants
-                        .filter((participant) => participant.attendance === 'UNDECIDED')
-                        .map((participant) => (
-                          <Text
-                            key={participant.id}
-                            fontWeight={participant.user.id === user?.id ? 600 : 300}
-                            color={participant.user.id === user?.id ? 'gray.900' : 'gray.600'}
-                          >
-                            {participant.user.username}
-                          </Text>
-                        ))}
-                    </Stack>
-                  </Stack>
+                        <Stack
+                          w={'full'}
+                          gap={3}
+                          border={'1px'}
+                          borderColor={'gray.300'}
+                          rounded={'xl'}
+                          py={5}
+                        >
+                          <Heading fontSize={'2xl'}>YES</Heading>
+                          <Divider borderColor={'gray.300'} />
+                          {participants
+                            .filter((participant) => participant.attendance === 'YES')
+                            .map((participant) => (
+                              <Text
+                                key={participant.id}
+                                fontWeight={participant.user.id === user?.id ? 600 : 300}
+                                color={participant.user.id === user?.id ? 'gray.900' : 'gray.600'}
+                              >
+                                {participant.user.username}
+                              </Text>
+                            ))}
+                        </Stack>
+                        <Stack
+                          w={'full'}
+                          gap={3}
+                          border={'1px'}
+                          borderColor={'gray.300'}
+                          rounded={'xl'}
+                          py={5}
+                        >
+                          <Heading fontSize={'2xl'}>NO</Heading>
+                          <Divider borderColor={'gray.300'} />
+                          {participants
+                            .filter((participant) => participant.attendance === 'NO')
+                            .map((participant) => (
+                              <Text
+                                key={participant.id}
+                                fontWeight={participant.user.id === user?.id ? 600 : 300}
+                                color={participant.user.id === user?.id ? 'gray.900' : 'gray.600'}
+                              >
+                                {participant.user.username}
+                              </Text>
+                            ))}
+                        </Stack>
+                        <Stack
+                          w={'full'}
+                          gap={3}
+                          border={'1px'}
+                          borderColor={'gray.300'}
+                          rounded={'xl'}
+                          py={5}
+                        >
+                          <Heading fontSize={'2xl'}>UNDECIDED</Heading>
+                          <Divider borderColor={'gray.300'} />
+                          {participants
+                            .filter((participant) => participant.attendance === 'UNDECIDED')
+                            .map((participant) => (
+                              <Text
+                                key={participant.id}
+                                fontWeight={participant.user.id === user?.id ? 600 : 300}
+                                color={participant.user.id === user?.id ? 'gray.900' : 'gray.600'}
+                              >
+                                {participant.user.username}
+                              </Text>
+                            ))}
+                        </Stack>
+                      </Stack>
+                    </>
+                  )}
                 </Stack>
               </Box>
             </Box>

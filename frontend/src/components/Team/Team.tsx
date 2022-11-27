@@ -227,7 +227,7 @@ export const Team = () => {
     }
   };
 
-  if (isEventsLoading || isTeamsLoading || isUserLoading || isMembersLoading) {
+  if (isTeamsLoading || isUserLoading) {
     return (
       <Center height={'75vh'}>
         <Spinner size={'xl'} />
@@ -302,36 +302,42 @@ export const Team = () => {
                 </Stack>
                 <Divider borderColor={'gray.300'} />
                 <Stack my={5} gap={2}>
-                  {members
-                    .filter((member) => member.id !== userId)
-                    .map((member) => (
-                      <Stack
-                        justify={'space-between'}
-                        align="center"
-                        direction="row"
-                        key={member.id}
-                      >
-                        <Text key={member.id} fontWeight={300} color={'gray.600'}>
-                          {member.username}
-                        </Text>
-                        {member.id !== userId &&
-                          members.find((member) => member.id === userId)?.isManager &&
-                          (isDeleteMemberLoading ? (
-                            <Center>
-                              <Spinner />
-                            </Center>
-                          ) : (
-                            <DeleteIcon
-                              onClick={(e) => {
-                                handleDeleteMember(e, member.id);
-                              }}
-                              _hover={{ cursor: 'pointer', color: 'red' }}
-                              w={4}
-                              h={4}
-                            />
-                          ))}
-                      </Stack>
-                    ))}
+                  {isMembersLoading ? (
+                    <Center height={40}>
+                      <Spinner size={'xl'} />
+                    </Center>
+                  ) : (
+                    members
+                      .filter((member) => member.id !== userId)
+                      .map((member) => (
+                        <Stack
+                          justify={'space-between'}
+                          align="center"
+                          direction="row"
+                          key={member.id}
+                        >
+                          <Text key={member.id} fontWeight={300} color={'gray.600'}>
+                            {member.username}
+                          </Text>
+                          {member.id !== userId &&
+                            members.find((member) => member.id === userId)?.isManager &&
+                            (isDeleteMemberLoading ? (
+                              <Center>
+                                <Spinner />
+                              </Center>
+                            ) : (
+                              <DeleteIcon
+                                onClick={(e) => {
+                                  handleDeleteMember(e, member.id);
+                                }}
+                                _hover={{ cursor: 'pointer', color: 'red' }}
+                                w={4}
+                                h={4}
+                              />
+                            ))}
+                        </Stack>
+                      ))
+                  )}
                 </Stack>
               </Box>
             </Box>
@@ -369,16 +375,22 @@ export const Team = () => {
                 </Stack>
                 <Divider borderColor={'gray.300'} />
                 <Flex direction="column" alignItems={'center'} my={5} gap={5}>
-                  {events
-                    .filter((event) => stringToJSDate(event.endTime) > new Date() || showPastEvents)
-                    .sort(
-                      (a, b) =>
-                        stringToJSDate(b.startTime).getTime() -
-                        stringToJSDate(a.startTime).getTime()
-                    )
-                    .map((event) => (
-                      <EventCard key={event.id} event={event} />
-                    ))}
+                  {isEventsLoading ? (
+                    <Center height={40}>
+                      <Spinner size={'xl'} />
+                    </Center>
+                  ) : (
+                    events
+                      .filter(
+                        (event) => stringToJSDate(event.endTime) > new Date() || showPastEvents
+                      )
+                      .sort(
+                        (a, b) =>
+                          stringToJSDate(b.startTime).getTime() -
+                          stringToJSDate(a.startTime).getTime()
+                      )
+                      .map((event) => <EventCard key={event.id} event={event} />)
+                  )}
                 </Flex>
               </Box>
             </Box>

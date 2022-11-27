@@ -113,6 +113,7 @@ export const Account = () => {
     userResponse?.id && updateUser(accountFields);
   };
 
+  // Need to check if !userResponse since it can be not loading but be null since we come from login
   if (isUserLoading || !userResponse) {
     return (
       <Center height={'75vh'}>
