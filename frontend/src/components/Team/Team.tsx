@@ -1,27 +1,22 @@
-import { Header } from 'components/Header/Header';
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from 'redux/hooks';
-import { getUsersByQuery, resetUserQuery, selectUser } from 'redux/slices/userSlice';
 import {
-  deleteMember,
-  deleteTeam,
-  addMember,
-  getByUser,
-  getMembers,
-  getEvents,
-  selectTeamById,
-  selectMembers,
-  selectEvents,
-  selectTeams
-} from 'redux/slices/teamsSlice';
+  useGetMembersQuery,
+  useGetSelfQuery,
+  useGetTeamsQuery,
+  useDeleteTeamMutation,
+  useSearchUsersQuery,
+  useDeleteMemberMutation,
+  useGetEventsQuery,
+  useAddMemberMutation
+} from 'redux/slices/apiSlice';
 import {
+  Spinner,
   Heading,
   Box,
   Flex,
   Text,
   Stack,
-  useColorModeValue,
   Badge,
   Divider,
   Checkbox,
@@ -37,95 +32,150 @@ import {
   FormLabel,
   Button,
   Input,
-  useToast
+  useToast,
+  Center
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 
-import { stringToJSDate } from 'utils/misc';
-import { useIsMounted } from 'hooks/useIsMounted';
+import { getErrorMessage, stringToJSDate } from 'utils/misc';
 
 import { EventCard } from 'components/EventCard/EventCard';
 import { BackButton } from 'components/BackButton/BackButton';
 
 export const Team = () => {
-  const isMounted = useIsMounted();
-
   const [usernameQuery, setUsernameQuery] = useState('');
 
   const [showPastEvents, setShowPastEvents] = useState(false);
 
   const toast = useToast();
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
   const { team_id } = useParams();
 
-  const teams = useAppSelector(selectTeams);
-  const user = useAppSelector(selectUser);
-  const team = useAppSelector((state) =>
-    selectTeamById(state, team_id ? parseInt(team_id) : undefined)
+  const { data: user, isLoading: isUserLoading } = useGetSelfQuery();
+  const userId = user?.id ?? 0;
+  const { data: teamsResponse, isLoading: isTeamsLoading } = useGetTeamsQuery(userId ?? 0, {
+    skip: !userId
+  });
+  const teams = teamsResponse?.teams ?? [];
+  const team = team_id ? teams.find((team) => team.id === parseInt(team_id)) : null;
+  const { data: membersResponse, isLoading: isMembersLoading } = useGetMembersQuery(
+    team_id ? parseInt(team_id) : 0,
+    {
+      skip: !team_id
+    }
   );
-  const members = useAppSelector(selectMembers);
-  const events = useAppSelector(selectEvents);
-
-  const dispatch = useAppDispatch();
-
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const members = membersResponse?.members ?? [];
+  const { data: eventsResponse, isLoading: isEventsLoading } = useGetEventsQuery(
+    team_id ? parseInt(team_id) : 0,
+    {
+      skip: !team_id
+    }
+  );
+  const events = eventsResponse?.events ?? [];
+  const { data: searchUsersResponse, isLoading: isSearchUsersLoading } = useSearchUsersQuery(
+    usernameQuery,
+    { skip: !usernameQuery }
+  );
+  const searchUsers = usernameQuery ? searchUsersResponse?.users ?? [] : [];
+  const [
+    addMember,
+    { error: addMemberError, isSuccess: isAddMemberSuccess, isLoading: isAddMemberLoading }
+  ] = useAddMemberMutation();
+  const [
+    deleteMember,
+    { error: deleteMemberError, isSuccess: isDeleteMemberSuccess, isLoading: isDeleteMemberLoading }
+  ] = useDeleteMemberMutation();
+  const [
+    deleteTeam,
+    { error: deleteTeamError, isSuccess: isDeleteTeamSuccess, isLoading: isDeleteTeamLoading }
+  ] = useDeleteTeamMutation();
 
   useEffect(() => {
-    if (teams.error && isMounted) {
+    if (isAddMemberSuccess) {
+      toast({
+        title: 'Added member successfully!',
+        status: 'success',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+      onClose();
+      setUsernameQuery('');
+    }
+  }, [isAddMemberSuccess]);
+
+  useEffect(() => {
+    if (addMemberError) {
       toast({
         title: 'An error occurred!',
-        description: teams.error,
+        description: getErrorMessage(addMemberError),
+        status: 'error',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+      onClose();
+      setUsernameQuery('');
+    }
+  }, [addMemberError]);
+
+  useEffect(() => {
+    if (isDeleteMemberSuccess) {
+      if (members.find((member) => member.id === userId)?.isManager) {
+        toast({
+          title: 'Member removed successfully.',
+          status: 'success',
+          position: 'top',
+          duration: 5000,
+          isClosable: true
+        });
+      } else {
+        navigate(`/teams`);
+      }
+      onClose();
+    }
+  }, [isDeleteMemberSuccess]);
+
+  useEffect(() => {
+    if (deleteMemberError) {
+      toast({
+        title: 'An error occurred!',
+        description: getErrorMessage(deleteMemberError),
+        status: 'error',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+      onClose();
+    }
+  }, [deleteMemberError]);
+
+  useEffect(() => {
+    if (isDeleteTeamSuccess) {
+      toast({
+        title: 'Deleted team successfully!',
+        status: 'success',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+      navigate(`/teams`);
+    }
+  }, [isDeleteTeamSuccess]);
+
+  useEffect(() => {
+    if (deleteTeamError) {
+      toast({
+        title: 'An error occurred!',
+        description: getErrorMessage(deleteTeamError),
         status: 'error',
         position: 'top',
         duration: 5000,
         isClosable: true
       });
     }
-  }, [teams.error]);
-
-  useEffect(() => {
-    if (teams.teamDeletionSuccess && isMounted) navigate(`/teams`);
-  }, [teams.teamDeletionSuccess]);
-
-  useEffect(() => {
-    if (teams.memberAddedSuccess && isMounted) {
-      toast({
-        title: teams.message,
-        status: 'success',
-        position: 'top',
-        duration: 5000,
-        isClosable: true
-      });
-    }
-    onClose();
-    setUsernameQuery('');
-  }, [teams.memberAddedSuccess]);
-
-  useEffect(() => {
-    if (teams.memberDeletionSuccess && isMounted) {
-      if (teams.members.find((member) => member.id === user.user.id)?.isManager)
-        toast({
-          title: teams.message,
-          status: 'success',
-          position: 'top',
-          duration: 5000,
-          isClosable: true
-        });
-      else navigate(`/teams`);
-    }
-    onClose();
-  }, [teams.memberDeletionSuccess]);
-
-  useEffect(() => {
-    user.user.id && dispatch(getByUser(user.user.id)); // we are getting all teams to get a single team. should use seperate slice for single team store.
-    team_id && dispatch(getMembers(parseInt(team_id)));
-    team_id && dispatch(getEvents(parseInt(team_id)));
-  }, []);
-
-  useEffect(() => {
-    usernameQuery && dispatch(getUsersByQuery(usernameQuery));
-  }, [usernameQuery]);
+  }, [deleteTeamError]);
 
   const toggleShowPastEvents = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -144,56 +194,57 @@ export const Team = () => {
   const handleOnClose = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     setUsernameQuery('');
-    dispatch(resetUserQuery());
     onClose();
   };
 
-  const handleAddMember = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    user_id: number | null
-  ) => {
+  const handleAddMember = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, id: number | null) => {
     e.preventDefault();
-    team_id &&
-      user_id &&
-      dispatch(
-        addMember({
-          team_id: parseInt(team_id),
-          teamMemberInfo: { id: user_id }
-        })
-      );
+    if (team_id && id) {
+      addMember({
+        teamId: parseInt(team_id),
+        addedUserId: id
+      });
+    }
   };
 
   const handleDeleteMember = (
     e: React.MouseEvent<SVGElement, MouseEvent> | React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    user_id: number | null
+    id: number | null
   ) => {
     e.preventDefault();
-    team_id &&
-      user_id &&
-      dispatch(
-        deleteMember({
-          user_id: user_id,
-          team_id: parseInt(team_id)
-        })
-      );
+    if (team_id && id && userId) {
+      deleteMember({
+        userId: id,
+        teamId: parseInt(team_id)
+      });
+    }
   };
 
   const handleDeleteTeam = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    team_id && dispatch(deleteTeam(parseInt(team_id)));
+    if (team_id) {
+      deleteTeam(parseInt(team_id));
+    }
   };
+
+  if (isEventsLoading || isTeamsLoading || isUserLoading || isMembersLoading) {
+    return (
+      <Center height={'75vh'}>
+        <Spinner size={'xl'} />
+      </Center>
+    );
+  }
 
   return (
     <>
-      <Header />
-      <Flex minH={'100vh'} pt={10} justify={'center'} bg={useColorModeValue('gray.50', 'gray.800')}>
+      <Flex minH={'100vh'} pt={10} justify={'center'} bg={'gray.50'}>
         <Stack spacing={8} mx={'auto'} width={'5xl'} py={12} px={6} gap={1} direction={'column'}>
           <BackButton fallback={'/teams'} />
           <Flex maxW={'1000px'} w={'full'}>
             <Box
               height={'fit-content'}
               w={'full'}
-              bg={useColorModeValue('white', 'gray.800')}
+              bg={'white'}
               boxShadow={'2xl'}
               rounded={'xl'}
               overflow={'hidden'}
@@ -212,13 +263,7 @@ export const Team = () => {
                   <Text color={'gray.500'}>{team?.manager.username}</Text>
                 </Stack>
                 <Stack align={'center'} justify={'center'} direction={'row'}>
-                  <Badge
-                    px={2}
-                    py={1}
-                    bg={useColorModeValue('gray.100', 'gray.800')}
-                    fontWeight={'700'}
-                    textTransform={'none'}
-                  >
+                  <Badge px={2} py={1} bg={'gray.100'} fontWeight={'700'} textTransform={'none'}>
                     Manager
                   </Badge>
                 </Stack>
@@ -229,14 +274,14 @@ export const Team = () => {
             <Box
               height={'fit-content'}
               w={'full'}
-              bg={useColorModeValue('white', 'gray.800')}
+              bg={'white'}
               boxShadow={'2xl'}
               rounded={'xl'}
               overflow={'hidden'}
             >
               <Box p={6}>
                 <Stack direction={'row'} justifyContent="right" color="blue.400" mb={'2'}>
-                  {teams.members.find((member) => member.id === user.user.id)?.isManager && (
+                  {members.find((member) => member.id === userId)?.isManager && (
                     <Flex
                       gap={2}
                       alignItems={'center'}
@@ -258,7 +303,7 @@ export const Team = () => {
                 <Divider borderColor={'gray.300'} />
                 <Stack my={5} gap={2}>
                   {members
-                    .filter((member) => member.id !== user.user.id)
+                    .filter((member) => member.id !== userId)
                     .map((member) => (
                       <Stack
                         justify={'space-between'}
@@ -269,8 +314,13 @@ export const Team = () => {
                         <Text key={member.id} fontWeight={300} color={'gray.600'}>
                           {member.username}
                         </Text>
-                        {member.id !== user.user.id &&
-                          teams.members.find((member) => member.id === user.user.id)?.isManager && (
+                        {member.id !== userId &&
+                          members.find((member) => member.id === userId)?.isManager &&
+                          (isDeleteMemberLoading ? (
+                            <Center>
+                              <Spinner />
+                            </Center>
+                          ) : (
                             <DeleteIcon
                               onClick={(e) => {
                                 handleDeleteMember(e, member.id);
@@ -279,7 +329,7 @@ export const Team = () => {
                               w={4}
                               h={4}
                             />
-                          )}
+                          ))}
                       </Stack>
                     ))}
                 </Stack>
@@ -288,14 +338,14 @@ export const Team = () => {
             <Box
               height={'fit-content'}
               w={'full'}
-              bg={useColorModeValue('white', 'gray.800')}
+              bg={'white'}
               boxShadow={'2xl'}
               rounded={'xl'}
               overflow={'hidden'}
             >
               <Box p={6}>
                 <Stack direction={'row'} justifyContent="right" color="blue.400" mb={'2'}>
-                  {teams.members.find((member) => member.id === user.user.id)?.isManager && (
+                  {members.find((member) => member.id === userId)?.isManager && (
                     <Flex
                       gap={2}
                       alignItems={'center'}
@@ -333,8 +383,9 @@ export const Team = () => {
               </Box>
             </Box>
           </Flex>
-          {teams.members.find((member) => member.id === user.user.id)?.isManager ? (
+          {members.find((member) => member.id === userId)?.isManager ? (
             <Button
+              isLoading={isDeleteTeamLoading}
               mb={5}
               p={4}
               py={6}
@@ -356,7 +407,7 @@ export const Team = () => {
               color="white"
               _hover={{ bg: 'red.400' }}
               onClick={(e) => {
-                handleDeleteMember(e, user.user.id);
+                handleDeleteMember(e, userId);
               }}
               width={'fit-content'}
               alignSelf="center"
@@ -391,23 +442,29 @@ export const Team = () => {
                   px={5}
                   py={2}
                 >
-                  {user.queryUsers
-                    .filter(
-                      (queriedUser) =>
-                        queriedUser.id !== user.user.id &&
-                        !members.some((members) => members.id === queriedUser.id)
-                    )
-                    .map((queriedUser) => (
-                      <Box
-                        p={2}
-                        _hover={{ cursor: 'pointer', bg: 'gray.50' }}
-                        onClick={(e) => handleAddMember(e, queriedUser.id)}
-                        key={queriedUser.id}
-                      >
-                        <Text key={queriedUser.id}>{queriedUser.username}</Text>
-                        <Divider borderColor={'gray.300'} />
-                      </Box>
-                    ))}
+                  {isSearchUsersLoading || isAddMemberLoading ? (
+                    <Center height={'full'}>
+                      <Spinner size={'lg'} />
+                    </Center>
+                  ) : (
+                    searchUsers
+                      .filter(
+                        (searchUser) =>
+                          searchUser.id !== userId &&
+                          !members.some((members) => members.id === searchUser.id)
+                      )
+                      .map((searchUser) => (
+                        <Box
+                          p={2}
+                          _hover={{ cursor: 'pointer', bg: 'gray.50' }}
+                          onClick={(e) => handleAddMember(e, searchUser.id)}
+                          key={searchUser.id}
+                        >
+                          <Text key={searchUser.id}>{searchUser.username}</Text>
+                          <Divider borderColor={'gray.300'} />
+                        </Box>
+                      ))
+                  )}
                 </Stack>
               </ModalBody>
 
