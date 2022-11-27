@@ -1,8 +1,7 @@
+import { Center, Spinner } from '@chakra-ui/react';
 import { useEffect, FC, ReactNode } from 'react';
-import { useAppSelector, useAppDispatch } from 'redux/hooks';
-import { getSelf, selectUser, clearUserState } from 'redux/slices/userSlice';
-import { clearTeamState } from 'redux/slices/teamsSlice';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useGetSelfQuery } from 'redux/slices/apiSlice';
 
 interface IProps {
   children: ReactNode;
@@ -14,25 +13,21 @@ export const AuthComponent: FC<IProps> = ({ children, isProtected = false }) => 
 
   const navigate = useNavigate();
 
-  const user = useAppSelector(selectUser);
-
-  const dispatch = useAppDispatch();
+  const { data: user } = useGetSelfQuery();
 
   useEffect(() => {
-    if (user.loggedIn == null) dispatch(getSelf());
-    if (user.loggedIn === false && location.pathname !== '/' && isProtected) navigate('/');
-  }, [location]);
-
-  useEffect(() => {
-    if (user.loggedIn === false) {
-      dispatch(clearUserState());
-      dispatch(clearTeamState());
+    // Better way to check for authenticated state? Null == logged out and Undefined == loading
+    if (user == null && user !== undefined && location.pathname !== '/' && isProtected) {
+      navigate('/');
     }
-    if (user.loggedIn === false && location.pathname !== '/' && isProtected) navigate('/');
-  }, [user.loggedIn]);
+  }, [location, user]);
 
-  if (!user.loggedIn && isProtected) {
-    return <p>LOADING...</p>;
+  if (!user && isProtected) {
+    return (
+      <Center height={'75vh'}>
+        <Spinner size={'xl'} />
+      </Center>
+    );
   }
 
   return <>{children}</>;
