@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Header } from 'components/Header/Header';
-import { useAppSelector, useAppDispatch } from 'redux/hooks';
-import { createTeam, selectTeams } from 'redux/slices/teamsSlice';
+import { useCreateTeamMutation } from 'redux/slices/apiSlice';
 import {
   Flex,
   FormControl,
@@ -10,47 +8,52 @@ import {
   Stack,
   Button,
   Heading,
-  useColorModeValue,
-  useToast,
   Spacer,
-  Select
+  Select,
+  useToast
 } from '@chakra-ui/react';
 
 import { useNavigate } from 'react-router-dom';
 
-import { useIsMounted } from 'hooks/useIsMounted';
-
 import { sports } from 'utils/consts';
 
 import { BackButton } from 'components/BackButton/BackButton';
+import { getErrorMessage } from 'utils/misc';
 
 export const CreateTeam = () => {
-  const isMounted = useIsMounted();
-
   const navigate = useNavigate();
-
   const toast = useToast();
 
-  const teams = useAppSelector(selectTeams);
-
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (teams.teamCreationSuccess && isMounted) navigate('/teams');
-  }, [teams.teamCreationSuccess]);
+  const [
+    createTeam,
+    { isLoading: isCreationLoading, isSuccess: isCreationSuccess, error: creationError }
+  ] = useCreateTeamMutation();
 
   useEffect(() => {
-    if (teams.error && isMounted) {
+    if (isCreationSuccess) {
+      toast({
+        title: 'Created successfully!',
+        status: 'success',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+      navigate(`/teams`);
+    }
+  }, [isCreationSuccess]);
+
+  useEffect(() => {
+    if (creationError) {
       toast({
         title: 'An error occurred!',
-        description: teams.error,
+        description: getErrorMessage(creationError),
         status: 'error',
         position: 'top',
         duration: 5000,
         isClosable: true
       });
     }
-  }, [teams.error]);
+  }, [creationError]);
 
   const [teamFields, setTeamFields] = useState({
     name: '',
@@ -69,13 +72,12 @@ export const CreateTeam = () => {
 
   const handleCreateTeam = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    dispatch(createTeam(teamFields));
+    createTeam(teamFields);
   };
 
   return (
     <>
-      <Header />
-      <Flex minH={'100vh'} pt={10} justify={'center'} bg={useColorModeValue('gray.50', 'gray.800')}>
+      <Flex minH={'100vh'} pt={10} justify={'center'} bg={'gray.50'}>
         <Stack spacing={8} mx={'auto'} width={'xl'} py={12} px={6}>
           <BackButton fallback="/teams" />
           <Stack align={'center'}>
@@ -107,6 +109,7 @@ export const CreateTeam = () => {
               </FormControl>
               <Spacer h={'xl'} />
               <Button
+                isLoading={isCreationLoading}
                 type="submit"
                 bg={'black'}
                 color={'white'}
