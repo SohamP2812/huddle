@@ -22,9 +22,7 @@ export const Account = () => {
   const navigate = useNavigate();
   const toast = useToast();
 
-  // Need to use isFetching since userResponse will be null when we login and navigate to /account and isUserLoading won't stop the render since it is being refetched, not initialized.
-  // Could also fix by putting a loading if !userResponse
-  const { data: userResponse, isFetching: isUserFetching } = useGetSelfQuery();
+  const { data: userResponse, isLoading: isUserLoading } = useGetSelfQuery();
   const [
     updateUser,
     { error: updateError, isSuccess: isUpdateSuccess, isLoading: isUpdateLoading }
@@ -115,7 +113,7 @@ export const Account = () => {
     userResponse?.id && updateUser(accountFields);
   };
 
-  if (isUserFetching) {
+  if (isUserLoading || !userResponse) {
     return (
       <Center height={'75vh'}>
         <Spinner size={'xl'} />
