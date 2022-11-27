@@ -1,29 +1,24 @@
 import React from 'react';
-import { Header } from 'components/Header/Header';
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from 'redux/hooks';
-import { selectUser } from 'redux/slices/userSlice';
 import {
-  getByUser,
-  getMembers,
-  getEvents,
-  getParticipants,
-  updateParticipant,
-  updateEvent,
-  deleteEvent,
-  selectEventById,
-  selectMembers,
-  selectParticipants,
-  selectTeams
-} from 'redux/slices/teamsSlice';
+  useGetSelfQuery,
+  useGetParticipantsQuery,
+  useGetEventsQuery,
+  useGetMembersQuery,
+  useUpdateParticipantMutation,
+  useUpdateEventMutation,
+  useDeleteEventMutation
+} from 'redux/slices/apiSlice';
 import {
+  Center,
+  Spinner,
+  useToast,
   Heading,
   Box,
   Flex,
   Text,
   Stack,
-  useColorModeValue,
   Badge,
   Divider,
   FormControl,
@@ -44,21 +39,17 @@ import {
   NumberInputField,
   NumberInputStepper,
   NumberIncrementStepper,
-  NumberDecrementStepper,
-  useToast
+  NumberDecrementStepper
 } from '@chakra-ui/react';
 import { EditIcon } from '@chakra-ui/icons';
 import dayjs from 'dayjs';
 
-import { stringToJSDate } from 'utils/misc';
+import { getErrorMessage, stringToJSDate } from 'utils/misc';
 import { isArrayDiff } from 'utils/misc';
-import { useIsMounted } from 'hooks/useIsMounted';
 
 import { BackButton } from 'components/BackButton/BackButton';
 
 export const Event = () => {
-  const isMounted = useIsMounted();
-
   const [allSelected, setAllSelected] = useState(false);
 
   const [eventFields, setEventFields] = useState<{
@@ -68,7 +59,7 @@ export const Event = () => {
     eventType: string;
     teamScore: number;
     opponentScore: number;
-    participantIds: (number | null)[];
+    participantIds: number[];
   }>({
     name: '',
     startTime: dayjs().set('seconds', 0).format(),
@@ -85,81 +76,133 @@ export const Event = () => {
     onOpen: onUpdateScoreOpen,
     onClose: onUpdateScoreClose
   } = useDisclosure();
-
+  const toast = useToast();
   const navigate = useNavigate();
   const { team_id, event_id } = useParams();
 
-  const [status, setStatus] = useState<string>('UNDECIDED');
+  const [status, setStatus] = useState('UNDECIDED');
 
-  const user = useAppSelector(selectUser);
-  const event = useAppSelector((state) =>
-    selectEventById(state, event_id ? parseInt(event_id) : undefined)
+  const { data: user, isLoading: isUserLoading } = useGetSelfQuery();
+  const { data: eventsResponse, isLoading: isEventsLoading } = useGetEventsQuery(
+    team_id ? parseInt(team_id) : 0,
+    {
+      skip: !team_id
+    }
   );
-  const members = useAppSelector(selectMembers);
-  const participants = useAppSelector(selectParticipants);
-  const teams = useAppSelector(selectTeams);
-
-  const dispatch = useAppDispatch();
-
-  const toast = useToast();
+  const event = event_id
+    ? eventsResponse?.events.find((event) => event.id === parseInt(event_id))
+    : null;
+  const { data: membersResponse, isLoading: isMembersLoading } = useGetMembersQuery(
+    team_id ? parseInt(team_id) : 0,
+    {
+      skip: !team_id
+    }
+  );
+  const members = membersResponse?.members ?? [];
+  const { data: participantsResponse } = useGetParticipantsQuery({
+    teamId: team_id ? parseInt(team_id) : 0,
+    eventId: event_id ? parseInt(event_id) : 0
+  });
+  const participants = participantsResponse?.eventParticipants ?? [];
+  const [
+    updateParticipant,
+    {
+      error: updateParticipantError,
+      isSuccess: isUpdateParticipantSuccess,
+      isLoading: isUpdateParticipantLoading
+    }
+  ] = useUpdateParticipantMutation();
+  const [
+    updateEvent,
+    { error: updateEventError, isSuccess: isUpdateEventSuccess, isLoading: isUpdateEventLoading }
+  ] = useUpdateEventMutation();
+  const [
+    deleteEvent,
+    { error: deleteError, isSuccess: isDeleteSuccess, isLoading: isDeleteLoading }
+  ] = useDeleteEventMutation();
 
   useEffect(() => {
-    if (teams.error && isMounted) {
+    if (isDeleteSuccess) {
+      toast({
+        title: 'Deleted successfully!',
+        status: 'success',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+      navigate(`/teams/${team_id}`);
+    }
+  }, [isDeleteSuccess]);
+
+  useEffect(() => {
+    if (isUpdateParticipantSuccess) {
+      toast({
+        title: 'Updated successfully!',
+        status: 'success',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+    }
+  }, [isUpdateParticipantSuccess]);
+
+  useEffect(() => {
+    if (isUpdateEventSuccess) {
+      toast({
+        title: 'Updated successfully!',
+        status: 'success',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+      onClose();
+      onUpdateScoreClose();
+    }
+  }, [isUpdateEventSuccess]);
+
+  useEffect(() => {
+    if (deleteError) {
       toast({
         title: 'An error occurred!',
-        description: teams.error,
+        description: getErrorMessage(deleteError),
         status: 'error',
         position: 'top',
         duration: 5000,
         isClosable: true
       });
     }
-  }, [teams.error]);
+  }, [deleteError]);
 
   useEffect(() => {
-    if (teams.eventDeletionSuccess && isMounted) navigate(`/teams/${team_id}`);
-  }, [teams.eventDeletionSuccess]);
-
-  useEffect(() => {
-    if (teams.eventUpdateSuccess && isMounted) {
+    if (updateEventError) {
       toast({
-        title: teams.message,
-        status: 'success',
+        title: 'An error occurred!',
+        description: getErrorMessage(updateEventError),
+        status: 'error',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+      onClose();
+      onUpdateScoreClose();
+    }
+  }, [updateEventError]);
+
+  useEffect(() => {
+    if (updateParticipantError) {
+      toast({
+        title: 'An error occurred!',
+        description: getErrorMessage(updateParticipantError),
+        status: 'error',
         position: 'top',
         duration: 5000,
         isClosable: true
       });
     }
-  }, [teams.eventUpdateSuccess]);
+  }, [updateParticipantError]);
 
   useEffect(() => {
-    if (teams.participantUpdateSuccess && isMounted) {
-      toast({
-        title: teams.message,
-        status: 'success',
-        position: 'top',
-        duration: 5000,
-        isClosable: true
-      });
-    }
-  }, [teams.participantUpdateSuccess]);
-
-  useEffect(() => {
-    user.user.id && dispatch(getByUser(user.user.id));
-    team_id && dispatch(getMembers(parseInt(team_id)));
-    team_id && dispatch(getEvents(parseInt(team_id)));
-    team_id &&
-      event_id &&
-      dispatch(
-        getParticipants({
-          team_id: parseInt(team_id),
-          event_id: parseInt(event_id)
-        })
-      );
-  }, []);
-
-  useEffect(() => {
-    event &&
+    if (event) {
       setEventFields((prevState) => ({
         ...prevState,
         name: event.name,
@@ -169,6 +212,7 @@ export const Event = () => {
         teamScore: event.teamScore,
         opponentScore: event.opponentScore
       }));
+    }
   }, [event]);
 
   useEffect(() => {
@@ -176,14 +220,20 @@ export const Event = () => {
     setEventFields((prevState) => ({
       ...prevState,
       participantIds: participants
-        .filter((member) => member.user.id !== user.user.id)
-        .map((participant) => participant.user.id)
+        .filter((member) => member.user.id !== user?.id && member.user.id != null)
+        .map((participant) => participant.user.id!)
     }));
-  }, [participants]);
+
+    if (members.length === participants.length) {
+      setAllSelected(true);
+    } else {
+      setAllSelected(false);
+    }
+  }, [participants, members]);
 
   const getPersistentStatus = () => {
     return (
-      participants.find((participant) => participant.user.id === user.user.id)?.attendance ??
+      participants.find((participant) => participant.user.id === user?.id)?.attendance ??
       'UNDECIDED'
     );
   };
@@ -195,17 +245,14 @@ export const Event = () => {
 
   const handleUpdateParticipant = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    team_id &&
-      event_id &&
-      user.user.id &&
-      dispatch(
-        updateParticipant({
-          team_id: parseInt(team_id),
-          event_id: parseInt(event_id),
-          user_id: user.user.id,
-          participantUpdateInfo: { attendance: status }
-        })
-      );
+    if (team_id && event_id && user?.id) {
+      updateParticipant({
+        teamId: parseInt(team_id),
+        eventId: parseInt(event_id),
+        userId: user.id,
+        updatedParticipant: { attendance: status }
+      });
+    }
   };
 
   const handleSelectParticipant = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -219,6 +266,10 @@ export const Event = () => {
       tempParticipantIds = tempParticipantIds.filter((id) => id !== parseInt(e.target.name));
     } else {
       tempParticipantIds.push(parseInt(e.target.name));
+    }
+
+    if (tempParticipantIds.length + 1 === members.length) {
+      setAllSelected(true);
     }
 
     setEventFields({
@@ -236,8 +287,8 @@ export const Event = () => {
       });
     } else {
       const allMembersIds = members
-        .filter((member) => member.id !== user.user.id)
-        .map((member) => member.id);
+        .filter((member) => member.id !== user?.id && member.id)
+        .map((member) => member.id!);
 
       setEventFields({
         ...eventFields,
@@ -252,34 +303,24 @@ export const Event = () => {
     setAllSelected(false);
     setEventFields({
       ...eventFields,
-      participantIds: participants.map((participant) => participant.user.id)
+      participantIds: participants
+        .filter((participant) => participant.user.id)
+        .map((participant) => participant.user.id!)
     });
     onClose();
   };
 
-  const handleUpdateEvent = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleUpdateEvent = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    if (team_id && event_id) {
-      const result = await dispatch(
-        updateEvent({
-          team_id: parseInt(team_id),
-          event_id: parseInt(event_id),
-          eventUpdateInfo: {
-            ...eventFields,
-            participantIds: [...eventFields.participantIds, user.user.id]
-          }
-        })
-      );
-      if (updateEvent.fulfilled.match(result)) {
-        await dispatch(
-          getParticipants({
-            team_id: parseInt(team_id),
-            event_id: parseInt(event_id)
-          })
-        );
-        onClose();
-        onUpdateScoreClose();
-      }
+    if (team_id && event_id && user?.id) {
+      updateEvent({
+        teamId: parseInt(team_id),
+        eventId: parseInt(event_id),
+        updatedEvent: {
+          ...eventFields,
+          participantIds: [...eventFields.participantIds, user?.id]
+        }
+      });
     }
   };
 
@@ -290,34 +331,39 @@ export const Event = () => {
 
   const handleDeleteEvent = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    team_id &&
-      event_id &&
-      dispatch(
-        deleteEvent({
-          team_id: parseInt(team_id),
-          event_id: parseInt(event_id)
-        })
-      );
+    if (team_id && event_id) {
+      deleteEvent({
+        teamId: parseInt(team_id),
+        eventId: parseInt(event_id)
+      });
+    }
   };
+
+  if (isUserLoading || isMembersLoading || isEventsLoading) {
+    return (
+      <Center height={'75vh'}>
+        <Spinner size={'xl'} />
+      </Center>
+    );
+  }
 
   return (
     <>
-      <Header />
-      <Flex minH={'100vh'} pt={10} justify={'center'} bg={useColorModeValue('gray.50', 'gray.800')}>
+      <Flex minH={'100vh'} pt={10} justify={'center'} bg={'gray.50'}>
         <Stack spacing={8} mx={'auto'} width={'5xl'} py={12} px={6} gap={1} direction={'column'}>
           <BackButton fallback={`/teams/${team_id}`} />
           <Flex maxW={'1000px'} w={'full'}>
             <Box
               height={'fit-content'}
               w={'full'}
-              bg={useColorModeValue('white', 'gray.800')}
+              bg={'white'}
               boxShadow={'2xl'}
               rounded={'xl'}
               overflow={'hidden'}
             >
               <Box p={6}>
                 <Stack direction={'row'} justifyContent="right" color="blue.400" mb={'2'}>
-                  {teams.members.find((member) => member.id === user.user.id)?.isManager && (
+                  {members.find((member) => member.id === user?.id)?.isManager && (
                     <Flex
                       gap={2}
                       alignItems={'center'}
@@ -348,7 +394,7 @@ export const Event = () => {
             <Box
               minH={'fit-content'}
               w={{ sm: '100%', md: '60%' }}
-              bg={useColorModeValue('white', 'gray.800')}
+              bg={'white'}
               boxShadow={'2xl'}
               rounded={'xl'}
               overflow={'hidden'}
@@ -385,7 +431,7 @@ export const Event = () => {
                   )}
                 </Stack>
                 {stringToJSDate(event?.endTime ?? '') < new Date() &&
-                  teams.members.find((member) => member.id === user.user.id)?.isManager && (
+                  members.find((member) => member.id === user?.id)?.isManager && (
                     <Flex justifyContent={'center'}>
                       <Button mb={5} onClick={onUpdateScoreOpen}>
                         Update Score
@@ -397,7 +443,7 @@ export const Event = () => {
             <Box
               minH={'fit-content'}
               w={{ sm: '100%', md: '40%' }}
-              bg={useColorModeValue('white', 'gray.800')}
+              bg={'white'}
               boxShadow={'2xl'}
               rounded={'xl'}
               overflow={'hidden'}
@@ -438,7 +484,7 @@ export const Event = () => {
             <Box
               height={'fit-content'}
               w={'full'}
-              bg={useColorModeValue('white', 'gray.800')}
+              bg={'white'}
               boxShadow={'2xl'}
               rounded={'xl'}
               overflow={'hidden'}
@@ -448,7 +494,7 @@ export const Event = () => {
                   <Heading fontSize={'2xl'} fontWeight={800} fontFamily={'body'}>
                     Participants
                   </Heading>
-                  {teams.members.find((member) => member.id === user.user.id)?.isManager && (
+                  {members.find((member) => member.id === user?.id)?.isManager && (
                     <Button mb={5} onClick={onOpen}>
                       Update Participants
                     </Button>
@@ -471,6 +517,7 @@ export const Event = () => {
                         </option>
                       </Select>
                       <Button
+                        isLoading={isUpdateParticipantLoading}
                         onClick={handleUpdateParticipant}
                         disabled={status === getPersistentStatus()}
                       >
@@ -500,8 +547,8 @@ export const Event = () => {
                         .map((participant) => (
                           <Text
                             key={participant.id}
-                            fontWeight={participant.user.id === user.user.id ? 600 : 300}
-                            color={participant.user.id === user.user.id ? 'gray.900' : 'gray.600'}
+                            fontWeight={participant.user.id === user?.id ? 600 : 300}
+                            color={participant.user.id === user?.id ? 'gray.900' : 'gray.600'}
                           >
                             {participant.user.username}
                           </Text>
@@ -522,8 +569,8 @@ export const Event = () => {
                         .map((participant) => (
                           <Text
                             key={participant.id}
-                            fontWeight={participant.user.id === user.user.id ? 600 : 300}
-                            color={participant.user.id === user.user.id ? 'gray.900' : 'gray.600'}
+                            fontWeight={participant.user.id === user?.id ? 600 : 300}
+                            color={participant.user.id === user?.id ? 'gray.900' : 'gray.600'}
                           >
                             {participant.user.username}
                           </Text>
@@ -544,8 +591,8 @@ export const Event = () => {
                         .map((participant) => (
                           <Text
                             key={participant.id}
-                            fontWeight={participant.user.id === user.user.id ? 600 : 300}
-                            color={participant.user.id === user.user.id ? 'gray.900' : 'gray.600'}
+                            fontWeight={participant.user.id === user?.id ? 600 : 300}
+                            color={participant.user.id === user?.id ? 'gray.900' : 'gray.600'}
                           >
                             {participant.user.username}
                           </Text>
@@ -556,8 +603,9 @@ export const Event = () => {
               </Box>
             </Box>
           </Flex>
-          {teams.members.find((member) => member.id === user.user.id)?.isManager && (
+          {members.find((member) => member.id === user?.id)?.isManager && (
             <Button
+              isLoading={isDeleteLoading}
               mb={5}
               p={4}
               py={6}
@@ -615,6 +663,7 @@ export const Event = () => {
                   Close
                 </Button>
                 <Button
+                  isLoading={isUpdateEventLoading}
                   disabled={
                     eventFields.opponentScore === event?.opponentScore &&
                     eventFields.teamScore === event?.teamScore
@@ -655,7 +704,7 @@ export const Event = () => {
                   >
                     <CheckboxGroup>
                       {members
-                        .filter((member) => member.id !== user.user.id)
+                        .filter((member) => member.id !== user?.id)
                         .map((member) => (
                           <>
                             {member.id && (
@@ -679,11 +728,12 @@ export const Event = () => {
                   Close
                 </Button>
                 <Button
+                  isLoading={isUpdateEventLoading}
                   disabled={
                     !isArrayDiff(
-                      eventFields.participantIds.filter((id) => id !== user.user.id),
+                      eventFields.participantIds.filter((id) => id !== user?.id),
                       participants
-                        .filter((member) => member.user.id !== user.user.id)
+                        .filter((member) => member.user.id !== user?.id)
                         .map((participant) => participant.user.id)
                     )
                   }
