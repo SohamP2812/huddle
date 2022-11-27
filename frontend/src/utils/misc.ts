@@ -1,3 +1,6 @@
+import { SerializedError } from '@reduxjs/toolkit';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/dist/query';
+
 export const allFieldsFilled = <T>(object: T): boolean => {
   for (const property in object) {
     if (!object[property as keyof T]) return false;
@@ -60,4 +63,28 @@ export const toIsoString = (date: Date) => {
     ':' +
     pad(Math.abs(tzo) % 60)
   );
+};
+
+export const getErrorMessage = (error: FetchBaseQueryError | SerializedError) => {
+  if ('status' in error) {
+    if (error.status === 400 && error.data && 'errors' in error.data) {
+      return (
+        error.data as {
+          errors: { defaultMessage: string }[];
+          message: string;
+          status: string;
+          timeStamp: string;
+        }
+      ).errors[0].defaultMessage;
+    }
+
+    const errorMessage =
+      'error' in error
+        ? error.error
+        : (error.data as { message: string; status: string; timeStamp: string }).message;
+
+    return errorMessage;
+  }
+
+  return error.message;
 };
