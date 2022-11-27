@@ -1,15 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Header } from 'components/Header/Header';
-import { useAppSelector, useAppDispatch } from 'redux/hooks';
-import {
-  getMembers,
-  getEvents,
-  getParticipants,
-  updateEvent,
-  selectEventById,
-  selectParticipants,
-  selectTeams
-} from 'redux/slices/teamsSlice';
 import {
   Flex,
   FormControl,
@@ -18,10 +7,11 @@ import {
   Stack,
   Button,
   Heading,
-  useColorModeValue,
-  useToast,
   Spacer,
-  Select
+  Select,
+  useToast,
+  Center,
+  Spinner
 } from '@chakra-ui/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
@@ -31,26 +21,64 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from 'dayjs';
 
 import { eventTypes } from 'utils/consts';
-import { useIsMounted } from 'hooks/useIsMounted';
-import { isObjectDiff } from 'utils/misc';
+import { getErrorMessage, isObjectDiff } from 'utils/misc';
 
 import { BackButton } from 'components/BackButton/BackButton';
+import {
+  useGetEventsQuery,
+  useGetParticipantsQuery,
+  useUpdateEventMutation
+} from 'redux/slices/apiSlice';
 
 export const EditEvent = () => {
-  const isMounted = useIsMounted();
-
   const navigate = useNavigate();
   const { team_id, event_id } = useParams();
-
   const toast = useToast();
 
-  const event = useAppSelector((state) =>
-    selectEventById(state, event_id ? parseInt(event_id) : undefined)
+  const { data: eventsResponse, isLoading: isEventsLoading } = useGetEventsQuery(
+    team_id ? parseInt(team_id) : 0,
+    {
+      skip: !team_id
+    }
   );
-  const participants = useAppSelector(selectParticipants);
-  const teams = useAppSelector(selectTeams);
+  const event = event_id
+    ? eventsResponse?.events.find((event) => event.id === parseInt(event_id))
+    : null;
+  const { data: participantsResponse } = useGetParticipantsQuery({
+    teamId: team_id ? parseInt(team_id) : 0,
+    eventId: event_id ? parseInt(event_id) : 0
+  });
+  const participants = participantsResponse?.eventParticipants ?? [];
+  const [
+    updateEvent,
+    { error: updateEventError, isSuccess: isUpdateEventSuccess, isLoading: isUpdateEventLoading }
+  ] = useUpdateEventMutation();
 
-  const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (isUpdateEventSuccess) {
+      toast({
+        title: 'Updated successfully!',
+        status: 'success',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+      navigate(`/teams/${team_id}/events/${event_id}`);
+    }
+  }, [isUpdateEventSuccess]);
+
+  useEffect(() => {
+    if (updateEventError) {
+      toast({
+        title: 'An error occurred!',
+        description: getErrorMessage(updateEventError),
+        status: 'error',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+    }
+  }, [updateEventError]);
 
   const [eventFields, setEventFields] = useState<{
     name: string;
@@ -69,37 +97,7 @@ export const EditEvent = () => {
   });
 
   useEffect(() => {
-    team_id && dispatch(getMembers(parseInt(team_id)));
-    team_id && dispatch(getEvents(parseInt(team_id)));
-    team_id &&
-      event_id &&
-      dispatch(
-        getParticipants({
-          team_id: parseInt(team_id),
-          event_id: parseInt(event_id)
-        })
-      );
-  }, []);
-
-  useEffect(() => {
-    if (teams.eventUpdateSuccess && isMounted) navigate(`/teams/${team_id}/events/${event_id}`);
-  }, [teams.eventUpdateSuccess]);
-
-  useEffect(() => {
-    if (teams.error && isMounted) {
-      toast({
-        title: 'An error occurred!',
-        description: teams.error,
-        status: 'error',
-        position: 'top',
-        duration: 5000,
-        isClosable: true
-      });
-    }
-  }, [teams.error]);
-
-  useEffect(() => {
-    event &&
+    if (event) {
       setEventFields({
         ...eventFields,
         name: event.name,
@@ -109,6 +107,7 @@ export const EditEvent = () => {
         teamScore: event.teamScore,
         opponentScore: event.opponentScore
       });
+    }
   }, [event]);
 
   const handleChangeEventFields = (
@@ -121,19 +120,20 @@ export const EditEvent = () => {
     });
   };
 
-  const handleUpdateEvent = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdateEvent = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (team_id && event_id)
-      dispatch(
-        updateEvent({
-          team_id: parseInt(team_id),
-          event_id: parseInt(event_id),
-          eventUpdateInfo: {
-            ...eventFields,
-            participantIds: participants.map((participant) => participant.user.id)
-          }
-        })
-      );
+    if (team_id && event_id) {
+      await updateEvent({
+        teamId: parseInt(team_id),
+        eventId: parseInt(event_id),
+        updatedEvent: {
+          ...eventFields,
+          participantIds: participants
+            .filter((participant) => participant.user.id)
+            .map((participant) => participant.user.id!)
+        }
+      });
+    }
   };
 
   const handleChangeStartTime = (newTime: string | null) => {
@@ -152,10 +152,17 @@ export const EditEvent = () => {
       });
   };
 
+  if (isEventsLoading) {
+    return (
+      <Center height={'75vh'}>
+        <Spinner size={'xl'} />
+      </Center>
+    );
+  }
+
   return (
     <>
-      <Header />
-      <Flex minH={'100vh'} pt={10} justify={'center'} bg={useColorModeValue('gray.50', 'gray.800')}>
+      <Flex minH={'100vh'} pt={10} justify={'center'} bg={'gray.50'}>
         <Stack spacing={8} mx={'auto'} width={'xl'} py={12} px={6}>
           <BackButton fallback={`/teams/${team_id}/events/${event_id}`} />
           <Stack align={'center'}>
@@ -213,6 +220,7 @@ export const EditEvent = () => {
               </FormControl>
               <Spacer h={'xl'} />
               <Button
+                isLoading={isUpdateEventLoading}
                 type="submit"
                 bg={'black'}
                 color={'white'}
