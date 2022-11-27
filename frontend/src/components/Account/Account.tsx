@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Header } from 'components/Header/Header';
-import { useAppSelector, useAppDispatch } from 'redux/hooks';
-import { logout, updateUser, selectUser } from 'redux/slices/userSlice';
+import React, { useEffect, useState } from 'react';
+import { useUpdateUserMutation, useGetSelfQuery, useLogoutMutation } from 'redux/slices/apiSlice';
+import { User } from 'utils/types';
 import {
   Flex,
   FormControl,
@@ -10,53 +9,92 @@ import {
   Stack,
   Button,
   Heading,
-  useColorModeValue,
-  useToast,
-  Spacer
+  Spacer,
+  Center,
+  Spinner,
+  useToast
 } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 
-import { useIsMounted } from 'hooks/useIsMounted';
-import { isObjectDiff } from 'utils/misc';
+import { getErrorMessage, isObjectDiff } from 'utils/misc';
 
 export const Account = () => {
-  const isMounted = useIsMounted();
-
+  const navigate = useNavigate();
   const toast = useToast();
 
-  const user = useAppSelector(selectUser);
+  // Need to use isFetching since userResponse will be null when we login and navigate to /account and isUserLoading won't stop the render since it is being refetched, not initialized.
+  // Could also fix by putting a loading if !userResponse
+  const { data: userResponse, isFetching: isUserFetching } = useGetSelfQuery();
+  const [
+    updateUser,
+    { error: updateError, isSuccess: isUpdateSuccess, isLoading: isUpdateLoading }
+  ] = useUpdateUserMutation();
+  const [logout, { error: logoutError, isSuccess: isLogoutSuccess, isLoading: isLogoutLoading }] =
+    useLogoutMutation();
 
-  const dispatch = useAppDispatch();
+  // Is this necessary?
+  useEffect(() => {
+    setAccountFields({
+      id: userResponse?.id ?? 0,
+      username: userResponse?.username ?? '',
+      firstName: userResponse?.firstName ?? '',
+      lastName: userResponse?.lastName ?? '',
+      email: userResponse?.email ?? '',
+      createdAt: userResponse?.createdAt ?? Date.now().toString()
+    });
+  }, [userResponse]);
 
   useEffect(() => {
-    if (user.message && isMounted) {
+    if (isUpdateSuccess) {
       toast({
-        title: user.message,
+        title: 'Updated successfully!',
         status: 'success',
         position: 'top',
         duration: 5000,
         isClosable: true
       });
     }
-  }, [user.message]);
+  }, [isUpdateSuccess]);
 
   useEffect(() => {
-    if (user.error && isMounted) {
+    if (updateError) {
       toast({
         title: 'An error occurred!',
-        description: user.error,
+        description: getErrorMessage(updateError),
         status: 'error',
         position: 'top',
         duration: 5000,
         isClosable: true
       });
     }
-  }, [user.error]);
+  }, [updateError]);
 
-  const [accountFields, setAccountFields] = useState({
-    username: user.user.username,
-    firstName: user.user.firstName,
-    lastName: user.user.lastName,
-    email: user.user.email
+  useEffect(() => {
+    if (isLogoutSuccess) {
+      navigate('/');
+    }
+  }, [isLogoutSuccess]);
+
+  useEffect(() => {
+    if (logoutError) {
+      toast({
+        title: 'An error occurred!',
+        description: getErrorMessage(logoutError),
+        status: 'error',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+    }
+  }, [logoutError]);
+
+  const [accountFields, setAccountFields] = useState<User>({
+    id: userResponse?.id ?? 0,
+    username: userResponse?.username ?? '',
+    firstName: userResponse?.firstName ?? '',
+    lastName: userResponse?.lastName ?? '',
+    email: userResponse?.email ?? '',
+    createdAt: userResponse?.createdAt ?? Date.now().toString()
   });
 
   const handleChangeSignupFields = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -66,23 +104,28 @@ export const Account = () => {
     });
   };
 
-  const handleLogout = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+  const handleLogout = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    dispatch(logout());
+    logout();
   };
 
   const handleUpdateUser = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
 
-    const { email, username, ...fieldsToUpdate } = accountFields;
-
-    dispatch(updateUser(fieldsToUpdate));
+    userResponse?.id && updateUser(accountFields);
   };
+
+  if (isUserFetching) {
+    return (
+      <Center height={'75vh'}>
+        <Spinner size={'xl'} />
+      </Center>
+    );
+  }
 
   return (
     <>
-      <Header />
-      <Flex minH={'100vh'} pt={10} justify={'center'} bg={useColorModeValue('gray.50', 'gray.800')}>
+      <Flex minH={'100vh'} pt={10} justify={'center'} bg={'gray.50'}>
         <Stack spacing={8} mx={'auto'} width={'xl'} py={12} px={6}>
           <Stack align={'center'}>
             <Heading fontSize={'4xl'}>Account</Heading>
@@ -129,7 +172,8 @@ export const Account = () => {
               </FormControl>
               <Spacer h={'xl'} />
               <Button
-                disabled={!isObjectDiff(accountFields, user.user)}
+                isLoading={isUpdateLoading}
+                disabled={!isObjectDiff(accountFields, userResponse)}
                 type="submit"
                 bg={'black'}
                 color={'white'}
@@ -140,6 +184,7 @@ export const Account = () => {
                 Update
               </Button>
               <Button
+                isLoading={isLogoutLoading}
                 onClick={handleLogout}
                 bg={'transparent'}
                 color={'black'}
