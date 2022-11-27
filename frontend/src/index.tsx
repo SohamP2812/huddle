@@ -15,6 +15,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { App } from 'App';
 
 import { theme as baseTheme } from 'theme';
+import { Header } from 'components/Header/Header';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -35,6 +36,7 @@ root.render(
       <ChakraProvider>
         <Provider store={store}>
           <BrowserRouter>
+            <Header />
             <App />
           </BrowserRouter>
         </Provider>
