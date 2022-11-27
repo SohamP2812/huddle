@@ -16,27 +16,27 @@ import {
   Image
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { useAppSelector } from 'redux/hooks';
-import { selectUser } from 'redux/slices/userSlice';
+import { useGetSelfQuery } from 'redux/slices/apiSlice';
 
 export const Header: FC = () => {
   const navigate = useNavigate();
-  const user = useAppSelector(selectUser);
+
+  const { data: user } = useGetSelfQuery();
 
   const { isOpen, onToggle } = useDisclosure();
 
   return (
     <Box>
       <Flex
-        bg={useColorModeValue('white', 'gray.800')}
-        color={useColorModeValue('gray.600', 'white')}
+        bg={'white'}
+        color={'gray.600'}
         py={{ base: 4 }}
         px={{ base: 4, md: 10, lg: '10vw' }}
         borderBottom={1}
         borderStyle={'solid'}
-        borderColor={useColorModeValue('gray.200', 'gray.900')}
+        borderColor={'gray.200'}
         align={'center'}
       >
         <Flex
@@ -62,12 +62,12 @@ export const Header: FC = () => {
           />
 
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
-            <DesktopNav loggedIn={user.loggedIn} />
+            <DesktopNav loggedIn={!!user} />
           </Flex>
         </Flex>
 
         <Stack flex={{ base: 1, md: 0 }} justify={'flex-end'} direction={'row'} spacing={6}>
-          {user.loggedIn ? (
+          {user ? (
             <Button
               as={RouterLink}
               fontSize={{ base: 'lg', md: 'xl' }}
@@ -110,7 +110,7 @@ export const Header: FC = () => {
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
-        <MobileNav loggedIn={user.loggedIn} />
+        <MobileNav loggedIn={!!user} />
       </Collapse>
     </Box>
   );
