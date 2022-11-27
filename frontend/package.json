@@ -33,7 +33,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "tsc && npm run prettier && BUILD_PATH='../backend/src/main/resources/static' react-scripts build",
+    "build": "tsc && npm run prettier:fix && BUILD_PATH='../backend/src/main/resources/static' react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint ./src/**/*.{tsx,ts}",
