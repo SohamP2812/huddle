@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useAppSelector, useAppDispatch } from 'redux/hooks';
-import { login, selectUser } from 'redux/slices/userSlice';
+import React, { useState, useEffect } from 'react';
+import { useGetSelfQuery, useLoginMutation } from 'redux/slices/apiSlice';
 import {
   Flex,
   Box,
@@ -12,56 +11,46 @@ import {
   Button,
   Heading,
   Text,
-  useColorModeValue,
-  useToast
+  useToast,
+  Center,
+  Spinner
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { allFieldsFilled } from 'utils/misc';
-import { useIsMounted } from 'hooks/useIsMounted';
-
-import { Header } from 'components/Header/Header';
+import { allFieldsFilled, getErrorMessage } from 'utils/misc';
 
 export const SignIn = () => {
-  const isMounted = useIsMounted();
-
   const navigate = useNavigate();
-
   const toast = useToast();
 
-  const user = useAppSelector(selectUser);
+  const { data: user, isLoading: isUserLoading } = useGetSelfQuery();
 
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (user.loggedIn) navigate('/');
-  }, [user.loggedIn]);
+  const [login, { error: loginError, isSuccess: isLoginSuccess, isLoading: isLoginLoading }] =
+    useLoginMutation();
 
   useEffect(() => {
-    if (user.message && isMounted) {
-      toast({
-        title: user.message,
-        status: 'success',
-        position: 'top',
-        duration: 5000,
-        isClosable: true
-      });
-    }
-  }, [user.message]);
-
-  useEffect(() => {
-    if (user.error && isMounted) {
+    if (loginError) {
       toast({
         title: 'An error occurred!',
-        description: user.error,
+        description: getErrorMessage(loginError),
         status: 'error',
         position: 'top',
         duration: 5000,
         isClosable: true
       });
     }
-  }, [user.error]);
+  }, [loginError]);
+
+  useEffect(() => {
+    if (isLoginSuccess) {
+      navigate('/account');
+    }
+  }, [isLoginSuccess]);
+
+  useEffect(() => {
+    if (user) navigate('/');
+  }, [user]);
 
   const [loginFields, setLoginFields] = useState({
     username: '',
@@ -75,20 +64,22 @@ export const SignIn = () => {
     });
   };
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>): void => {
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(login(loginFields));
+    login(loginFields);
   };
+
+  if (isUserLoading) {
+    return (
+      <Center height={'75vh'}>
+        <Spinner size={'xl'} />
+      </Center>
+    );
+  }
 
   return (
     <>
-      <Header />
-      <Flex
-        minH={'100vh'}
-        pt={{ base: 0, md: 20 }}
-        justify={'center'}
-        bg={useColorModeValue('gray.50', 'gray.800')}
-      >
+      <Flex minH={'100vh'} pt={{ base: 0, md: 20 }} justify={'center'} bg={'gray.50'}>
         <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
           <Stack align={'center'}>
             <Heading fontSize={{ base: '3xl', md: '4xl' }}>Sign in to your account</Heading>
@@ -96,7 +87,7 @@ export const SignIn = () => {
               to make your life a little bit easier ✌️
             </Text>
           </Stack>
-          <Box rounded={'lg'} bg={useColorModeValue('white', 'gray.700')} boxShadow={'lg'} p={8}>
+          <Box rounded={'lg'} bg={'white'} boxShadow={'lg'} p={8}>
             <form onSubmit={handleLogin}>
               <Stack spacing={4}>
                 <FormControl id="username">
@@ -121,6 +112,7 @@ export const SignIn = () => {
                   <Link color={'blue.400'}>Forgot password?</Link>
 
                   <Button
+                    isLoading={isLoginLoading}
                     type="submit"
                     bg={'black'}
                     color={'white'}

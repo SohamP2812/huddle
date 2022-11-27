@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useAppSelector, useAppDispatch } from 'redux/hooks';
-import { createAccount, selectUser } from 'redux/slices/userSlice';
 import {
   Flex,
   Box,
@@ -12,57 +10,51 @@ import {
   Button,
   Heading,
   Text,
-  useColorModeValue,
-  useToast,
-  Spacer
+  Spacer,
+  Center,
+  Spinner,
+  useToast
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { allFieldsFilled } from 'utils/misc';
-import { useIsMounted } from 'hooks/useIsMounted';
+import { allFieldsFilled, getErrorMessage } from 'utils/misc';
 
-import { Header } from 'components/Header/Header';
+import { useGetSelfQuery, useCreateUserMutation } from 'redux/slices/apiSlice';
 
 export const SignUp = () => {
-  const isMounted = useIsMounted();
-
   const navigate = useNavigate();
-
   const toast = useToast();
 
-  const user = useAppSelector(selectUser);
+  const { data: user, isLoading: isUserLoading } = useGetSelfQuery();
 
-  const dispatch = useAppDispatch();
+  const [
+    createUser,
+    { error: creationError, isSuccess: isCreationSuccess, isLoading: isCreationLoading }
+  ] = useCreateUserMutation();
 
   useEffect(() => {
-    if (user.loggedIn) navigate('/');
-  }, [user.loggedIn]);
+    if (user) navigate('/');
+  }, [user]);
 
   useEffect(() => {
-    if (user.message && isMounted) {
-      toast({
-        title: user.message,
-        status: 'success',
-        position: 'top',
-        duration: 5000,
-        isClosable: true
-      });
+    if (isCreationSuccess) {
+      navigate('/account');
     }
-  }, [user.message]);
+  }, [isCreationSuccess]);
 
   useEffect(() => {
-    if (user.error && isMounted) {
+    if (creationError) {
       toast({
         title: 'An error occurred!',
-        description: user.error,
+        description: getErrorMessage(creationError),
         status: 'error',
         position: 'top',
         duration: 5000,
         isClosable: true
       });
     }
-  }, [user.error]);
+  }, [creationError]);
 
   const [signupFields, setSignupFields] = useState({
     username: '',
@@ -79,20 +71,22 @@ export const SignUp = () => {
     });
   };
 
-  const handleSignup = (e: React.FormEvent<HTMLFormElement>): void => {
+  const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(createAccount(signupFields));
+    createUser(signupFields);
   };
+
+  if (isUserLoading) {
+    return (
+      <Center height={'75vh'}>
+        <Spinner size={'xl'} />
+      </Center>
+    );
+  }
 
   return (
     <>
-      <Header />
-      <Flex
-        minH={'100vh'}
-        pt={{ base: 0, md: 20 }}
-        justify={'center'}
-        bg={useColorModeValue('gray.50', 'gray.800')}
-      >
+      <Flex minH={'100vh'} pt={{ base: 0, md: 20 }} justify={'center'} bg={'gray.50'}>
         <Stack spacing={8} mx={'auto'} maxW={'lg'} minW={{ md: 'lg' }} py={12} px={6}>
           <Stack align={'center'}>
             <Heading fontSize={{ base: '3xl', md: '4xl' }}>Create your account</Heading>
@@ -100,7 +94,7 @@ export const SignUp = () => {
               to make your life a little bit easier ✌️
             </Text>
           </Stack>
-          <Box rounded={'lg'} bg={useColorModeValue('white', 'gray.700')} boxShadow={'lg'} p={8}>
+          <Box rounded={'lg'} bg={'white'} boxShadow={'lg'} p={8}>
             <form onSubmit={handleSignup}>
               <Stack spacing={4}>
                 <FormControl id="username">
@@ -150,6 +144,7 @@ export const SignUp = () => {
                 </FormControl>
                 <Spacer />
                 <Button
+                  isLoading={isCreationLoading}
                   type="submit"
                   bg={'black'}
                   color={'white'}
