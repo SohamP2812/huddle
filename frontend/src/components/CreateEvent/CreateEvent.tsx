@@ -1,8 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Header } from 'components/Header/Header';
-import { selectUser } from 'redux/slices/userSlice';
-import { useAppSelector, useAppDispatch } from 'redux/hooks';
-import { createEvent, getMembers, selectTeams, selectMembers } from 'redux/slices/teamsSlice';
 import {
   Flex,
   FormControl,
@@ -11,12 +7,13 @@ import {
   Stack,
   Button,
   Heading,
-  useColorModeValue,
-  useToast,
   Spacer,
   Select,
   Checkbox,
-  CheckboxGroup
+  CheckboxGroup,
+  useToast,
+  Center,
+  Spinner
 } from '@chakra-ui/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
@@ -26,25 +23,57 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from 'dayjs';
 
 import { eventTypes } from 'utils/consts';
-import { useIsMounted } from 'hooks/useIsMounted';
 
 import { BackButton } from 'components/BackButton/BackButton';
+import { useGetMembersQuery, useGetSelfQuery, useCreateEventMutation } from 'redux/slices/apiSlice';
+import { getErrorMessage } from 'utils/misc';
 
 export const CreateEvent = () => {
-  const isMounted = useIsMounted();
-
   const navigate = useNavigate();
   const { team_id } = useParams();
-
   const toast = useToast();
 
-  const teams = useAppSelector(selectTeams);
-  const members = useAppSelector(selectMembers);
-  const user = useAppSelector(selectUser);
-
-  const dispatch = useAppDispatch();
+  const { data: user, isLoading: isUserLoading } = useGetSelfQuery();
+  const userId = user?.id ?? 0;
+  const { data: membersResponse, isLoading: isMembersLoading } = useGetMembersQuery(
+    team_id ? parseInt(team_id) : 0,
+    {
+      skip: !team_id
+    }
+  );
+  const members = membersResponse?.members ?? [];
+  const [
+    createEvent,
+    { error: creationError, isSuccess: isCreationSuccess, isLoading: isCreationLoading }
+  ] = useCreateEventMutation();
 
   const [allSelected, setAllSelected] = useState(false);
+
+  useEffect(() => {
+    if (isCreationSuccess) {
+      toast({
+        title: 'Created successfully!',
+        status: 'success',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+      navigate(`/teams/${team_id}`);
+    }
+  }, [isCreationSuccess]);
+
+  useEffect(() => {
+    if (creationError) {
+      toast({
+        title: 'An error occurred!',
+        description: getErrorMessage(creationError),
+        status: 'error',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+    }
+  }, [creationError]);
 
   const [eventFields, setEventFields] = useState<{
     name: string;
@@ -53,7 +82,7 @@ export const CreateEvent = () => {
     eventType: string;
     teamScore: number;
     opponentScore: number;
-    participantIds: (number | null)[];
+    participantIds: number[];
   }>({
     name: '',
     startTime: dayjs().set('seconds', 0).format(),
@@ -63,36 +92,6 @@ export const CreateEvent = () => {
     opponentScore: 0,
     participantIds: []
   });
-
-  useEffect(() => {
-    team_id && dispatch(getMembers(parseInt(team_id)));
-  }, []);
-
-  useEffect(() => {
-    if (teams.eventCreationSuccess && isMounted) {
-      toast({
-        title: teams.message,
-        status: 'success',
-        position: 'top',
-        duration: 5000,
-        isClosable: true
-      });
-      navigate(`/teams/${team_id}`);
-    }
-  }, [teams.eventCreationSuccess]);
-
-  useEffect(() => {
-    if (teams.error && isMounted) {
-      toast({
-        title: 'An error occurred!',
-        description: teams.error,
-        status: 'error',
-        position: 'top',
-        duration: 5000,
-        isClosable: true
-      });
-    }
-  }, [teams.error]);
 
   const handleChangeEventFields = (
     e: React.ChangeEvent<HTMLSelectElement> | React.ChangeEvent<HTMLInputElement>
@@ -117,6 +116,10 @@ export const CreateEvent = () => {
       tempParticipantIds.push(parseInt(e.target.name));
     }
 
+    if (tempParticipantIds.length + 1 === members.length) {
+      setAllSelected(true);
+    }
+
     setEventFields({
       ...eventFields,
       participantIds: tempParticipantIds
@@ -132,7 +135,7 @@ export const CreateEvent = () => {
       });
     } else {
       const allMembersIds = members
-        .filter((member) => member.id !== user.user.id)
+        .filter((member) => member.id !== userId)
         .map((member) => member.id);
 
       setEventFields({
@@ -143,18 +146,17 @@ export const CreateEvent = () => {
     setAllSelected(!allSelected);
   };
 
-  const handleCreateEvent = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateEvent = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    team_id &&
-      dispatch(
-        createEvent({
-          id: parseInt(team_id),
-          eventCreationInfo: {
-            ...eventFields,
-            participantIds: [...eventFields.participantIds, user.user.id]
-          }
-        })
-      );
+    if (team_id) {
+      await createEvent({
+        teamId: parseInt(team_id),
+        createdEvent: {
+          ...eventFields,
+          participantIds: [...eventFields.participantIds, userId]
+        }
+      });
+    }
   };
 
   const handleChangeStartTime = (newTime: string | null) => {
@@ -173,10 +175,17 @@ export const CreateEvent = () => {
       });
   };
 
+  if (isUserLoading || isMembersLoading) {
+    return (
+      <Center height={'75vh'}>
+        <Spinner size={'xl'} />
+      </Center>
+    );
+  }
+
   return (
     <>
-      <Header />
-      <Flex minH={'100vh'} pt={10} justify={'center'} bg={useColorModeValue('gray.50', 'gray.800')}>
+      <Flex minH={'100vh'} pt={10} justify={'center'} bg={'gray.50'}>
         <Stack spacing={8} mx={'auto'} width={'xl'} py={12} px={6}>
           <BackButton fallback={`/teams/${team_id}`} />
           <Stack align={'center'}>
@@ -231,7 +240,7 @@ export const CreateEvent = () => {
                 >
                   <CheckboxGroup>
                     {members
-                      .filter((member) => member.id !== user.user.id)
+                      .filter((member) => member.id !== userId)
                       .map((member) => (
                         <>
                           {member.id && (
@@ -272,6 +281,7 @@ export const CreateEvent = () => {
               </FormControl>
               <Spacer h={'xl'} />
               <Button
+                isLoading={isCreationLoading}
                 type="submit"
                 bg={'black'}
                 color={'white'}
