@@ -1,19 +1,18 @@
 import '@fontsource/plus-jakarta-sans/700.css';
 
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppSelector } from 'redux/hooks';
-import { selectUser } from 'redux/slices/userSlice';
+import { useGetSelfQuery } from 'redux/slices/apiSlice';
 import { Text, Heading, Stack, useColorModeValue, Flex, Image, Button } from '@chakra-ui/react';
 import { ChevronRightIcon } from '@chakra-ui/icons';
-import { Header } from 'components/Header/Header';
+
 export const LandingPage: FC = () => {
   const navigate = useNavigate();
 
-  const user = useAppSelector(selectUser);
+  const { data: user } = useGetSelfQuery();
+
   return (
     <>
-      <Header />
       <Flex
         minH={'100vh'}
         pt={{ base: 0, md: 5 }}
@@ -62,7 +61,7 @@ export const LandingPage: FC = () => {
                     base: { background: 'gray.300' },
                     md: { background: 'gray.100' }
                   }}
-                  onClick={() => navigate(user.loggedIn ? `/teams` : `/sign-up`)}
+                  onClick={() => navigate(user ? `/teams` : `/sign-up`)}
                 >
                   Get Started <ChevronRightIcon w={5} h={5} />
                 </Button>
