@@ -1,7 +1,7 @@
 package com.huddle.backend.security.services;
 
-import com.huddle.backend.models.User;
-import com.huddle.backend.repository.UserRepository;
+import com.huddle.backend.user.User;
+import com.huddle.backend.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -124,7 +124,7 @@ export const Event = () => {
   useEffect(() => {
     if (isDeleteSuccess) {
       toast({
-        title: 'Deleted successfully!',
+        title: 'Deleted event successfully!',
         status: 'success',
         position: 'top',
         duration: 5000,
@@ -391,58 +391,60 @@ export const Event = () => {
             </Box>
           </Flex>
           <Flex direction={{ base: 'column', md: 'row' }} maxW={'1000px'} w={'full'} gap={5}>
-            <Box
-              minH={'fit-content'}
-              w={{ sm: '100%', md: '60%' }}
-              bg={'white'}
-              boxShadow={'2xl'}
-              rounded={'xl'}
-              overflow={'hidden'}
-            >
-              <Box p={6}>
-                <Stack spacing={0} align={'center'} mb={5}>
-                  <Heading fontSize={'2xl'} fontWeight={800} fontFamily={'body'}>
-                    Score
-                  </Heading>
-                </Stack>
-                <Divider borderColor={'gray.300'} />
-                <Stack
-                  justify={'space-evenly'}
-                  textAlign={'center'}
-                  direction={'row'}
-                  mt={7}
-                  mb={10}
-                >
-                  {stringToJSDate(event?.endTime ?? '') < new Date() ? (
-                    <>
-                      <Stack direction={'column'}>
-                        <Heading fontSize={'xxx-large'}>{event?.teamScore}</Heading>
-                        <Text>Team Score</Text>
-                      </Stack>
-                      <Stack direction={'column'}>
-                        <Heading fontSize={'xxx-large'}>{event?.opponentScore}</Heading>
-                        <Text>Opponent Score</Text>
-                      </Stack>
-                    </>
-                  ) : (
-                    <Badge px={2} py={1} fontWeight={'700'} textTransform={'none'}>
-                      TBD
-                    </Badge>
-                  )}
-                </Stack>
-                {stringToJSDate(event?.endTime ?? '') < new Date() &&
-                  members.find((member) => member.id === user?.id)?.isManager && (
-                    <Flex justifyContent={'center'}>
-                      <Button mb={5} onClick={onUpdateScoreOpen}>
-                        Update Score
-                      </Button>
-                    </Flex>
-                  )}
+            {event?.eventType === 'GAME' ? (
+              <Box
+                minH={'fit-content'}
+                w={{ sm: '100%', md: '60%' }}
+                bg={'white'}
+                boxShadow={'2xl'}
+                rounded={'xl'}
+                overflow={'hidden'}
+              >
+                <Box p={6}>
+                  <Stack spacing={0} align={'center'} mb={5}>
+                    <Heading fontSize={'2xl'} fontWeight={800} fontFamily={'body'}>
+                      Score
+                    </Heading>
+                  </Stack>
+                  <Divider borderColor={'gray.300'} />
+                  <Stack
+                    justify={'space-evenly'}
+                    textAlign={'center'}
+                    direction={'row'}
+                    mt={7}
+                    mb={10}
+                  >
+                    {stringToJSDate(event?.endTime ?? '') < new Date() ? (
+                      <>
+                        <Stack direction={'column'}>
+                          <Heading fontSize={'xxx-large'}>{event?.teamScore}</Heading>
+                          <Text>Team Score</Text>
+                        </Stack>
+                        <Stack direction={'column'}>
+                          <Heading fontSize={'xxx-large'}>{event?.opponentScore}</Heading>
+                          <Text>Opponent Score</Text>
+                        </Stack>
+                      </>
+                    ) : (
+                      <Badge px={2} py={1} fontWeight={'700'} textTransform={'none'}>
+                        TBD
+                      </Badge>
+                    )}
+                  </Stack>
+                  {stringToJSDate(event?.endTime ?? '') < new Date() &&
+                    members.find((member) => member.id === user?.id)?.isManager && (
+                      <Flex justifyContent={'center'}>
+                        <Button mb={5} onClick={onUpdateScoreOpen}>
+                          Update Score
+                        </Button>
+                      </Flex>
+                    )}
+                </Box>
               </Box>
-            </Box>
+            ) : null}
             <Box
               minH={'fit-content'}
-              w={{ sm: '100%', md: '40%' }}
+              w={{ sm: '100%', md: event?.eventType === 'GAME' ? '40%' : '100%' }}
               bg={'white'}
               boxShadow={'2xl'}
               rounded={'xl'}

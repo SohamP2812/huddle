@@ -1,7 +1,7 @@
 package com.huddle.backend.security.services;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.huddle.backend.models.User;
+import com.huddle.backend.user.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
