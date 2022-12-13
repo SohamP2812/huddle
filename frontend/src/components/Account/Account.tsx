@@ -110,7 +110,11 @@ export const Account = () => {
   const handleUpdateUser = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
 
-    userResponse?.id && updateUser(accountFields);
+    userResponse?.id &&
+      updateUser({
+        id: userResponse.id,
+        updatedUser: { firstName: accountFields.firstName, lastName: accountFields.lastName }
+      });
   };
 
   // Need to check if !userResponse since it can be not loading but be null since we come from login

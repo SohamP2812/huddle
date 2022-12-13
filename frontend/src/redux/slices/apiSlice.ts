@@ -37,8 +37,8 @@ export const apiSlice = createApi({
       query: (newUser) => ({ url: `users`, method: 'POST', body: newUser }),
       invalidatesTags: ['Self']
     }),
-    updateUser: builder.mutation<User, Partial<User> & Pick<User, 'id'>>({
-      query: ({ id, ...updatedUser }) => ({
+    updateUser: builder.mutation<User, { id: number; updatedUser: Partial<User> }>({
+      query: ({ id, updatedUser }) => ({
         url: `users/${id}`,
         method: 'PATCH',
         body: updatedUser
