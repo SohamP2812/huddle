@@ -65,4 +65,4 @@ jobs:
               docker rm -f huddle
               docker image prune -a -f
               docker pull sohamp1228/huddle:${{env.TAG}}
-              docker run -d --name huddle -p 8080:8080 -p 80:80 -p 443:443 --net=host sohamp1228/huddle:${{env.TAG}}
+              docker run -d --name huddle --mount source=huddle,target=/huddle -p 8080:8080 -p 80:80 -p 443:443 --net=host sohamp1228/huddle:${{env.TAG}}
