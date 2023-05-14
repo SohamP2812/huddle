@@ -1,0 +1,15 @@
+{
+  "short_name": "Huddle",
+  "name": "Huddle Sports",
+  "icons": [
+    {
+      "src": "images/HuddleLogoWhiteNoText.png",
+      "type": "image/png",
+      "sizes": "344x340"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
