@@ -52,7 +52,7 @@ jobs:
       - name: Docker Push
         run: |
           cd ./backend
-          docker push sohamp1228/huddle:$TAG
+          docker push --all-tags sohamp1228/huddle
       - name: Connect to Digital Ocean and Deploy
         uses: appleboy/ssh-action@master
         with:
