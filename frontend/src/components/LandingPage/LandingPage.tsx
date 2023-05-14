@@ -63,7 +63,7 @@ export const LandingPage: FC = () => {
                   }}
                   onClick={() => navigate(user ? `/teams` : `/sign-up`)}
                 >
-                  Get Started TEST <ChevronRightIcon w={5} h={5} />
+                  Get Started <ChevronRightIcon w={5} h={5} />
                 </Button>
               </Flex>
               <Image
