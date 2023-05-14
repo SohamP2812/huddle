@@ -1,6 +1,6 @@
-application.properties
-application-dev.properties
-application-prod.properties
+#application.properties
+#application-dev.properties
+#application-prod.properties
 /key
 
 # Logs
