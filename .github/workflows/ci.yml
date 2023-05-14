@@ -48,7 +48,7 @@ jobs:
       - name: Build the Docker image
         run: |
           cd ./backend
-          docker build . --file Dockerfile --tag sohamp1228/huddle:$TAG
+          docker build . --file Dockerfile --tag sohamp1228/huddle --tag sohamp1228/huddle:$TAG
       - name: Docker Push
         run: |
           cd ./backend
