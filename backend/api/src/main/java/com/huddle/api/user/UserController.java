@@ -103,8 +103,7 @@ public class UserController {
         List<UserResponse> responseUsers = dbUsers
                 .stream()
                 .map(
-                        user ->
-                                new UserResponse(user)
+                        UserResponse::new
                 )
                 .toList();
 

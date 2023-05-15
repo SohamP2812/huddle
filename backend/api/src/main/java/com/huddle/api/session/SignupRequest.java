@@ -2,11 +2,13 @@ package com.huddle.api.session;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 public class SignupRequest {
     @NotEmpty(message = "Username must not be empty")
     @Size(min = 3, max = 20, message = "Min length is 3 characters and max length is 20 characters")
+    @Pattern(regexp = "[a-zA-Z0-9]+", message = "Username must not contain special characters")
     private String username;
 
     @NotEmpty(message = "First name must not be empty")
