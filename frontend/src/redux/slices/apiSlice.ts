@@ -45,6 +45,14 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Self', 'Teams', 'Events', 'Participants']
     }),
+    deleteUser: builder.mutation<string, { id: number; password: string }>({
+      query: ({id, password}) => ({
+        url: `users/${id}`,
+        method: 'DELETE',
+        body : {password: password}
+      }),
+      invalidatesTags: ['Self', 'Teams', 'Events', 'Participants']
+    }),
     searchUsers: builder.query<{ users: User[] }, string>({
       query: (username) => ({ url: `users`, params: { username: username } })
     }),
@@ -156,6 +164,7 @@ export const {
   useGetSelfQuery,
   useLoginMutation,
   useUpdateUserMutation,
+  useDeleteUserMutation,
   useLogoutMutation,
   useCreateUserMutation,
   useSearchUsersQuery,

@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useUpdateUserMutation, useGetSelfQuery, useLogoutMutation } from 'redux/slices/apiSlice';
+import {
+  useUpdateUserMutation,
+  useGetSelfQuery,
+  useLogoutMutation,
+  useDeleteUserMutation
+} from 'redux/slices/apiSlice';
 import { User } from 'utils/types';
 import {
   Flex,
@@ -12,7 +17,15 @@ import {
   Spacer,
   Center,
   Spinner,
-  useToast
+  useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,12 +34,17 @@ import { getErrorMessage, isObjectDiff } from 'utils/misc';
 export const Account = () => {
   const navigate = useNavigate();
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const { data: userResponse, isLoading: isUserLoading } = useGetSelfQuery();
   const [
     updateUser,
     { error: updateError, isSuccess: isUpdateSuccess, isLoading: isUpdateLoading }
   ] = useUpdateUserMutation();
+  const [
+    deleteUser,
+    { error: deleteError, isSuccess: isDeleteSuccess, isLoading: isDeleteLoading }
+  ] = useDeleteUserMutation();
   const [logout, { error: logoutError, isSuccess: isLogoutSuccess, isLoading: isLogoutLoading }] =
     useLogoutMutation();
 
@@ -55,6 +73,12 @@ export const Account = () => {
   }, [isUpdateSuccess]);
 
   useEffect(() => {
+    if (isDeleteSuccess) {
+      navigate('/');
+    }
+  }, [isDeleteSuccess]);
+
+  useEffect(() => {
     if (updateError) {
       toast({
         title: 'An error occurred!',
@@ -66,6 +90,19 @@ export const Account = () => {
       });
     }
   }, [updateError]);
+
+  useEffect(() => {
+    if (deleteError) {
+      toast({
+        title: 'An error occurred!',
+        description: getErrorMessage(deleteError),
+        status: 'error',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+    }
+  }, [deleteError]);
 
   useEffect(() => {
     if (isLogoutSuccess) {
@@ -94,6 +131,11 @@ export const Account = () => {
     email: userResponse?.email ?? '',
     createdAt: userResponse?.createdAt ?? Date.now().toString()
   });
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+
+  const handleChangeConfirmPassword = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setConfirmPassword(e.target.value);
+  };
 
   const handleChangeSignupFields = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setAccountFields({
@@ -115,6 +157,11 @@ export const Account = () => {
         id: userResponse.id,
         updatedUser: { firstName: accountFields.firstName, lastName: accountFields.lastName }
       });
+  };
+
+  const handleDeleteAccount = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    deleteUser({ id: accountFields.id, password: confirmPassword });
   };
 
   // Need to check if !userResponse since it can be not loading but be null since we come from login
@@ -199,10 +246,57 @@ export const Account = () => {
               >
                 Logout
               </Button>
+              <Spacer h={'xl'} />
+              <Button
+                onClick={onOpen}
+                bg={'red'}
+                color={'white'}
+                border={'1px'}
+                borderColor={'red.500'}
+                _hover={{
+                  bg: 'red.300'
+                }}
+              >
+                Delete Account
+              </Button>
             </Stack>
           </form>
         </Stack>
       </Flex>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Are you sure?</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {`Deleting your account is an irreversable action. Please be certain you want to do this
+            as you won't be able to recover your account.`}
+            <Spacer h={'4'} />
+            <FormLabel>Confirm your password</FormLabel>
+            <Input
+              name="password"
+              type="password"
+              onChange={handleChangeConfirmPassword}
+              value={confirmPassword}
+            />
+          </ModalBody>
+
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={onClose}>
+              Close
+            </Button>
+            <Button
+              disabled={!confirmPassword}
+              isLoading={isDeleteLoading}
+              colorScheme="red"
+              onClick={handleDeleteAccount}
+            >
+              Delete
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
