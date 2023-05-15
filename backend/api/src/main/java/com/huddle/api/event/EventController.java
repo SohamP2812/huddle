@@ -3,7 +3,7 @@ package com.huddle.api.event;
 import com.huddle.api.eventparticipant.EAttendance;
 import com.huddle.api.eventparticipant.DbEventParticipant;
 import com.huddle.api.eventparticipant.EventParticipantRepository;
-import com.huddle.api.exception.UnauthorizedException;
+import com.huddle.core.exceptions.UnauthorizedException;
 import com.huddle.api.payload.response.MessageResponse;
 import com.huddle.api.security.services.UserDetailsImpl;
 import com.huddle.api.team.DbTeam;

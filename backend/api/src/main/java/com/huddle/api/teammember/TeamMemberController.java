@@ -73,7 +73,6 @@ public class TeamMemberController {
     ) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-
         DbUser dbUser = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
 
         DbTeam dbTeam = teamRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No team exists with this id."));
