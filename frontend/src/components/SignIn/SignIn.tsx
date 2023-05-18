@@ -91,7 +91,7 @@ export const SignIn = () => {
             <form onSubmit={handleLogin}>
               <Stack spacing={4}>
                 <FormControl id="username">
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>Username or Email</FormLabel>
                   <Input
                     type="text"
                     name="username"

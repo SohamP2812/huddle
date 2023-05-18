@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import {
   useGetMembersQuery,
   useGetSelfQuery,
@@ -260,7 +260,9 @@ export const Team = () => {
                   <Heading fontSize={'lg'} fontWeight={500} fontFamily={'body'}>
                     {team?.manager.firstName} {team?.manager.lastName}
                   </Heading>
-                  <Text color={'gray.500'}>{team?.manager.username}</Text>
+                  <Button as={RouterLink} color={'gray.500'} variant={'link'} to={''}>
+                    @{team?.manager.username}
+                  </Button>
                 </Stack>
                 <Stack align={'center'} justify={'center'} direction={'row'}>
                   <Badge px={2} py={1} bg={'gray.100'} fontWeight={'700'} textTransform={'none'}>
