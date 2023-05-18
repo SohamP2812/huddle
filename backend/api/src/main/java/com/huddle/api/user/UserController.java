@@ -7,10 +7,9 @@ import com.huddle.api.session.SignupRequest;
 import com.huddle.api.team.DbTeam;
 import com.huddle.api.team.TeamResponse;
 import com.huddle.api.team.TeamsResponse;
-import com.huddle.api.teammember.DbTeamMember;
 import com.huddle.api.teammember.TeamMemberRepository;
+import com.huddle.core.exceptions.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,13 +19,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -47,32 +43,15 @@ public class UserController {
     @Autowired
     JwtUtils jwtUtils;
 
+    @Autowired
+    UserService userService;
+
     @PostMapping("")
     public ResponseEntity<?> createUser(
             HttpServletResponse response,
             @Valid @RequestBody SignupRequest signUpRequest
     ) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Username is already taken!"));
-        }
-
-        if (userRepository.existsByEmailIgnoreCase(signUpRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Email is already in use!"));
-        }
-
-        DbUser dbUser = new DbUser(
-                signUpRequest.getFirstName(),
-                signUpRequest.getLastName(),
-                signUpRequest.getUsername(),
-                signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword())
-        );
-
-        dbUser = userRepository.save(dbUser);
+        DbUser dbUser = userService.createUser(signUpRequest);
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -98,7 +77,7 @@ public class UserController {
 
     @GetMapping("")
     public ResponseEntity<?> getUsers(@RequestParam String username) {
-        List<DbUser> dbUsers = userRepository.findByUsernameStartsWithIgnoreCase(username);
+        List<DbUser> dbUsers = userService.getUsers(username);
 
         List<UserResponse> responseUsers = dbUsers
                 .stream()
@@ -112,7 +91,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUser(@PathVariable Long id) {
-        DbUser dbUser = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
+        DbUser dbUser = userService.getUser(id);
 
         return ResponseEntity.ok(new UserResponse(dbUser));
     }
@@ -126,17 +105,10 @@ public class UserController {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         if (userDetails.getId() != id) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponse("You do not have the authority to make this change."));
+            throw new UnauthorizedException("ou do not have the authority to make this change.");
         }
 
-        DbUser dbUser = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
-
-        dbUser.setFirstName(userRequest.getFirstName());
-        dbUser.setLastName(userRequest.getLastName());
-
-        userRepository.save(dbUser);
+        DbUser dbUser = userService.updateUser(userRequest, id);
 
         return ResponseEntity.ok(new UserResponse(dbUser));
     }
@@ -146,8 +118,8 @@ public class UserController {
     public ResponseEntity<?> deleteUser(
             HttpServletResponse response,
             Authentication authentication,
-            @PathVariable Long id,
-            @Valid @RequestBody DeleteUserRequest deleteUserRequest
+            @Valid @RequestBody DeleteUserRequest deleteUserRequest,
+            @PathVariable Long id
     ) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
@@ -159,18 +131,10 @@ public class UserController {
         );
 
         if (userDetails.getId() != id) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponse("You do not have the authority to make this change."));
+            throw new UnauthorizedException("ou do not have the authority to make this change.");
         }
 
-        Optional<DbUser> user = userRepository.findById(id);
-
-        if (user.isEmpty()) return ResponseEntity
-                .badRequest()
-                .body(new MessageResponse("No user exists with this id."));
-
-        userRepository.delete(user.get());
+        userService.deleteUser(deleteUserRequest, id);
 
         Cookie jwtTokenCookie = new Cookie("huddle_session", null);
 
@@ -187,24 +151,11 @@ public class UserController {
             Authentication authentication,
             @PathVariable Long id
     ) {
-        DbUser dbUser = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
-
-        // Which method is better?
-        Set<DbTeamMember> memberTeams = dbUser.getMemberTeams();
-
-        //      List<TeamMember> memberTeams = teamMemberRepository.findAllByMemberId(id);
-
-        List<DbTeam> dbTeams = memberTeams
-                .stream()
-                .map(memberTeam -> memberTeam.getTeam())
-                .toList();
+        List<DbTeam> dbTeams = userService.getTeams(id);
 
         List<TeamResponse> responseTeams = dbTeams
                 .stream()
-                .map(
-                        team ->
-                                new TeamResponse(team)
-                )
+                .map(TeamResponse::new)
                 .toList();
 
         return ResponseEntity.ok(new TeamsResponse(responseTeams));
