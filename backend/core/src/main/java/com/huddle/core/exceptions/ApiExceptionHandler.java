@@ -38,5 +38,22 @@ public class ApiExceptionHandler {
 
         return new ResponseEntity<>(apiException, unauthorized);
     }
-}
 
+    @ExceptionHandler(value = {ConflictException.class})
+    public ResponseEntity<Object> handleConflict(ConflictException e) {
+        HttpStatus conflict = HttpStatus.CONFLICT;
+
+        ApiException apiException = new ApiException(e.getMessage(), conflict, ZonedDateTime.now(ZoneId.of("Z")));
+
+        return new ResponseEntity<>(apiException, conflict);
+    }
+
+    @ExceptionHandler(value = {BadRequestException.class})
+    public ResponseEntity<Object> handleBadRequest(BadRequestException e) {
+        HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+
+        ApiException apiException = new ApiException(e.getMessage(), badRequest, ZonedDateTime.now(ZoneId.of("Z")));
+
+        return new ResponseEntity<>(apiException, badRequest);
+    }
+}
