@@ -7,13 +7,9 @@ import com.huddle.core.exceptions.ConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.persistence.EntityNotFoundException;
-import javax.validation.Valid;
 import java.util.List;
-import java.util.Set;
 
 public class UserService {
     @Autowired
@@ -51,15 +47,16 @@ public class UserService {
         return userRepository.findByUsernameStartsWithIgnoreCase(username);
     }
 
-    public DbUser getUser(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
+    public DbUser getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
     }
 
     public DbUser updateUser(
-            @Valid @RequestBody UserRequest userRequest,
-            @PathVariable Long id
+            UserRequest userRequest,
+            Long userId
     ) {
-        DbUser dbUser = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
+        DbUser dbUser = getUser(userId);
 
         dbUser.setFirstName(userRequest.getFirstName());
         dbUser.setLastName(userRequest.getLastName());
@@ -69,23 +66,16 @@ public class UserService {
         return dbUser;
     }
 
-    public void deleteUser(
-            @Valid @RequestBody DeleteUserRequest deleteUserRequest,
-            @PathVariable Long id
-    ) {
-        DbUser dbUser = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
+    public void deleteUser(Long userId) {
+        DbUser dbUser = getUser(userId);
 
         userRepository.delete(dbUser);
     }
 
-    public List<DbTeam> getTeams(
-            @PathVariable Long id
-    ) {
-        DbUser dbUser = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
+    public List<DbTeam> getTeams(Long userId) {
+        DbUser dbUser = getUser(userId);
 
-        Set<DbTeamMember> memberTeams = dbUser.getMemberTeams();
-
-        return memberTeams
+        return dbUser.getMemberTeams()
                 .stream()
                 .map(DbTeamMember::getTeam)
                 .toList();

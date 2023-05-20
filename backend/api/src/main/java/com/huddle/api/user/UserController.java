@@ -7,7 +7,6 @@ import com.huddle.api.session.SignupRequest;
 import com.huddle.api.team.DbTeam;
 import com.huddle.api.team.TeamResponse;
 import com.huddle.api.team.TeamsResponse;
-import com.huddle.api.teammember.TeamMemberRepository;
 import com.huddle.core.exceptions.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +14,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,15 +28,6 @@ import java.util.List;
 public class UserController {
     @Autowired
     AuthenticationManager authenticationManager;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    TeamMemberRepository teamMemberRepository;
-
-    @Autowired
-    PasswordEncoder encoder;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -89,37 +78,37 @@ public class UserController {
         return ResponseEntity.ok(new UsersResponse(responseUsers));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getUser(@PathVariable Long id) {
-        DbUser dbUser = userService.getUser(id);
+    @GetMapping("/{user_id}")
+    public ResponseEntity<?> getUser(@PathVariable Long user_id) {
+        DbUser dbUser = userService.getUser(user_id);
 
         return ResponseEntity.ok(new UserResponse(dbUser));
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{user_id}")
     public ResponseEntity<?> updateUser(
             Authentication authentication,
             @Valid @RequestBody UserRequest userRequest,
-            @PathVariable Long id
+            @PathVariable Long user_id
     ) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        if (userDetails.getId() != id) {
-            throw new UnauthorizedException("ou do not have the authority to make this change.");
+        if (userDetails.getId() != user_id) {
+            throw new UnauthorizedException("You do not have the authority to make this change.");
         }
 
-        DbUser dbUser = userService.updateUser(userRequest, id);
+        DbUser dbUser = userService.updateUser(userRequest, user_id);
 
         return ResponseEntity.ok(new UserResponse(dbUser));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{user_id}")
     @Transactional
     public ResponseEntity<?> deleteUser(
             HttpServletResponse response,
             Authentication authentication,
             @Valid @RequestBody DeleteUserRequest deleteUserRequest,
-            @PathVariable Long id
+            @PathVariable Long user_id
     ) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
@@ -130,11 +119,11 @@ public class UserController {
                 )
         );
 
-        if (userDetails.getId() != id) {
-            throw new UnauthorizedException("ou do not have the authority to make this change.");
+        if (userDetails.getId() != user_id) {
+            throw new UnauthorizedException("You do not have the authority to make this change.");
         }
 
-        userService.deleteUser(deleteUserRequest, id);
+        userService.deleteUser(user_id);
 
         Cookie jwtTokenCookie = new Cookie("huddle_session", null);
 
@@ -146,12 +135,12 @@ public class UserController {
         return ResponseEntity.ok(new MessageResponse("User deleted successfully!"));
     }
 
-    @GetMapping("/{id}/teams")
+    @GetMapping("/{user_id}/teams")
     public ResponseEntity<?> getTeams(
             Authentication authentication,
-            @PathVariable Long id
+            @PathVariable Long user_id
     ) {
-        List<DbTeam> dbTeams = userService.getTeams(id);
+        List<DbTeam> dbTeams = userService.getTeams(user_id);
 
         List<TeamResponse> responseTeams = dbTeams
                 .stream()
