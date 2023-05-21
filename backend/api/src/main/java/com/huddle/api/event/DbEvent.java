@@ -121,4 +121,12 @@ public class DbEvent extends DbTimestampedEntity {
     public void setOpponentScore(Integer opponentScore) {
         this.opponentScore = opponentScore;
     }
+
+    public Set<DbEventParticipant> getEventParticipants() {
+        return eventParticipants;
+    }
+
+    public void setEventParticipants(Set<DbEventParticipant> eventParticipants) {
+        this.eventParticipants = eventParticipants;
+    }
 }
