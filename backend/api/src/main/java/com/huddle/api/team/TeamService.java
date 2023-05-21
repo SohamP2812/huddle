@@ -6,10 +6,12 @@ import com.huddle.api.teammember.TeamMemberRepository;
 import com.huddle.api.user.DbUser;
 import com.huddle.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.persistence.EntityNotFoundException;
 
+@Service
 public class TeamService {
     @Autowired
     TeamRepository teamRepository;

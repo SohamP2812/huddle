@@ -1,10 +1,10 @@
 package com.huddle.api.team;
 
-import com.huddle.api.payload.response.MessageResponse;
 import com.huddle.api.security.services.UserDetailsImpl;
-import com.huddle.api.user.DbUser;
-import com.huddle.api.user.UserService;
+import com.huddle.api.teammember.DbTeamMember;
+import com.huddle.api.teammember.TeamMemberService;
 import com.huddle.core.exceptions.UnauthorizedException;
+import com.huddle.core.payload.MessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -24,7 +25,7 @@ public class TeamController {
     TeamService teamService;
 
     @Autowired
-    UserService userService;
+    TeamMemberService teamMemberService;
 
     @PostMapping("")
     public ResponseEntity<?> createTeam(
@@ -42,14 +43,13 @@ public class TeamController {
     public ResponseEntity<?> getTeam(Authentication authentication, @PathVariable Long team_id) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        DbUser dbUser = userService.getUser(userDetails.getId());
+        List<DbTeamMember> dbTeamMembers = teamMemberService.getMembers(team_id);
+
+        if (!dbTeamMembers.stream().map(dbTeamMember -> dbTeamMember.getMember().getId()).toList().contains(userDetails.getId())) {
+            throw new UnauthorizedException("You are not a member of this team.");
+        }
 
         DbTeam dbTeam = teamService.getTeam(team_id);
-
-        if (!dbUser.getMemberTeams().stream().map(memberTeam -> memberTeam.getTeam().getId()).toList().contains(team_id))
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("You are not a member of this team."));
 
         return ResponseEntity.ok(new TeamResponse(dbTeam));
     }

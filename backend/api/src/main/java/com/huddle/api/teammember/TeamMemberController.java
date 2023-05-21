@@ -1,8 +1,10 @@
 package com.huddle.api.teammember;
 
-import com.huddle.api.payload.response.MessageResponse;
 import com.huddle.api.security.services.UserDetailsImpl;
+import com.huddle.api.team.DbTeam;
+import com.huddle.api.team.TeamService;
 import com.huddle.core.exceptions.UnauthorizedException;
+import com.huddle.core.payload.MessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -18,6 +20,9 @@ import java.util.List;
 public class TeamMemberController {
     @Autowired
     TeamMemberService teamMemberService;
+
+    @Autowired
+    TeamService teamService;
 
     @GetMapping("")
     public ResponseEntity<?> getMembers(Authentication authentication, @PathVariable Long team_id) {
@@ -44,13 +49,9 @@ public class TeamMemberController {
     ) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        List<DbTeamMember> dbTeamMembers = teamMemberService.getMembers(team_id);
+        DbTeam dbTeam = teamService.getTeam(team_id);
 
-        if (!dbTeamMembers.stream().map(dbTeamMember -> dbTeamMember.getMember().getId()).toList().contains(userDetails.getId())) {
-            throw new UnauthorizedException("You are not a member of this team.");
-        }
-
-        if (dbTeamMembers.stream().filter(DbTeamMember::isManager).findFirst().orElseThrow().getId() != userDetails.getId()) {
+        if (dbTeam.getManager().getId() != userDetails.getId()) {
             throw new UnauthorizedException("You do not have the authority to make this change.");
         }
 
@@ -87,13 +88,9 @@ public class TeamMemberController {
     ) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        List<DbTeamMember> dbTeamMembers = teamMemberService.getMembers(team_id);
+        DbTeam dbTeam = teamService.getTeam(team_id);
 
-        if (!dbTeamMembers.stream().map(dbTeamMember -> dbTeamMember.getMember().getId()).toList().contains(userDetails.getId())) {
-            throw new UnauthorizedException("You are not a member of this team.");
-        }
-
-        if (dbTeamMembers.stream().filter(DbTeamMember::isManager).findFirst().orElseThrow().getId() != userDetails.getId()) {
+        if (dbTeam.getManager().getId() != userDetails.getId()) {
             throw new UnauthorizedException("You do not have the authority to make this change.");
         }
 

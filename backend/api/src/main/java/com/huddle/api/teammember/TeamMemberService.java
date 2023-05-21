@@ -8,10 +8,12 @@ import com.huddle.api.user.DbUser;
 import com.huddle.api.user.UserService;
 import com.huddle.core.exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
+@Service
 public class TeamMemberService {
     @Autowired
     TeamMemberRepository teamMemberRepository;
@@ -56,9 +58,7 @@ public class TeamMemberService {
                 dbTeam
         );
 
-        teamMemberRepository.save(dbTeamMember);
-
-        return dbTeamMember;
+        return teamMemberRepository.save(dbTeamMember);
     }
 
     public DbTeamMember getMember(
