@@ -5,16 +5,14 @@ import com.huddle.api.team.DbTeam;
 import com.huddle.api.teammember.DbTeamMember;
 import com.huddle.core.exceptions.ConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
+@Service
 public class UserService {
-    @Autowired
-    AuthenticationManager authenticationManager;
-
     @Autowired
     UserRepository userRepository;
 
@@ -38,9 +36,7 @@ public class UserService {
                 encoder.encode(signUpRequest.getPassword())
         );
 
-        dbUser = userRepository.save(dbUser);
-
-        return dbUser;
+        return userRepository.save(dbUser);
     }
 
     public List<DbUser> getUsers(String username) {
@@ -61,9 +57,7 @@ public class UserService {
         dbUser.setFirstName(userRequest.getFirstName());
         dbUser.setLastName(userRequest.getLastName());
 
-        userRepository.save(dbUser);
-
-        return dbUser;
+        return userRepository.save(dbUser);
     }
 
     public void deleteUser(Long userId) {

@@ -1,4 +1,4 @@
-package com.huddle.api.payload.response;
+package com.huddle.core.payload;
 
 public class MessageResponse {
     private String message;

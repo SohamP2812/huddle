@@ -26,7 +26,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         DbUser dbUser;
 
         if (matcher.matches()) {
-            System.out.println("EMAIL");
             dbUser = userRepository
                     .findByEmail(username)
                     .orElseThrow(
@@ -36,7 +35,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                                     )
                     );
         } else {
-            System.out.println("USERNAME");
             dbUser = userRepository
                     .findByUsername(username)
                     .orElseThrow(

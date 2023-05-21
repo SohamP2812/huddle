@@ -1,6 +1,6 @@
 package com.huddle.api.user;
 
-import com.huddle.api.payload.response.MessageResponse;
+import com.huddle.core.payload.MessageResponse;
 import com.huddle.api.security.jwt.JwtUtils;
 import com.huddle.api.security.services.UserDetailsImpl;
 import com.huddle.api.session.SignupRequest;

@@ -1,21 +1,19 @@
 package com.huddle.api.session;
 
-import com.huddle.api.payload.response.MessageResponse;
+import com.huddle.core.payload.MessageResponse;
 import com.huddle.api.security.jwt.JwtUtils;
 import com.huddle.api.security.services.UserDetailsImpl;
 import com.huddle.api.user.DbUser;
-import com.huddle.api.user.UserRepository;
 import com.huddle.api.user.UserResponse;
+import com.huddle.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -28,13 +26,10 @@ public class SessionController {
     AuthenticationManager authenticationManager;
 
     @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    PasswordEncoder encoder;
-
-    @Autowired
     JwtUtils jwtUtils;
+
+    @Autowired
+    UserService userService;
 
     @PostMapping("")
     public ResponseEntity<?> authenticateUser(
@@ -76,7 +71,7 @@ public class SessionController {
     public ResponseEntity<?> getSelfFromToken(Authentication authentication) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        DbUser dbUser = userRepository.findById(userDetails.getId()).orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
+        DbUser dbUser = userService.getUser(userDetails.getId());
 
         return ResponseEntity.ok(new UserResponse(dbUser));
     }
