@@ -244,7 +244,7 @@ const NewPassword = ({
   setSearchParams
 }: {
   token: string;
-  setSearchParams: (params: any) => any;
+  setSearchParams: (params: unknown) => void;
 }) => {
   const toast = useToast();
 
