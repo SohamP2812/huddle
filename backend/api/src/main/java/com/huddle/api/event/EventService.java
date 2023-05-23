@@ -6,15 +6,19 @@ import com.huddle.api.eventparticipant.EventParticipantRepository;
 import com.huddle.api.eventparticipant.EventParticipantService;
 import com.huddle.api.team.DbTeam;
 import com.huddle.api.team.TeamService;
-import com.huddle.api.teammember.TeamMemberService;
 import com.huddle.api.user.DbUser;
 import com.huddle.api.user.UserService;
+import com.huddle.core.email.EmailSender;
 import com.huddle.core.exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -32,10 +36,10 @@ public class EventService {
     UserService userService;
 
     @Autowired
-    TeamMemberService teamMemberService;
+    EventParticipantService eventParticipantService;
 
     @Autowired
-    EventParticipantService eventParticipantService;
+    EmailSender emailSender;
 
     public List<DbEvent> getEventsUserIsPartOf(Long teamId, Long userId) {
         DbTeam dbTeam = teamService.getTeam(teamId);
@@ -81,6 +85,23 @@ public class EventService {
                 );
 
                 eventParticipantRepository.save(dbEventParticipant);
+
+                Map<String, Object> variables = new HashMap<>();
+                variables.put("name", participant.getFirstName());
+                variables.put("teamName", dbTeam.getName());
+                variables.put("eventName", dbEvent.getName());
+                variables.put("eventType", dbEvent.getEventType().toString());
+                DateTimeFormatter dateTimeFormatter = DateTimeFormatter
+                        .ofPattern("EEEE MMMM dd, yyyy hh:mm a");
+                variables.put("startTime", dbEvent.getStartTime().atZoneSameInstant(ZoneId.of("UTC")).toOffsetDateTime().format(dateTimeFormatter) + " UTC");
+                variables.put("endTime", dbEvent.getEndTime().atZoneSameInstant(ZoneId.of("UTC")).toOffsetDateTime().format(dateTimeFormatter) + " UTC");
+
+                emailSender.sendNow(
+                        participant.getEmail(),
+                        "AddedToEvent",
+                        variables,
+                        "You've Been Added to an Event!"
+                );
             } catch (EntityNotFoundException ignored) {
             }
         }
@@ -140,6 +161,23 @@ public class EventService {
                     );
 
                     eventParticipantRepository.save(dbEventParticipant);
+
+                    Map<String, Object> variables = new HashMap<>();
+                    variables.put("name", participant.getFirstName());
+                    variables.put("teamName", dbEvent.getTeam().getName());
+                    variables.put("eventName", dbEvent.getName());
+                    variables.put("eventType", dbEvent.getEventType().toString());
+                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter
+                            .ofPattern("EEEE MMMM dd, yyyy hh:mm a");
+                    variables.put("startTime", dbEvent.getStartTime().atZoneSameInstant(ZoneId.of("UTC")).toOffsetDateTime().format(dateTimeFormatter) + " UTC");
+                    variables.put("endTime", dbEvent.getEndTime().atZoneSameInstant(ZoneId.of("UTC")).toOffsetDateTime().format(dateTimeFormatter) + " UTC");
+
+                    emailSender.sendNow(
+                            participant.getEmail(),
+                            "AddedToEvent",
+                            variables,
+                            "You've Been Added to an Event!"
+                    );
                 } catch (EntityNotFoundException ignored) {
                 }
             }
@@ -151,6 +189,23 @@ public class EventService {
                     DbEventParticipant dbEventParticipant = eventParticipantService.getEventParticipantByUserAndEvent(participantId, eventId);
 
                     eventParticipantRepository.delete(dbEventParticipant);
+
+                    Map<String, Object> variables = new HashMap<>();
+                    variables.put("name", dbEventParticipant.getParticipant().getFirstName());
+                    variables.put("teamName", dbEvent.getTeam().getName());
+                    variables.put("eventName", dbEvent.getName());
+                    variables.put("eventType", dbEvent.getEventType().toString());
+                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter
+                            .ofPattern("EEEE MMMM dd, yyyy hh:mm a");
+                    variables.put("startTime", dbEvent.getStartTime().atZoneSameInstant(ZoneId.of("UTC")).toOffsetDateTime().format(dateTimeFormatter) + " UTC");
+                    variables.put("endTime", dbEvent.getEndTime().atZoneSameInstant(ZoneId.of("UTC")).toOffsetDateTime().format(dateTimeFormatter) + " UTC");
+
+                    emailSender.sendNow(
+                            dbEventParticipant.getParticipant().getEmail(),
+                            "RemovedFromEvent",
+                            variables,
+                            "You've Been Added to an Event!"
+                    );
                 } catch (EntityNotFoundException ignored) {
                 }
             }

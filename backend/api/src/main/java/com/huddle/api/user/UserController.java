@@ -1,6 +1,5 @@
 package com.huddle.api.user;
 
-import com.huddle.core.payload.MessageResponse;
 import com.huddle.api.security.jwt.JwtUtils;
 import com.huddle.api.security.services.UserDetailsImpl;
 import com.huddle.api.session.SignupRequest;
@@ -8,6 +7,7 @@ import com.huddle.api.team.DbTeam;
 import com.huddle.api.team.TeamResponse;
 import com.huddle.api.team.TeamsResponse;
 import com.huddle.core.exceptions.UnauthorizedException;
+import com.huddle.core.payload.MessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;

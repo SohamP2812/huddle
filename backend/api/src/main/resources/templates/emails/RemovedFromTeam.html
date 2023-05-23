@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Huddle Team Removal</title>
+    <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    p {
+      color: #555;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      max-width: 150px;
+    }
+
+    .footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+    }
+
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logo">
+        <img src="https://i.imgur.com/nTY5IMP.png" alt="Huddle Logo">
+    </div>
+    <h2>You've Been Removed from the Team</h2>
+    <p>Dear <span th:text="${name}">[User's Name]</span>,</p>
+    <p>We regret to inform you that you have been removed from the <span th:text="${teamName}">[Team Name]</span> team
+        on Huddle.</p>
+    <p>If you have any questions or concerns regarding your removal, please reach out to the manager <span
+            th:text="${managerName}">[Team Manager's Name]</span>
+        at <span
+                th:text="${managerEmail}">[Team Manager's Email]</span>.</p>
+    <p>We appreciate your participation and contributions to the team while you were a member. Thank you for your
+        understanding.</p>
+    <p>Best regards,</p>
+    <p>The Huddle Team</p>
+    <div class="footer">
+        <p>This is an automated email. Please do not reply.</p>
+    </div>
+</div>
+</body>
+</html>

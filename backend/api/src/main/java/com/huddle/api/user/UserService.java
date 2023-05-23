@@ -3,13 +3,16 @@ package com.huddle.api.user;
 import com.huddle.api.session.SignupRequest;
 import com.huddle.api.team.DbTeam;
 import com.huddle.api.teammember.DbTeamMember;
+import com.huddle.core.email.EmailSender;
 import com.huddle.core.exceptions.ConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserService {
@@ -18,6 +21,9 @@ public class UserService {
 
     @Autowired
     PasswordEncoder encoder;
+
+    @Autowired
+    EmailSender emailSender;
 
     public DbUser createUser(SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
@@ -36,7 +42,19 @@ public class UserService {
                 encoder.encode(signUpRequest.getPassword())
         );
 
-        return userRepository.save(dbUser);
+        userRepository.save(dbUser);
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("name", dbUser.getFirstName());
+
+        emailSender.sendNow(
+                dbUser.getEmail(),
+                "CreatedAccount",
+                variables,
+                "Welcome to Huddle!"
+        );
+
+        return dbUser;
     }
 
     public List<DbUser> getUsers(String username) {
