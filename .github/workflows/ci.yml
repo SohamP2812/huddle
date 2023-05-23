@@ -64,4 +64,3 @@ jobs:
               cd /huddle/docker
               docker-compose pull huddle
               docker-compose up --detach --build huddle
-              docker image prune -a -f

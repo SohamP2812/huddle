@@ -511,7 +511,7 @@ export const Event = () => {
                   ) : (
                     <>
                       <FormControl>
-                        <FormLabel>Your Status</FormLabel>
+                        <FormLabel>Are you participating?</FormLabel>
                         <Stack direction={'row'}>
                           <Select onChange={handleChangeStatus} value={status}>
                             <option key={'UNDECIDED'} value={'UNDECIDED'}>
