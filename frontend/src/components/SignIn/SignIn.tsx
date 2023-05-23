@@ -79,6 +79,10 @@ export const SignIn = () => {
     login(loginFields);
   };
 
+  const resetToken = () => {
+    setSearchParams({});
+  };
+
   if (isUserLoading) {
     return (
       <Center height={'75vh'}>
@@ -88,7 +92,7 @@ export const SignIn = () => {
   }
 
   if (token) {
-    return <NewPassword token={token} setSearchParams={setSearchParams} />;
+    return <NewPassword token={token} resetToken={resetToken} />;
   }
 
   if (forgotPassword) {
@@ -197,6 +201,8 @@ const ForgotPassword = ({
     }
   }, [error]);
 
+  const resetToken = () => {};
+
   return (
     <Flex minH={'100vh'} pt={{ base: 0, md: 20 }} justify={'center'} bg={'gray.50'}>
       <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
@@ -239,13 +245,7 @@ const ForgotPassword = ({
   );
 };
 
-const NewPassword = ({
-  token,
-  setSearchParams
-}: {
-  token: string;
-  setSearchParams: (params: unknown) => void;
-}) => {
+const NewPassword = ({ token, resetToken }: { token: string; resetToken: () => void }) => {
   const toast = useToast();
 
   const [password, setPassword] = useState('');
@@ -267,7 +267,7 @@ const NewPassword = ({
         duration: 5000,
         isClosable: true
       });
-      setSearchParams({});
+      resetToken();
     }
   }, [isSuccess]);
 
