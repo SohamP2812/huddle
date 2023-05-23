@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useGetSelfQuery, useLoginMutation } from 'redux/slices/apiSlice';
+import {
+  useGetSelfQuery,
+  useLoginMutation,
+  useResetPasswordMutation,
+  useUpdatePasswordMutation
+} from 'redux/slices/apiSlice';
 import {
   Flex,
   Box,
@@ -15,7 +20,7 @@ import {
   Center,
   Spinner
 } from '@chakra-ui/react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
 
 import { allFieldsFilled, getErrorMessage } from 'utils/misc';
@@ -23,6 +28,9 @@ import { allFieldsFilled, getErrorMessage } from 'utils/misc';
 export const SignIn = () => {
   const navigate = useNavigate();
   const toast = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const token = searchParams.get('token');
 
   const { data: user, isLoading: isUserLoading } = useGetSelfQuery();
 
@@ -57,6 +65,8 @@ export const SignIn = () => {
     password: ''
   });
 
+  const [forgotPassword, setForgotPassword] = useState(false);
+
   const handleChangeLoginFields = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setLoginFields({
       ...loginFields,
@@ -75,6 +85,14 @@ export const SignIn = () => {
         <Spinner size={'xl'} />
       </Center>
     );
+  }
+
+  if (token) {
+    return <NewPassword token={token} setSearchParams={setSearchParams} />;
+  }
+
+  if (forgotPassword) {
+    return <ForgotPassword setForgotPassword={setForgotPassword} />;
   }
 
   return (
@@ -109,7 +127,9 @@ export const SignIn = () => {
                   />
                 </FormControl>
                 <Stack spacing={10}>
-                  <Link color={'blue.400'}>Forgot password?</Link>
+                  <Link onClick={() => setForgotPassword(true)} color={'blue.400'}>
+                    Forgot password?
+                  </Link>
 
                   <Button
                     isLoading={isLoginLoading}
@@ -133,5 +153,172 @@ export const SignIn = () => {
         </Stack>
       </Flex>
     </>
+  );
+};
+
+const ForgotPassword = ({
+  setForgotPassword
+}: {
+  setForgotPassword: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  const toast = useToast();
+
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+
+  const [resetPassword, { error, isSuccess, isLoading }] = useResetPasswordMutation();
+
+  const handleForgotPassword = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    resetPassword({ email: forgotPasswordEmail });
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast({
+        title: 'Reset email sent.',
+        status: 'success',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+    }
+  }, [isSuccess]);
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: 'An error occurred!',
+        description: getErrorMessage(error),
+        status: 'error',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+    }
+  }, [error]);
+
+  return (
+    <Flex minH={'100vh'} pt={{ base: 0, md: 20 }} justify={'center'} bg={'gray.50'}>
+      <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
+        <Box rounded={'lg'} bg={'white'} boxShadow={'lg'} p={8}>
+          <form onSubmit={handleForgotPassword}>
+            <Stack spacing={4}>
+              <Link onClick={() => setForgotPassword(false)} color={'blue.400'}>
+                Back
+              </Link>
+              <Heading fontSize={{ base: '2xl', md: '3xl' }}>Forgot your password?</Heading>
+              <Text fontSize={'lg'} color={'gray.600'}>
+                You&apos;ll get an email with a reset link
+              </Text>
+              <FormControl id="username">
+                <FormLabel>Email</FormLabel>
+                <Input
+                  type="text"
+                  name="email"
+                  onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                  value={forgotPasswordEmail}
+                />
+              </FormControl>
+              <Button
+                isLoading={isLoading}
+                type="submit"
+                bg={'black'}
+                color={'white'}
+                _hover={{
+                  bg: 'gray.600'
+                }}
+                disabled={!forgotPasswordEmail}
+              >
+                Request Reset
+              </Button>
+            </Stack>
+          </form>
+        </Box>
+      </Stack>
+    </Flex>
+  );
+};
+
+const NewPassword = ({
+  token,
+  setSearchParams
+}: {
+  token: string;
+  setSearchParams: (params: any) => any;
+}) => {
+  const toast = useToast();
+
+  const [password, setPassword] = useState('');
+
+  const [updatePassword, { error, isSuccess, isLoading }] = useUpdatePasswordMutation();
+
+  const setNewPassword = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    updatePassword({ token: token, password: password });
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast({
+        title: 'Password reset successfully!',
+        status: 'success',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+      setSearchParams({});
+    }
+  }, [isSuccess]);
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: 'An error occurred!',
+        description: getErrorMessage(error),
+        status: 'error',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+    }
+  }, [error]);
+
+  return (
+    <Flex minH={'100vh'} pt={{ base: 0, md: 20 }} justify={'center'} bg={'gray.50'}>
+      <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
+        <Box rounded={'lg'} bg={'white'} boxShadow={'lg'} p={8}>
+          <form onSubmit={setNewPassword}>
+            <Stack spacing={4}>
+              <Heading fontSize={{ base: '2xl', md: '3xl' }}>Reset your password</Heading>
+              <Text fontSize={'lg'} color={'gray.600'}>
+                You&apos;ll be able to sign in with this new password
+              </Text>
+              <FormControl id="password">
+                <FormLabel>Password</FormLabel>
+                <Input
+                  type="password"
+                  name="password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  value={password}
+                />
+              </FormControl>
+              <Button
+                isLoading={isLoading}
+                type="submit"
+                bg={'black'}
+                color={'white'}
+                _hover={{
+                  bg: 'gray.600'
+                }}
+                disabled={!password}
+              >
+                Reset
+              </Button>
+            </Stack>
+          </form>
+        </Box>
+      </Stack>
+    </Flex>
   );
 };

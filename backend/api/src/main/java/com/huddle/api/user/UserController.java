@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
@@ -76,6 +77,23 @@ public class UserController {
                 .toList();
 
         return ResponseEntity.ok(new UsersResponse(responseUsers));
+    }
+
+    @DeleteMapping("/password")
+    public ResponseEntity<?> resetPassword(
+            HttpServletRequest request,
+            @Valid @RequestBody ResetPasswordRequest resetPasswordRequest
+    ) {
+        userService.resetPassword(request, resetPasswordRequest);
+
+        return ResponseEntity.ok(new MessageResponse("Reset email sent."));
+    }
+
+    @PostMapping("/password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody NewPasswordRequest newPasswordRequest) {
+        userService.setNewPassword(newPasswordRequest);
+
+        return ResponseEntity.ok(new MessageResponse("Password reset successfully!"));
     }
 
     @GetMapping("/{user_id}")

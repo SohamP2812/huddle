@@ -6,12 +6,15 @@ import com.huddle.api.team.DbTeam;
 import com.huddle.api.team.TeamService;
 import com.huddle.api.user.DbUser;
 import com.huddle.api.user.UserService;
+import com.huddle.core.email.EmailSender;
 import com.huddle.core.exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TeamMemberService {
@@ -26,6 +29,9 @@ public class TeamMemberService {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    EmailSender emailSender;
 
     public List<DbTeamMember> getMembers(Long teamId) {
         DbTeam dbTeam = teamService.getTeam(teamId);
@@ -58,7 +64,22 @@ public class TeamMemberService {
                 dbTeam
         );
 
-        return teamMemberRepository.save(dbTeamMember);
+        teamMemberRepository.save(dbTeamMember);
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("name", dbUserToAdd.getFirstName());
+        variables.put("teamName", dbTeam.getName());
+        variables.put("managerName", dbTeam.getManager().getFirstName());
+        variables.put("managerEmail", dbTeam.getManager().getEmail());
+
+        emailSender.sendNow(
+                dbUserToAdd.getEmail(),
+                "AddedToTeam",
+                variables,
+                String.format("You've Been Added to the %s Team!", dbTeam.getName())
+        );
+
+        return dbTeamMember;
     }
 
     public DbTeamMember getMember(
@@ -88,5 +109,18 @@ public class TeamMemberService {
         for (DbEvent dbEvent : dbTeam.getEvents()) {
             eventParticipantRepository.deleteByParticipantIdAndEventId(userId, dbEvent.getId());
         }
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("name", teamMember.getMember().getFirstName());
+        variables.put("teamName", dbTeam.getName());
+        variables.put("managerName", dbTeam.getManager().getFirstName());
+        variables.put("managerEmail", dbTeam.getManager().getEmail());
+
+        emailSender.sendNow(
+                teamMember.getMember().getEmail(),
+                "RemovedFromTeam",
+                variables,
+                String.format("You've Been Removed from the %s Team", dbTeam.getName())
+        );
     }
 }
