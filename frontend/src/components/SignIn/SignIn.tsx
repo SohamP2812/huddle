@@ -201,8 +201,6 @@ const ForgotPassword = ({
     }
   }, [error]);
 
-  const resetToken = () => {};
-
   return (
     <Flex minH={'100vh'} pt={{ base: 0, md: 20 }} justify={'center'} bg={'gray.50'}>
       <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
