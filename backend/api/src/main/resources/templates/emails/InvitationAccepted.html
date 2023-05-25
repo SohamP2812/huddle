@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Huddle Team Notification</title>
+    <title>Huddle Event Notification</title>
     <style>
     body {
       font-family: Arial, sans-serif;
@@ -36,13 +36,28 @@
       max-width: 150px;
     }
 
+    .event-details {
+      margin-bottom: 20px;
+    }
+
+    .event-details p {
+      margin: 5px 0;
+    }
+
     .footer {
       margin-top: 20px;
       text-align: center;
       font-size: 12px;
       color: #888;
     }
-
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 4px;
+      }
 
     </style>
 </head>
@@ -51,18 +66,17 @@
     <div class="logo">
         <img src="https://i.imgur.com/nTY5IMP.png" alt="Huddle Logo">
     </div>
-    <h2>Welcome to the Team!</h2>
+    <h2>Invitation Accepted</h2>
     <p>Dear <span th:text="${name}">[User's Name]</span>,</p>
-    <p>Congratulations! You have been added to the <span th:text="${teamName}">[Team Name]</span> team on Huddle. We are
-        excited to have you on board!</p>
-    <p>Your team manager is <span th:text="${managerName}">[Team Manager's Name]</span>. You can reach them at <span
-            th:text="${managerEmail}">[Team Manager's Email]</span> for any team-related inquiries.</p>
-    <p>With Huddle, you can stay organized, schedule events, communicate with your teammates, and manage your team
-        effectively.</p>
-    <p>Please visit our website to access your team's information and start enjoying the benefits of Huddle.</p>
+    <p>One of your team invitations has been accepted.</p>
+    <div class="event-details">
+        <p><strong>Name:</strong> <span th:text="${acceptedUserName}">[Name]</span></p>
+        <p><strong>Email:</strong> <span th:text="${acceptedUserEmail}">[Email]</span></p>
+        <p><strong>Joined Team:</strong> <span th:text="${joinedTeamName}">[Joined Team]</span></p>
+    </div>
+    <p>Be sure to give them a warm welcome!</p>
     <p>If you have any questions or need assistance, feel free to contact our support team at huddlesportsca@gmail.com.
     </p>
-    <p>Thank you and enjoy your experience with Huddle!</p>
     <div class="footer">
         <p>This is an automated email. Please do not reply.</p>
     </div>

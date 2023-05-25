@@ -115,6 +115,20 @@ public class TeamInviteService {
         if (updateTeamInviteRequest.getAccepted() && !dbTeamInvite.getAccepted()) {
             DbUser dbUser = userService.getUserByEmail(dbTeamInvite.getEmail());
             teamMemberService.addMember(dbTeamInvite.getTeam().getId(), dbUser.getId());
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("name", dbTeamInvite.getTeam().getManager().getFirstName());
+            variables.put("acceptedUserName", String.format("%s %s", dbUser.getFirstName(), dbUser.getLastName()));
+            variables.put("acceptedUserEmail", dbUser.getEmail());
+            variables.put("joinedTeamName", dbTeamInvite.getTeam().getName());
+
+            emailSender.sendNow(
+                    dbTeamInvite.getTeam().getManager().getEmail(),
+                    "InvitationAccepted",
+                    variables,
+                    "Your Invite was Accepted!"
+            );
+
         }
 
         dbTeamInvite.setAccepted(updateTeamInviteRequest.getAccepted());
