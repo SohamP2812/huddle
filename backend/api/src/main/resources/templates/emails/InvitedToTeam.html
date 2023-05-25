@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Huddle Event Notification</title>
+    <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    p {
+      color: #555;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      max-width: 150px;
+    }
+
+    .event-details {
+      margin-bottom: 20px;
+    }
+
+    .event-details p {
+      margin: 5px 0;
+    }
+
+    .footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+    }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 4px;
+      }
+
+
+
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logo">
+        <img src="https://i.imgur.com/nTY5IMP.png" alt="Huddle Logo">
+    </div>
+    <h2>Invitation to Join the Team</h2>
+    <p>Hey there,</p>
+    <p>You have been invited to join a team on Huddle.</p>
+    <div class="event-details">
+        <p><strong>Team Name:</strong> <span th:text="${teamName}">[Team Name]</span></p>
+        <p><strong>Manager:</strong> <span th:text="${managerName}">[Manager Name]</span></p>
+        <p><strong>Manager Email:</strong> <span th:text="${managerEmail}">[Manager Email]</span></p>
+    </div>
+    <p>To accept the invitation, click the button below:</p>
+    <p><a class="btn" th:href="${invitationUrl}"
+          style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 4px;">Accept
+        Invitation</a></p>
+
+    <p>If you have any questions or need more information, please contact your team manager or visit Huddle for further
+        details.</p>
+    <p>Thank you and best of luck with your team!</p>
+    <div class="footer">
+        <p>This is an automated email. Please do not reply.</p>
+    </div>
+</div>
+</body>
+</html>

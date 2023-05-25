@@ -10,5 +10,7 @@ import java.util.Optional;
 public interface TeamInviteRepository extends JpaRepository<DbTeamInvite, Long> {
     Optional<DbTeamInvite> findByToken(String token);
 
+    Optional<DbTeamInvite> findByEmailAndTeamId(String email, Long teamId);
+
     List<DbTeamInvite> findAllByEmailAndAccepted(String email, Boolean accepted);
 }

@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TeamInviteService {
@@ -40,6 +42,14 @@ public class TeamInviteService {
                 .orElseThrow(() -> new EntityNotFoundException("No invite exists with this token."));
     }
 
+    public DbTeamInvite getInviteByEmailAndTeamId(
+            String email,
+            Long teamId
+    ) {
+        return teamInviteRepository.findByEmailAndTeamId(email, teamId)
+                .orElseThrow(() -> new EntityNotFoundException("No invite exists with this token."));
+    }
+
     public DbTeamInvite createInvite(TeamInviteRequest teamInviteRequest) {
         DbTeam dbTeam = teamService.getTeam(teamInviteRequest.getTeamId());
 
@@ -57,12 +67,41 @@ public class TeamInviteService {
         } catch (EntityNotFoundException ignored) {
         }
 
+        try {
+            DbTeamInvite dbTeamInvite = getInviteByEmailAndTeamId(
+                    teamInviteRequest.getEmail(),
+                    teamInviteRequest.getTeamId()
+            );
+
+            teamInviteRepository.delete(dbTeamInvite);
+        } catch (EntityNotFoundException ignored) {
+        }
+
         DbTeamInvite dbTeamInvite = new DbTeamInvite(
                 teamInviteRequest.getEmail(),
                 dbTeam
         );
 
         teamInviteRepository.save(dbTeamInvite);
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("teamName", dbTeam.getName());
+        variables.put("managerName",
+                String.format(
+                        "%s %s",
+                        dbTeam.getManager().getFirstName(),
+                        dbTeam.getManager().getLastName()
+                )
+        );
+        variables.put("managerEmail", dbTeam.getManager().getEmail());
+        variables.put("invitationUrl", String.format("https://huddlesports.ca/invites/%s", dbTeamInvite.getToken()));
+
+        emailSender.sendNow(
+                teamInviteRequest.getEmail(),
+                "InvitedToTeam",
+                variables,
+                "You've Been Invited to a Team!"
+        );
 
         return dbTeamInvite;
     }
