@@ -1,16 +1,14 @@
 package com.huddle.api.user;
 
+import com.huddle.core.persistence.DbTimestampedEntity;
+
 import javax.persistence.*;
 import java.util.Calendar;
 import java.util.Date;
 
 @Entity
 @Table(name = "password_reset_tokens")
-public class DbPasswordResetToken {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
+public class DbPasswordResetToken extends DbTimestampedEntity {
     private String token;
 
     @OneToOne(targetEntity = DbUser.class, fetch = FetchType.EAGER)

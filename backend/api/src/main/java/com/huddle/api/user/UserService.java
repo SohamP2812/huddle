@@ -121,6 +121,11 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
     }
 
+    public DbUser getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("No user exists with this email."));
+    }
+
     public DbUser updateUser(
             UserRequest userRequest,
             Long userId

@@ -1,6 +1,7 @@
 package com.huddle.api.team;
 
 import com.huddle.api.event.DbEvent;
+import com.huddle.api.teaminvite.DbTeamInvite;
 import com.huddle.api.teammember.DbTeamMember;
 import com.huddle.api.user.DbUser;
 import com.huddle.core.persistence.DbTimestampedEntity;
@@ -9,7 +10,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,6 +30,9 @@ public class DbTeam extends DbTimestampedEntity {
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.REMOVE)
     private Set<DbEvent> events = new HashSet<>();
+
+    @OneToMany(mappedBy = "team", cascade = CascadeType.REMOVE)
+    private Set<DbTeamInvite> invites = new HashSet<>();
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -68,6 +71,14 @@ public class DbTeam extends DbTimestampedEntity {
         this.teamMembers = teamMembers;
     }
 
+    public Set<DbTeamInvite> getInvites() {
+        return invites;
+    }
+
+    public void setInvites(Set<DbTeamInvite> invites) {
+        this.invites = invites;
+    }
+
     public Set<DbEvent> getEvents() {
         return events;
     }
@@ -82,13 +93,5 @@ public class DbTeam extends DbTimestampedEntity {
 
     public void setSport(ESport sport) {
         this.sport = sport;
-    }
-
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 }

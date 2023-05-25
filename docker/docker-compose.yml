@@ -16,6 +16,20 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./db_init.sql:/docker-entrypoint-initdb.d/create-db.sql
+  huddle:
+    image: sohamp1228/huddle:latest
+    environment:
+      - 'DB_USER=${MYSQL_USER}'
+      - 'DB_PASSWORD=${MYSQL_PASS}'
+      - 'SSL_KEYSTORE_PASSWORD=${SSL_KEYSTORE_PASSWORD}'
+    ports:
+      - '443:443'
+    depends_on:
+      - mysql
+    volumes:
+      - /huddle:/huddle
 volumes:
   mysql_data:
     driver: local
+  huddle:
+
