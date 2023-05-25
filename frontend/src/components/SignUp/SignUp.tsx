@@ -15,7 +15,7 @@ import {
   Spinner,
   useToast
 } from '@chakra-ui/react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
 
 import { allFieldsFilled, getErrorMessage } from 'utils/misc';
@@ -25,6 +25,9 @@ import { useGetSelfQuery, useCreateUserMutation } from 'redux/slices/apiSlice';
 export const SignUp = () => {
   const navigate = useNavigate();
   const toast = useToast();
+  const [searchParams] = useSearchParams();
+
+  const redirect = searchParams.get('redirect');
 
   const { data: user, isLoading: isUserLoading } = useGetSelfQuery();
 
@@ -34,14 +37,24 @@ export const SignUp = () => {
   ] = useCreateUserMutation();
 
   useEffect(() => {
-    if (user) navigate('/');
-  }, [user]);
-
-  useEffect(() => {
     if (isCreationSuccess) {
-      navigate('/account');
+      if (redirect) {
+        navigate(redirect);
+      } else {
+        navigate('/account');
+      }
     }
   }, [isCreationSuccess]);
+
+  useEffect(() => {
+    if (user) {
+      if (redirect) {
+        navigate(redirect);
+      } else {
+        navigate('/');
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     if (creationError) {
@@ -86,7 +99,7 @@ export const SignUp = () => {
 
   return (
     <>
-      <Flex minH={'100vh'} pt={{ base: 0, md: 20 }} justify={'center'} bg={'gray.50'}>
+      <Flex minH={'100vh'} pt={{ base: 0, md: 5 }} justify={'center'} bg={'gray.50'}>
         <Stack spacing={8} mx={'auto'} maxW={'lg'} minW={{ md: 'lg' }} py={12} px={6}>
           <Stack align={'center'}>
             <Heading fontSize={{ base: '3xl', md: '4xl' }}>Create your account</Heading>
@@ -155,7 +168,11 @@ export const SignUp = () => {
                 >
                   Sign Up
                 </Button>
-                <Link as={RouterLink} to="/sign-in" color={'blue.400'}>
+                <Link
+                  as={RouterLink}
+                  to={`/sign-in${redirect && `?redirect=${redirect}`}`}
+                  color={'blue.400'}
+                >
                   Already have an account? Login.
                 </Link>
               </Stack>

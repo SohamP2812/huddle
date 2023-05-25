@@ -47,3 +47,12 @@ export interface Participant {
   event: Event;
   attendance: string;
 }
+
+export interface TeamInvite {
+  id: number;
+  token: string;
+  team: Team;
+  email: string;
+  accepted: boolean;
+  createdAt: string;
+}

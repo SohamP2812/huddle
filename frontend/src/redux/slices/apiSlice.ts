@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Team, Event, Participant, User, LoginCredentials, AccountCreationInfo } from 'utils/types';
+import { Team, Event, Participant, User, LoginCredentials, AccountCreationInfo, TeamInvite } from 'utils/types';
 
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl: '/api/' }),
-  tagTypes: ['Self', 'Teams', 'Members', 'Events', 'Participants'],
+  tagTypes: ['Self', 'Invites', 'Teams', 'Members', 'Events', 'Participants'],
   endpoints: (builder) => ({
     getSelf: builder.query<User | null, void>({
       queryFn: async (name, api, extraOptions, baseQuery) => {
@@ -162,6 +162,46 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Events', 'Participants']
     }),
+    getInvites: builder.query<
+      {invites: TeamInvite[]},
+      string
+    >({
+      query: (email) => ({
+        url: `invites?email=${email}`,
+        method: 'GET',
+      }), 
+      providesTags: ['Invites']
+    }), 
+    createInvite: builder.mutation<
+      TeamInvite,
+      {
+        teamId: number,
+        email: string
+      }
+    >({
+      query: (createdInvite) => ({
+        url: `invites`,
+        method: 'POST',
+        body: createdInvite
+      }), 
+      invalidatesTags: ['Invites']
+    }),
+    updateInvite: builder.mutation<
+      TeamInvite,
+      { 
+        inviteToken: string,
+        accepted: boolean
+      }
+    >({
+      query: ({ inviteToken, accepted }) => ({
+        url: `invites/${inviteToken}`,
+        method: 'PATCH',
+        body: {
+          accepted: accepted
+        }
+      }),
+      invalidatesTags: ['Invites', 'Teams', 'Events', 'Participants']
+    }),
     deleteEvent: builder.mutation<Event, { teamId: number; eventId: number }>({
       query: ({ teamId, eventId }) => ({
         url: `teams/${teamId}/events/${eventId}`,
@@ -193,5 +233,8 @@ export const {
   useUpdateParticipantMutation,
   useUpdateEventMutation,
   useCreateEventMutation,
+  useGetInvitesQuery, 
+  useCreateInviteMutation,
+  useUpdateInviteMutation,
   useDeleteEventMutation
 } = apiSlice;

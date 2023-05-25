@@ -18,7 +18,7 @@ export const AuthComponent: FC<IProps> = ({ children, isProtected = false }) => 
   useEffect(() => {
     // Better way to check for authenticated state? Null == logged out and Undefined == loading
     if (user == null && user !== undefined && location.pathname !== '/' && isProtected) {
-      navigate('/');
+      navigate(`/sign-in?redirect=${location.pathname}`);
     }
   }, [location, user]);
 

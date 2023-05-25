@@ -278,5 +278,10 @@ const NAV_ITEMS: Array<NavItem> = [
     label: 'Teams',
     href: '/teams',
     protected: true
+  },
+  {
+    label: 'Invites',
+    href: '/invites',
+    protected: true
   }
 ];

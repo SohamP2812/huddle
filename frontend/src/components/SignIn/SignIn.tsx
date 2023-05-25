@@ -31,6 +31,7 @@ export const SignIn = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const token = searchParams.get('token');
+  const redirect = searchParams.get('redirect');
 
   const { data: user, isLoading: isUserLoading } = useGetSelfQuery();
 
@@ -52,12 +53,22 @@ export const SignIn = () => {
 
   useEffect(() => {
     if (isLoginSuccess) {
-      navigate('/account');
+      if (redirect) {
+        navigate(redirect);
+      } else {
+        navigate('/account');
+      }
     }
   }, [isLoginSuccess]);
 
   useEffect(() => {
-    if (user) navigate('/');
+    if (user) {
+      if (redirect) {
+        navigate(redirect);
+      } else {
+        navigate('/');
+      }
+    }
   }, [user]);
 
   const [loginFields, setLoginFields] = useState({
@@ -148,7 +159,11 @@ export const SignIn = () => {
                     Sign in
                   </Button>
                 </Stack>
-                <Link as={RouterLink} to="/sign-up" color={'blue.400'}>
+                <Link
+                  as={RouterLink}
+                  to={`/sign-up${redirect && `?redirect=${redirect}`}`}
+                  color={'blue.400'}
+                >
                   Don&apos;t have an account? Sign up.
                 </Link>
               </Stack>

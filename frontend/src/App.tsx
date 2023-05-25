@@ -15,6 +15,8 @@ import { Event } from 'components/Event/Event';
 import { EditEvent } from 'components/EditEvent/EditEvent';
 
 import { useAnalytics } from 'hooks/useAnalytics';
+import { TeamInvite } from 'components/TeamInvite/TeamInvite';
+import { TeamInvites } from 'components/TeamInvites/TeamInvites';
 
 export const App: FC = () => {
   useAnalytics();
@@ -27,6 +29,11 @@ export const App: FC = () => {
       <Route path="account" element={<AuthComponent children={<Account />} isProtected />} />
       <Route path="account" element={<AuthComponent children={<Account />} isProtected />} />
       <Route path="create-team" element={<AuthComponent children={<CreateTeam />} isProtected />} />
+      <Route path="invites" element={<AuthComponent children={<TeamInvites />} isProtected />} />
+      <Route
+        path="invites/:invite_token"
+        element={<AuthComponent children={<TeamInvite />} isProtected />}
+      />
       <Route path="teams" element={<AuthComponent children={<Teams />} isProtected />} />
       <Route path="teams/:team_id" element={<AuthComponent children={<Team />} isProtected />} />
       <Route

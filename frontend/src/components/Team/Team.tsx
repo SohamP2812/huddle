@@ -8,7 +8,8 @@ import {
   useSearchUsersQuery,
   useDeleteMemberMutation,
   useGetEventsQuery,
-  useAddMemberMutation
+  useAddMemberMutation,
+  useCreateInviteMutation
 } from 'redux/slices/apiSlice';
 import {
   Spinner,
@@ -44,11 +45,27 @@ import { BackButton } from 'components/BackButton/BackButton';
 
 export const Team = () => {
   const [usernameQuery, setUsernameQuery] = useState('');
+  const [inviteEmail, setInviteEmail] = useState('');
 
   const [showPastEvents, setShowPastEvents] = useState(false);
 
   const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isAddMemberChoiceOpen,
+    onOpen: onAddMemberChoiceOpen,
+    onClose: onAddMemberChoiceClose
+  } = useDisclosure();
+  const {
+    isOpen: isMemberListOpen,
+    onOpen: onMemberListOpen,
+    onClose: onMemberListClose
+  } = useDisclosure();
+  const {
+    isOpen: isEmailInviteOpen,
+    onOpen: onEmailInviteOpen,
+    onClose: onEmailInviteClose
+  } = useDisclosure();
+
   const navigate = useNavigate();
   const { team_id } = useParams();
 
@@ -90,6 +107,39 @@ export const Team = () => {
     deleteTeam,
     { error: deleteTeamError, isSuccess: isDeleteTeamSuccess, isLoading: isDeleteTeamLoading }
   ] = useDeleteTeamMutation();
+  const [
+    createInvite,
+    { error: createInviteError, isSuccess: isCreateInviteSuccess, isLoading: isCreateInviteLoading }
+  ] = useCreateInviteMutation();
+
+  useEffect(() => {
+    if (isCreateInviteSuccess) {
+      toast({
+        title: 'Sent invite successfully!',
+        status: 'success',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+      onEmailInviteClose();
+      setInviteEmail('');
+    }
+  }, [isCreateInviteSuccess]);
+
+  useEffect(() => {
+    if (createInviteError) {
+      toast({
+        title: 'An error occurred!',
+        description: getErrorMessage(createInviteError),
+        status: 'error',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+      onMemberListClose();
+      setUsernameQuery('');
+    }
+  }, [createInviteError]);
 
   useEffect(() => {
     if (isAddMemberSuccess) {
@@ -100,7 +150,7 @@ export const Team = () => {
         duration: 5000,
         isClosable: true
       });
-      onClose();
+      onMemberListClose();
       setUsernameQuery('');
     }
   }, [isAddMemberSuccess]);
@@ -115,7 +165,7 @@ export const Team = () => {
         duration: 5000,
         isClosable: true
       });
-      onClose();
+      onMemberListClose();
       setUsernameQuery('');
     }
   }, [addMemberError]);
@@ -133,7 +183,7 @@ export const Team = () => {
       } else {
         navigate(`/teams`);
       }
-      onClose();
+      onMemberListClose();
     }
   }, [isDeleteMemberSuccess]);
 
@@ -147,7 +197,7 @@ export const Team = () => {
         duration: 5000,
         isClosable: true
       });
-      onClose();
+      onMemberListClose();
     }
   }, [deleteMemberError]);
 
@@ -191,10 +241,20 @@ export const Team = () => {
     setUsernameQuery(e.target.value);
   };
 
-  const handleOnClose = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleUpdateInviteEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInviteEmail(e.target.value);
+  };
+
+  const handleOnMemberListClose = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     setUsernameQuery('');
-    onClose();
+    onMemberListClose();
+  };
+
+  const handleOnEmailInviteClose = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    setInviteEmail('');
+    onEmailInviteClose();
   };
 
   const handleAddMember = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, id: number | null) => {
@@ -205,6 +265,18 @@ export const Team = () => {
         addedUserId: id
       });
     }
+  };
+
+  const handleOnMemberListOpen = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    setUsernameQuery('');
+    onAddMemberChoiceClose();
+    onMemberListOpen();
+  };
+
+  const handleOnEmailInviteOpen = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    setInviteEmail('');
+    onAddMemberChoiceClose();
+    onEmailInviteOpen();
   };
 
   const handleDeleteMember = (
@@ -224,6 +296,13 @@ export const Team = () => {
     e.preventDefault();
     if (team_id) {
       deleteTeam(parseInt(team_id));
+    }
+  };
+
+  const handleInvite = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    if (team_id) {
+      createInvite({ teamId: parseInt(team_id), email: inviteEmail });
     }
   };
 
@@ -290,7 +369,7 @@ export const Team = () => {
                       _hover={{
                         cursor: 'pointer'
                       }}
-                      onClick={onOpen}
+                      onClick={onAddMemberChoiceOpen}
                     >
                       <AddIcon w={3} h={3} />
                       <Text>Add Member</Text>
@@ -430,7 +509,55 @@ export const Team = () => {
             </Button>
           )}
 
-          <Modal isOpen={isOpen} onClose={onClose}>
+          <Modal isOpen={isAddMemberChoiceOpen} onClose={onAddMemberChoiceClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Select one</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Stack my={5} gap={2}>
+                  <Button
+                    w={'fit'}
+                    py={8}
+                    px={10}
+                    bg={'#151f21'}
+                    color={'white'}
+                    rounded={'lg'}
+                    gap={'10px'}
+                    _hover={{
+                      opacity: '60%'
+                    }}
+                    onClick={handleOnMemberListOpen}
+                  >
+                    Search by username
+                  </Button>{' '}
+                  <Button
+                    w={'fit'}
+                    py={8}
+                    px={10}
+                    bg={'#151f21'}
+                    color={'white'}
+                    rounded={'lg'}
+                    gap={'10px'}
+                    _hover={{
+                      opacity: '60%'
+                    }}
+                    onClick={handleOnEmailInviteOpen}
+                  >
+                    Send email invite
+                  </Button>
+                </Stack>
+              </ModalBody>
+
+              <ModalFooter>
+                <Button variant="ghost" mr={3} onClick={onAddMemberChoiceClose}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+
+          <Modal isOpen={isMemberListOpen} onClose={onMemberListClose}>
             <ModalOverlay />
             <ModalContent>
               <ModalHeader>Update Member List</ModalHeader>
@@ -483,8 +610,41 @@ export const Team = () => {
               </ModalBody>
 
               <ModalFooter>
-                <Button variant="ghost" mr={3} onClick={handleOnClose}>
+                <Button variant="ghost" mr={3} onClick={handleOnMemberListClose}>
                   Close
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+
+          <Modal isOpen={isEmailInviteOpen} onClose={onEmailInviteClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Send an email invite</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <FormControl mb={10} id="participantIds">
+                  <FormLabel mb={0}>Email</FormLabel>
+                  <Input
+                    type="text"
+                    name="name"
+                    onChange={handleUpdateInviteEmail}
+                    value={inviteEmail}
+                  />
+                </FormControl>
+              </ModalBody>
+
+              <ModalFooter>
+                <Button variant="ghost" mr={3} onClick={handleOnEmailInviteClose}>
+                  Close
+                </Button>
+                <Button
+                  disabled={!inviteEmail}
+                  isLoading={isCreateInviteLoading}
+                  colorScheme="blue"
+                  onClick={handleInvite}
+                >
+                  Send
                 </Button>
               </ModalFooter>
             </ModalContent>
