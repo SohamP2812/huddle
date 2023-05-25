@@ -170,7 +170,7 @@ export const SignUp = () => {
                 </Button>
                 <Link
                   as={RouterLink}
-                  to={`/sign-in${redirect && `?redirect=${redirect}`}`}
+                  to={`/sign-in${redirect ? `?redirect=${redirect}` : ''}`}
                   color={'blue.400'}
                 >
                   Already have an account? Login.
