@@ -12,5 +12,5 @@ public interface TeamInviteRepository extends JpaRepository<DbTeamInvite, Long> 
 
     Optional<DbTeamInvite> findByEmailAndTeamId(String email, Long teamId);
 
-    List<DbTeamInvite> findAllByEmailAndAccepted(String email, Boolean accepted);
+    List<DbTeamInvite> findAllByEmailAndState(String email, EInvitation state);
 }

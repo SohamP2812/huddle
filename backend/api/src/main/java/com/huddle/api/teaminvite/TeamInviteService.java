@@ -34,7 +34,7 @@ public class TeamInviteService {
     TeamInviteRepository teamInviteRepository;
 
     public List<DbTeamInvite> getInvitesForEmail(String email) {
-        return teamInviteRepository.findAllByEmailAndAccepted(email, false);
+        return teamInviteRepository.findAllByEmailAndState(email, EInvitation.PENDING);
     }
 
     public DbTeamInvite getInviteByToken(String inviteToken) {
@@ -112,7 +112,7 @@ public class TeamInviteService {
     ) {
         DbTeamInvite dbTeamInvite = getInviteByToken(inviteToken);
 
-        if (updateTeamInviteRequest.getAccepted() && !dbTeamInvite.getAccepted()) {
+        if (updateTeamInviteRequest.getState() == EInvitation.ACCEPTED && dbTeamInvite.getState() != EInvitation.ACCEPTED) {
             DbUser dbUser = userService.getUserByEmail(dbTeamInvite.getEmail());
             teamMemberService.addMember(dbTeamInvite.getTeam().getId(), dbUser.getId());
 
@@ -131,7 +131,7 @@ public class TeamInviteService {
 
         }
 
-        dbTeamInvite.setAccepted(updateTeamInviteRequest.getAccepted());
+        dbTeamInvite.setState(updateTeamInviteRequest.getState());
 
         return teamInviteRepository.save(dbTeamInvite);
     }

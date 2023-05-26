@@ -1,13 +1,13 @@
 package com.huddle.api.teaminvite;
 
 public class UpdateTeamInviteRequest {
-    private Boolean accepted;
+    private EInvitation state;
 
-    public Boolean getAccepted() {
-        return accepted;
+    public EInvitation getState() {
+        return state;
     }
 
-    public void setAccepted(Boolean accepted) {
-        this.accepted = accepted;
+    public void setState(EInvitation state) {
+        this.state = state;
     }
 }

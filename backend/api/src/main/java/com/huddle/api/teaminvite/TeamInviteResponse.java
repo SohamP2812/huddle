@@ -2,6 +2,8 @@ package com.huddle.api.teaminvite;
 
 import com.huddle.api.team.TeamResponse;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.time.OffsetDateTime;
 
 public class TeamInviteResponse {
@@ -13,7 +15,8 @@ public class TeamInviteResponse {
 
     private String email;
 
-    private Boolean accepted;
+    @Enumerated(EnumType.STRING)
+    private EInvitation state;
 
     private OffsetDateTime createdAt;
 
@@ -22,7 +25,7 @@ public class TeamInviteResponse {
         this.token = invite.getToken();
         this.team = new TeamResponse(invite.getTeam());
         this.email = invite.getEmail();
-        this.accepted = invite.getAccepted();
+        this.state = invite.getState();
         this.createdAt = invite.getCreatedAt();
     }
 
@@ -58,12 +61,12 @@ public class TeamInviteResponse {
         this.email = email;
     }
 
-    public Boolean getAccepted() {
-        return accepted;
+    public EInvitation getState() {
+        return state;
     }
 
-    public void setAccepted(Boolean accepted) {
-        this.accepted = accepted;
+    public void setState(EInvitation state) {
+        this.state = state;
     }
 
     public OffsetDateTime getCreatedAt() {

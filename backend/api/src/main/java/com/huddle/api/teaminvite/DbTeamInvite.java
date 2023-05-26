@@ -19,7 +19,7 @@ public class DbTeamInvite extends DbTimestampedEntity {
     @JoinColumn(name = "team_id")
     private DbTeam team;
 
-    private Boolean accepted;
+    private EInvitation state;
 
     public DbTeamInvite() {
     }
@@ -28,7 +28,7 @@ public class DbTeamInvite extends DbTimestampedEntity {
         this.token = UUID.randomUUID().toString();
         this.email = email;
         this.team = team;
-        this.accepted = false;
+        this.state = EInvitation.PENDING;
     }
 
     public String getToken() {
@@ -55,11 +55,11 @@ public class DbTeamInvite extends DbTimestampedEntity {
         this.email = email;
     }
 
-    public Boolean getAccepted() {
-        return accepted;
+    public EInvitation getState() {
+        return state;
     }
 
-    public void setAccepted(Boolean accepted) {
-        this.accepted = accepted;
+    public void setState(EInvitation state) {
+        this.state = state;
     }
 }
