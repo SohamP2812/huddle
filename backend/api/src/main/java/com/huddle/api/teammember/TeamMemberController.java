@@ -90,7 +90,7 @@ public class TeamMemberController {
 
         DbTeam dbTeam = teamService.getTeam(team_id);
 
-        if (dbTeam.getManager().getId() != userDetails.getId()) {
+        if (dbTeam.getManager().getId() != userDetails.getId() && user_id != userDetails.getId()) {
             throw new UnauthorizedException("You do not have the authority to make this change.");
         }
 

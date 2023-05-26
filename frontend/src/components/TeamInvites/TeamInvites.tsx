@@ -93,19 +93,33 @@ export const TeamInvites = () => {
             <RepeatIcon w={3} h={3} />
           </Button>
         </Stack>
-      ) : null}
-      {[...invites]
-        .sort(
-          (a, b) => stringToJSDate(b.createdAt).getTime() - stringToJSDate(a.createdAt).getTime()
-        )
-        .map((invite) => (
-          <TeamInviteCard
-            key={invite.token}
-            token={invite.token}
-            teamName={invite.team.name}
-            managerUsername={invite.team.manager.username}
-          />
-        ))}
+      ) : (
+        <>
+          <Button
+            disabled={refreshDisabled}
+            rounded={'lg'}
+            _hover={{
+              opacity: '60%'
+            }}
+            onClick={handleRefetchInvites}
+          >
+            <RepeatIcon w={3} h={3} />
+          </Button>
+          {[...invites]
+            .sort(
+              (a, b) =>
+                stringToJSDate(b.createdAt).getTime() - stringToJSDate(a.createdAt).getTime()
+            )
+            .map((invite) => (
+              <TeamInviteCard
+                key={invite.token}
+                token={invite.token}
+                teamName={invite.team.name}
+                managerUsername={invite.team.manager.username}
+              />
+            ))}
+        </>
+      )}
     </Flex>
   );
 };
