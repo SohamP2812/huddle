@@ -53,6 +53,6 @@ export interface TeamInvite {
   token: string;
   team: Team;
   email: string;
-  accepted: boolean;
+  state: string;
   createdAt: string;
 }

@@ -39,7 +39,12 @@ export const TeamInvite = () => {
   const invite = invite_token ? invites.find((invite) => invite.token === invite_token) : null;
   const [
     updateInvite,
-    { error: updateInviteError, isSuccess: isUpdateInviteSuccess, isLoading: isUpdateInviteLoading }
+    {
+      data: updateInviteData,
+      error: updateInviteError,
+      isSuccess: isUpdateInviteSuccess,
+      isLoading: isUpdateInviteLoading
+    }
   ] = useUpdateInviteMutation();
 
   useEffect(() => {
@@ -57,8 +62,16 @@ export const TeamInvite = () => {
 
   useEffect(() => {
     if (isUpdateInviteSuccess) {
+      let updateMessage = 'Updated invite successfully!';
+
+      if (updateInviteData?.state === 'ACCEPTED') {
+        updateMessage = 'Joined team successfully!';
+      } else if (updateInviteData?.state === 'DECLINED') {
+        updateMessage = 'Rejected invite successfully.';
+      }
+
       toast({
-        title: 'Joined team successfully!',
+        title: updateMessage,
         status: 'success',
         position: 'top',
         duration: 5000,
@@ -84,7 +97,14 @@ export const TeamInvite = () => {
   const handleAcceptInvite = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     if (invite_token) {
-      updateInvite({ inviteToken: invite_token, accepted: true });
+      updateInvite({ inviteToken: invite_token, state: 'ACCEPTED' });
+    }
+  };
+
+  const handleDeclineInvite = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    if (invite_token) {
+      updateInvite({ inviteToken: invite_token, state: 'DECLINED' });
     }
   };
 
@@ -122,16 +142,20 @@ export const TeamInvite = () => {
               Team Manager: <strong>{invite?.team?.manager?.firstName}</strong>
             </Text>
           </Box>
-          <Flex justifyContent="center" pt={8}>
-            <Button
-              isLoading={isUpdateInviteLoading}
-              colorScheme="green"
-              mr={2}
-              onClick={handleAcceptInvite}
-            >
-              Accept
-            </Button>
-          </Flex>
+          {isUpdateInviteLoading ? (
+            <Center pt={8}>
+              <Spinner size={'lg'} />
+            </Center>
+          ) : (
+            <Flex justifyContent="center" pt={8}>
+              <Button colorScheme="green" mr={2} onClick={handleAcceptInvite}>
+                Accept
+              </Button>
+              <Button colorScheme="red" mr={2} onClick={handleDeclineInvite}>
+                Decline
+              </Button>
+            </Flex>
+          )}
         </Box>
       </Stack>
     </Flex>

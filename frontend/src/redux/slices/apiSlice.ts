@@ -100,7 +100,7 @@ export const apiSlice = createApi({
         url: `teams/${teamId}/members/${userId}`,
         method: 'DELETE'
       }),
-      invalidatesTags: ['Members']
+      invalidatesTags: ['Members', 'Teams']
     }),
     createTeam: builder.mutation<Team, Partial<Team>>({
       query: (createdTeam) => ({
@@ -190,14 +190,14 @@ export const apiSlice = createApi({
       TeamInvite,
       { 
         inviteToken: string,
-        accepted: boolean
+        state: string
       }
     >({
-      query: ({ inviteToken, accepted }) => ({
+      query: ({ inviteToken, state }) => ({
         url: `invites/${inviteToken}`,
         method: 'PATCH',
         body: {
-          accepted: accepted
+          state: state
         }
       }),
       invalidatesTags: ['Invites', 'Teams', 'Events', 'Participants']
