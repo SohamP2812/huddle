@@ -504,6 +504,7 @@ export const Team = () => {
               }}
               width={'fit-content'}
               alignSelf="center"
+              isLoading={isDeleteMemberLoading}
             >
               Leave Team
             </Button>
