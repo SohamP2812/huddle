@@ -16,11 +16,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -106,16 +108,17 @@ public class UserController {
     @PatchMapping("/{user_id}")
     public ResponseEntity<?> updateUser(
             Authentication authentication,
-            @Valid @RequestBody UserRequest userRequest,
+            @Valid @RequestPart UserRequest user,
+            @RequestPart(required = false) MultipartFile profilePictureImage,
             @PathVariable Long user_id
-    ) {
+    ) throws IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         if (userDetails.getId() != user_id) {
             throw new UnauthorizedException("You do not have the authority to make this change.");
         }
 
-        DbUser dbUser = userService.updateUser(userRequest, user_id);
+        DbUser dbUser = userService.updateUser(user, profilePictureImage, user_id);
 
         return ResponseEntity.ok(new UserResponse(dbUser));
     }

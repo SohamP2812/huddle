@@ -5,6 +5,7 @@ export interface User {
   lastName: string;
   email: string;
   isManager?: boolean;
+  profilePictureUrl?: string;
   createdAt: string;
 }
 

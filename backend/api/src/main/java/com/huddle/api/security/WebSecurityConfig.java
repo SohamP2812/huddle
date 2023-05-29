@@ -119,6 +119,8 @@ public class WebSecurityConfig {
                 .permitAll()
                 .antMatchers(HttpMethod.POST, "/api/users/password")
                 .permitAll()
+                .antMatchers(HttpMethod.POST, "/api/users/profile-picture")
+                .permitAll()
                 .antMatchers(HttpMethod.GET, "/actuator/**")
                 .permitAll()
                 .anyRequest()

@@ -44,6 +44,8 @@ public class DbUser extends DbTimestampedEntity {
     @Size(max = 120)
     private String password;
 
+    private String profilePictureUrl;
+
     @OneToMany(mappedBy = "manager", cascade = CascadeType.REMOVE)
     private Set<DbTeam> teams = new HashSet<>();
 
@@ -108,6 +110,14 @@ public class DbUser extends DbTimestampedEntity {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
     }
 
     public Set<DbTeamMember> getMemberTeams() {

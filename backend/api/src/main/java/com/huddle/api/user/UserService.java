@@ -6,13 +6,16 @@ import com.huddle.api.teammember.DbTeamMember;
 import com.huddle.core.email.EmailSender;
 import com.huddle.core.exceptions.BadRequestException;
 import com.huddle.core.exceptions.ConflictException;
+import com.huddle.core.storage.StorageProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -28,6 +31,9 @@ public class UserService {
 
     @Autowired
     PasswordResetTokenRepository passwordResetTokenRepository;
+
+    @Autowired
+    StorageProvider storageProvider;
 
     public DbUser createUser(SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
@@ -128,12 +134,18 @@ public class UserService {
 
     public DbUser updateUser(
             UserRequest userRequest,
+            MultipartFile profilePictureImage,
             Long userId
-    ) {
+    ) throws IOException {
         DbUser dbUser = getUser(userId);
 
         dbUser.setFirstName(userRequest.getFirstName());
         dbUser.setLastName(userRequest.getLastName());
+
+        if (profilePictureImage != null) {
+            String profilePicUrl = uploadImage(profilePictureImage);
+            dbUser.setProfilePictureUrl(profilePicUrl);
+        }
 
         return userRepository.save(dbUser);
     }
@@ -151,5 +163,9 @@ public class UserService {
                 .stream()
                 .map(DbTeamMember::getTeam)
                 .toList();
+    }
+
+    public String uploadImage(MultipartFile file) throws IOException {
+        return storageProvider.putImage("users/profile-pictures", file.getBytes());
     }
 }

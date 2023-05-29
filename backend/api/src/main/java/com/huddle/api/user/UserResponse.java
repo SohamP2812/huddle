@@ -8,14 +8,15 @@ public class UserResponse {
     private String lastName;
     private String email;
 
-    public UserResponse(
-            DbUser dbUser
-    ) {
+    private String profilePictureUrl;
+
+    public UserResponse(DbUser dbUser) {
         this.id = dbUser.getId();
         this.firstName = dbUser.getFirstName();
         this.lastName = dbUser.getLastName();
         this.username = dbUser.getUsername();
         this.email = dbUser.getEmail();
+        this.profilePictureUrl = dbUser.getProfilePictureUrl();
     }
 
     public Long getId() {
@@ -56,5 +57,13 @@ public class UserResponse {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
     }
 }

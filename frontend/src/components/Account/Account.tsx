@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   useUpdateUserMutation,
   useGetSelfQuery,
@@ -25,6 +25,7 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  Image,
   useDisclosure
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
@@ -58,6 +59,10 @@ export const Account = () => {
       email: userResponse?.email ?? '',
       createdAt: userResponse?.createdAt ?? Date.now().toString()
     });
+    setSelectedImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   }, [userResponse]);
 
   useEffect(() => {
@@ -132,6 +137,9 @@ export const Account = () => {
     createdAt: userResponse?.createdAt ?? Date.now().toString()
   });
   const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [selectedImage, setSelectedImage] = useState<File | Blob | MediaSource | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChangeConfirmPassword = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setConfirmPassword(e.target.value);
@@ -152,11 +160,37 @@ export const Account = () => {
   const handleUpdateUser = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
 
-    userResponse?.id &&
+    const updatedUser = new FormData();
+
+    updatedUser.append(
+      'user',
+      new Blob(
+        [
+          JSON.stringify({
+            firstName: accountFields.firstName,
+            lastName: accountFields.lastName
+          })
+        ],
+        {
+          type: 'application/json'
+        }
+      )
+    );
+
+    if (selectedImage) {
+      updatedUser.append(
+        'profilePictureImage',
+        selectedImage as File,
+        (selectedImage as File).name
+      );
+    }
+
+    if (userResponse?.id) {
       updateUser({
         id: userResponse.id,
-        updatedUser: { firstName: accountFields.firstName, lastName: accountFields.lastName }
+        updatedUser: updatedUser
       });
+    }
   };
 
   const handleDeleteAccount = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -182,6 +216,29 @@ export const Account = () => {
           </Stack>
           <form onSubmit={handleUpdateUser}>
             <Stack spacing={4}>
+              <Stack>
+                <FormLabel>Profile Picture</FormLabel>
+                <Image
+                  width={'75px'}
+                  height={'75px'}
+                  objectFit={'cover'}
+                  src={
+                    selectedImage
+                      ? URL.createObjectURL(selectedImage as Blob)
+                      : userResponse.profilePictureUrl ??
+                        'https://res.cloudinary.com/dorjnhwzp/image/upload/v1685321543/users/profile-pictures/default.jpg'
+                  }
+                  rounded={'full'}
+                />
+                <input
+                  type={'file'}
+                  accept={'image/*'}
+                  onChange={(event) => {
+                    setSelectedImage(event?.target?.files ? event.target.files[0] : null);
+                  }}
+                  ref={fileInputRef}
+                />
+              </Stack>
               <FormControl id="username">
                 <FormLabel>Username</FormLabel>
                 <Input
@@ -223,7 +280,7 @@ export const Account = () => {
               <Spacer h={'xl'} />
               <Button
                 isLoading={isUpdateLoading}
-                disabled={!isObjectDiff(accountFields, userResponse)}
+                disabled={!isObjectDiff(accountFields, userResponse) && !selectedImage}
                 type="submit"
                 bg={'black'}
                 color={'white'}

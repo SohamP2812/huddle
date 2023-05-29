@@ -49,11 +49,12 @@ export const apiSlice = createApi({
       query: (resetDetails) => ({ url: `users/password`, method: 'POST', body: resetDetails }),
       invalidatesTags: ['Self']
     }),
-    updateUser: builder.mutation<User, { id: number; updatedUser: Partial<User> }>({
+    updateUser: builder.mutation<User, { id: number; updatedUser: FormData }>({
       query: ({ id, updatedUser }) => ({
         url: `users/${id}`,
         method: 'PATCH',
-        body: updatedUser
+        body: updatedUser,
+        // headers: { "Content-Type": "multipart/form-data" }
       }),
       invalidatesTags: ['Self', 'Teams', 'Events', 'Participants']
     }),
