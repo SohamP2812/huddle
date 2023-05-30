@@ -21,6 +21,10 @@ public class DbEvent extends DbTimestampedEntity {
     private String name;
 
     @NotNull
+    @Size(max = 800)
+    private String notes;
+
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private EEvent eventType;
@@ -50,6 +54,7 @@ public class DbEvent extends DbTimestampedEntity {
 
     public DbEvent(
             String name,
+            String notes,
             EEvent eventType,
             DbTeam team,
             OffsetDateTime startTime,
@@ -58,6 +63,7 @@ public class DbEvent extends DbTimestampedEntity {
             Integer opponentScore
     ) {
         this.name = name;
+        this.notes = notes;
         this.eventType = eventType;
         this.team = team;
         this.startTime = startTime;
@@ -72,6 +78,14 @@ public class DbEvent extends DbTimestampedEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     public DbTeam getTeam() {

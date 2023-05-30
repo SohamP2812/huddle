@@ -64,6 +64,7 @@ public class EventService {
 
         DbEvent dbEvent = new DbEvent(
                 eventRequest.getName(),
+                eventRequest.getNotes(),
                 eventRequest.getEventType(),
                 dbTeam,
                 eventRequest.getStartTime(),
@@ -139,6 +140,7 @@ public class EventService {
 
         dbEvent.setEventType(eventRequest.getEventType());
         dbEvent.setName(eventRequest.getName());
+        dbEvent.setNotes(eventRequest.getNotes());
         dbEvent.setStartTime(eventRequest.getStartTime());
         dbEvent.setEndTime(eventRequest.getEndTime());
         dbEvent.setTeamScore(eventRequest.getTeamScore());

@@ -10,6 +10,9 @@ public class EventRequest {
     private String name;
 
     @NotNull
+    private String notes;
+
+    @NotNull
     private EEvent eventType;
 
     @NotNull
@@ -24,6 +27,14 @@ public class EventRequest {
 
     @NotNull
     private List<Long> participantIds;
+
+    public String getNotes() {
+        return notes.trim();
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
 
     public String getName() {
         return name;

@@ -33,6 +33,7 @@ export interface Team {
 export interface Event {
   id: number;
   name: string;
+  notes: string;
   team: Team;
   startTime: string;
   endTime: string;

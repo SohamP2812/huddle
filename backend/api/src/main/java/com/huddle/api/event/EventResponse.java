@@ -8,6 +8,8 @@ public class EventResponse {
     private Long id;
     private String name;
 
+    private String notes;
+
     private TeamResponse team;
 
     private OffsetDateTime startTime;
@@ -20,11 +22,10 @@ public class EventResponse {
 
     private Integer opponentScore;
 
-    public EventResponse(
-            DbEvent dbEvent
-    ) {
+    public EventResponse(DbEvent dbEvent) {
         this.id = dbEvent.getId();
         this.name = dbEvent.getName();
+        this.notes = dbEvent.getNotes();
         this.team = new TeamResponse(dbEvent.getTeam());
         this.startTime = dbEvent.getStartTime();
         this.endTime = dbEvent.getEndTime();
@@ -47,6 +48,14 @@ public class EventResponse {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     public TeamResponse getTeam() {
