@@ -11,7 +11,8 @@ import {
   Select,
   useToast,
   Center,
-  Spinner
+  Spinner,
+  Textarea
 } from '@chakra-ui/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
@@ -82,6 +83,7 @@ export const EditEvent = () => {
 
   const [eventFields, setEventFields] = useState<{
     name: string;
+    notes: string;
     startTime: string;
     endTime: string;
     eventType: string;
@@ -89,6 +91,7 @@ export const EditEvent = () => {
     opponentScore: number;
   }>({
     name: '',
+    notes: '',
     startTime: dayjs().set('seconds', 0).format(),
     endTime: dayjs().set('seconds', 0).add(30, 'minutes').format(),
     eventType: 'GAME',
@@ -101,6 +104,7 @@ export const EditEvent = () => {
       setEventFields({
         ...eventFields,
         name: event.name,
+        notes: event.notes,
         startTime: event.startTime,
         endTime: event.endTime,
         eventType: event.eventType,
@@ -111,7 +115,10 @@ export const EditEvent = () => {
   }, [event]);
 
   const handleChangeEventFields = (
-    e: React.ChangeEvent<HTMLSelectElement> | React.ChangeEvent<HTMLInputElement>
+    e:
+      | React.ChangeEvent<HTMLSelectElement>
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>
   ): void => {
     e.preventDefault();
     setEventFields({
@@ -196,6 +203,15 @@ export const EditEvent = () => {
                   ))}
                 </Select>
               </FormControl>
+              <FormControl id="notes">
+                <FormLabel>Notes</FormLabel>
+                <Textarea
+                  name="notes"
+                  onChange={handleChangeEventFields}
+                  value={eventFields.notes}
+                  maxLength={800}
+                />
+              </FormControl>
               <FormControl id="times">
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <Stack direction={{ sm: 'column', md: 'row' }} gap={2} mt={3}>
@@ -230,6 +246,7 @@ export const EditEvent = () => {
                 disabled={
                   !isObjectDiff(eventFields, {
                     name: event?.name,
+                    notes: event?.notes,
                     startTime: event?.startTime,
                     endTime: event?.endTime,
                     eventType: event?.eventType,

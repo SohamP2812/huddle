@@ -387,6 +387,22 @@ export const Event = () => {
                     {event?.eventType}
                   </Badge>
                 </Stack>
+                {event?.notes ? (
+                  <Stack mt={8}>
+                    <Text fontWeight={'semibold'}>Notes:</Text>
+                    <Box border={'1px'} borderColor={'gray.300'} rounded={'xl'}>
+                      <Text
+                        p={2}
+                        scrollPaddingY={10}
+                        maxHeight={150}
+                        overflowY={'scroll'}
+                        whiteSpace={'pre-wrap'}
+                      >
+                        {event?.notes}
+                      </Text>
+                    </Box>
+                  </Stack>
+                ) : null}
               </Box>
             </Box>
           </Flex>

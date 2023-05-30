@@ -13,6 +13,7 @@ import {
   CheckboxGroup,
   useToast,
   Center,
+  Textarea,
   Spinner
 } from '@chakra-ui/react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -77,6 +78,7 @@ export const CreateEvent = () => {
 
   const [eventFields, setEventFields] = useState<{
     name: string;
+    notes: string;
     startTime: string;
     endTime: string;
     eventType: string;
@@ -85,6 +87,7 @@ export const CreateEvent = () => {
     participantIds: number[];
   }>({
     name: '',
+    notes: '',
     startTime: dayjs().set('seconds', 0).format(),
     endTime: dayjs().set('seconds', 0).add(30, 'minutes').format(),
     eventType: 'GAME',
@@ -94,7 +97,10 @@ export const CreateEvent = () => {
   });
 
   const handleChangeEventFields = (
-    e: React.ChangeEvent<HTMLSelectElement> | React.ChangeEvent<HTMLInputElement>
+    e:
+      | React.ChangeEvent<HTMLSelectElement>
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>
   ): void => {
     e.preventDefault();
     setEventFields({
@@ -218,6 +224,15 @@ export const CreateEvent = () => {
                     </option>
                   ))}
                 </Select>
+              </FormControl>
+              <FormControl id="notes">
+                <FormLabel>Notes</FormLabel>
+                <Textarea
+                  name="notes"
+                  onChange={handleChangeEventFields}
+                  value={eventFields.notes}
+                  maxLength={800}
+                />
               </FormControl>
               <FormControl id="participantIds">
                 <Flex mb={'0.5rem'}>

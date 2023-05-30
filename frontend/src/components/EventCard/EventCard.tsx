@@ -1,7 +1,8 @@
 import React, { FC } from 'react';
-import { Heading, Box, Text, Stack, Badge } from '@chakra-ui/react';
+import { Heading, Box, Text, Stack, Badge, Flex } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { stringToJSDate } from 'utils/misc';
+import { StatusIndicator } from 'components/StatusIndicator/StatusIndicator';
 
 interface IProps {
   event: {
@@ -37,6 +38,15 @@ export const EventCard: FC<IProps> = ({ event }) => {
       onClick={goToEvent}
     >
       <Stack spacing={0} align={'center'}>
+        {stringToJSDate(event.endTime) > new Date() &&
+        stringToJSDate(event.startTime) < new Date() ? (
+          <Flex mb={1} mr={1} alignItems={'center'} flexDirection={'row'}>
+            <StatusIndicator />
+            <Text fontSize={'sm'} fontWeight={'bold'}>
+              LIVE
+            </Text>
+          </Flex>
+        ) : null}
         <Heading fontSize={'lg'} fontWeight={500} fontFamily={'body'}>
           {event.name}
         </Heading>

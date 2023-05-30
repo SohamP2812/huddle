@@ -108,7 +108,12 @@ export const TeamInvites = () => {
             }}
             onClick={handleRefetchInvites}
           >
-            <RepeatIcon w={3} h={3} />
+            <RepeatIcon
+              transition={'all 0.5s ease'}
+              style={{ transform: refreshDisabled ? 'rotate(180deg)' : 'none' }}
+              w={3}
+              h={3}
+            />
           </Button>
           {[...invites]
             .sort(

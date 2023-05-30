@@ -8,7 +8,6 @@ import {
   useSearchUsersQuery,
   useDeleteMemberMutation,
   useGetEventsQuery,
-  useAddMemberMutation,
   useCreateInviteMutation
 } from 'redux/slices/apiSlice';
 import {
@@ -96,10 +95,6 @@ export const Team = () => {
   );
   const searchUsers = usernameQuery ? searchUsersResponse?.users ?? [] : [];
   const [
-    addMember,
-    { error: addMemberError, isSuccess: isAddMemberSuccess, isLoading: isAddMemberLoading }
-  ] = useAddMemberMutation();
-  const [
     deleteMember,
     { error: deleteMemberError, isSuccess: isDeleteMemberSuccess, isLoading: isDeleteMemberLoading }
   ] = useDeleteMemberMutation();
@@ -121,8 +116,8 @@ export const Team = () => {
         duration: 5000,
         isClosable: true
       });
-      onEmailInviteClose();
-      setInviteEmail('');
+      handleOnMemberListClose();
+      handleOnEmailInviteClose();
     }
   }, [isCreateInviteSuccess]);
 
@@ -136,39 +131,10 @@ export const Team = () => {
         duration: 5000,
         isClosable: true
       });
-      onMemberListClose();
-      setUsernameQuery('');
+      handleOnMemberListClose();
+      handleOnEmailInviteClose();
     }
   }, [createInviteError]);
-
-  useEffect(() => {
-    if (isAddMemberSuccess) {
-      toast({
-        title: 'Added member successfully!',
-        status: 'success',
-        position: 'top',
-        duration: 5000,
-        isClosable: true
-      });
-      onMemberListClose();
-      setUsernameQuery('');
-    }
-  }, [isAddMemberSuccess]);
-
-  useEffect(() => {
-    if (addMemberError) {
-      toast({
-        title: 'An error occurred!',
-        description: getErrorMessage(addMemberError),
-        status: 'error',
-        position: 'top',
-        duration: 5000,
-        isClosable: true
-      });
-      onMemberListClose();
-      setUsernameQuery('');
-    }
-  }, [addMemberError]);
 
   useEffect(() => {
     if (isDeleteMemberSuccess) {
@@ -245,26 +211,20 @@ export const Team = () => {
     setInviteEmail(e.target.value);
   };
 
-  const handleOnMemberListClose = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
+  const handleOnMemberListClose = (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (e) {
+      e.preventDefault();
+    }
     setUsernameQuery('');
     onMemberListClose();
   };
 
-  const handleOnEmailInviteClose = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
+  const handleOnEmailInviteClose = (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (e) {
+      e.preventDefault();
+    }
     setInviteEmail('');
     onEmailInviteClose();
-  };
-
-  const handleAddMember = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, id: number | null) => {
-    e.preventDefault();
-    if (team_id && id) {
-      addMember({
-        teamId: parseInt(team_id),
-        addedUserId: id
-      });
-    }
   };
 
   const handleOnMemberListOpen = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -299,10 +259,15 @@ export const Team = () => {
     }
   };
 
-  const handleInvite = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleInvite = (
+    e:
+      | React.MouseEvent<HTMLButtonElement, MouseEvent>
+      | React.MouseEvent<HTMLDivElement, MouseEvent>,
+    email: string
+  ) => {
     e.preventDefault();
     if (team_id) {
-      createInvite({ teamId: parseInt(team_id), email: inviteEmail });
+      createInvite({ teamId: parseInt(team_id), email: email });
     }
   };
 
@@ -584,7 +549,7 @@ export const Team = () => {
                   px={5}
                   py={2}
                 >
-                  {isSearchUsersLoading || isAddMemberLoading ? (
+                  {isSearchUsersLoading ? (
                     <Center height={'full'}>
                       <Spinner size={'lg'} />
                     </Center>
@@ -599,7 +564,7 @@ export const Team = () => {
                         <Box
                           p={2}
                           _hover={{ cursor: 'pointer', bg: 'gray.50' }}
-                          onClick={(e) => handleAddMember(e, searchUser.id)}
+                          onClick={(e) => handleInvite(e, searchUser.email)}
                           key={searchUser.id}
                         >
                           <Text key={searchUser.id}>{searchUser.username}</Text>
@@ -643,7 +608,7 @@ export const Team = () => {
                   disabled={!inviteEmail}
                   isLoading={isCreateInviteLoading}
                   colorScheme="blue"
-                  onClick={handleInvite}
+                  onClick={(e) => handleInvite(e, inviteEmail)}
                 >
                   Send
                 </Button>
