@@ -79,6 +79,7 @@ export const CreateEvent = () => {
   const [eventFields, setEventFields] = useState<{
     name: string;
     notes: string;
+    address: string;
     startTime: string;
     endTime: string;
     eventType: string;
@@ -88,6 +89,7 @@ export const CreateEvent = () => {
   }>({
     name: '',
     notes: '',
+    address: '',
     startTime: dayjs().set('seconds', 0).format(),
     endTime: dayjs().set('seconds', 0).add(30, 'minutes').format(),
     eventType: 'GAME',
@@ -232,6 +234,15 @@ export const CreateEvent = () => {
                   onChange={handleChangeEventFields}
                   value={eventFields.notes}
                   maxLength={800}
+                />
+              </FormControl>
+              <FormControl id="address">
+                <FormLabel>Address</FormLabel>
+                <Input
+                  type="text"
+                  name="address"
+                  onChange={handleChangeEventFields}
+                  value={eventFields.address}
                 />
               </FormControl>
               <FormControl id="participantIds">

@@ -84,6 +84,7 @@ export const EditEvent = () => {
   const [eventFields, setEventFields] = useState<{
     name: string;
     notes: string;
+    address: string;
     startTime: string;
     endTime: string;
     eventType: string;
@@ -92,6 +93,7 @@ export const EditEvent = () => {
   }>({
     name: '',
     notes: '',
+    address: '',
     startTime: dayjs().set('seconds', 0).format(),
     endTime: dayjs().set('seconds', 0).add(30, 'minutes').format(),
     eventType: 'GAME',
@@ -105,6 +107,7 @@ export const EditEvent = () => {
         ...eventFields,
         name: event.name,
         notes: event.notes,
+        address: event.address,
         startTime: event.startTime,
         endTime: event.endTime,
         eventType: event.eventType,
@@ -212,6 +215,15 @@ export const EditEvent = () => {
                   maxLength={800}
                 />
               </FormControl>
+              <FormControl id="address">
+                <FormLabel>Address</FormLabel>
+                <Input
+                  type="text"
+                  name="address"
+                  onChange={handleChangeEventFields}
+                  value={eventFields.address}
+                />
+              </FormControl>
               <FormControl id="times">
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <Stack direction={{ sm: 'column', md: 'row' }} gap={2} mt={3}>
@@ -247,6 +259,7 @@ export const EditEvent = () => {
                   !isObjectDiff(eventFields, {
                     name: event?.name,
                     notes: event?.notes,
+                    address: event?.address,
                     startTime: event?.startTime,
                     endTime: event?.endTime,
                     eventType: event?.eventType,

@@ -10,6 +10,8 @@ public class EventResponse {
 
     private String notes;
 
+    private String address;
+
     private TeamResponse team;
 
     private OffsetDateTime startTime;
@@ -26,6 +28,7 @@ public class EventResponse {
         this.id = dbEvent.getId();
         this.name = dbEvent.getName();
         this.notes = dbEvent.getNotes();
+        this.address = dbEvent.getAddress();
         this.team = new TeamResponse(dbEvent.getTeam());
         this.startTime = dbEvent.getStartTime();
         this.endTime = dbEvent.getEndTime();
@@ -56,6 +59,14 @@ public class EventResponse {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public TeamResponse getTeam() {

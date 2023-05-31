@@ -65,6 +65,7 @@ public class EventService {
         DbEvent dbEvent = new DbEvent(
                 eventRequest.getName(),
                 eventRequest.getNotes(),
+                eventRequest.getAddress(),
                 eventRequest.getEventType(),
                 dbTeam,
                 eventRequest.getStartTime(),
@@ -89,6 +90,7 @@ public class EventService {
 
                 Map<String, Object> variables = new HashMap<>();
                 variables.put("name", participant.getFirstName());
+                variables.put("address", dbEvent.getAddress());
                 variables.put("teamName", dbTeam.getName());
                 variables.put("eventName", dbEvent.getName());
                 variables.put("eventType", dbEvent.getEventType().toString());
@@ -141,6 +143,7 @@ public class EventService {
         dbEvent.setEventType(eventRequest.getEventType());
         dbEvent.setName(eventRequest.getName());
         dbEvent.setNotes(eventRequest.getNotes());
+        dbEvent.setAddress(eventRequest.getAddress());
         dbEvent.setStartTime(eventRequest.getStartTime());
         dbEvent.setEndTime(eventRequest.getEndTime());
         dbEvent.setTeamScore(eventRequest.getTeamScore());
@@ -166,6 +169,7 @@ public class EventService {
 
                     Map<String, Object> variables = new HashMap<>();
                     variables.put("name", participant.getFirstName());
+                    variables.put("address", dbEvent.getAddress());
                     variables.put("teamName", dbEvent.getTeam().getName());
                     variables.put("eventName", dbEvent.getName());
                     variables.put("eventType", dbEvent.getEventType().toString());

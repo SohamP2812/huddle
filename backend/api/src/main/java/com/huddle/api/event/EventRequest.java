@@ -13,6 +13,9 @@ public class EventRequest {
     private String notes;
 
     @NotNull
+    private String address;
+
+    @NotNull
     private EEvent eventType;
 
     @NotNull
@@ -34,6 +37,15 @@ public class EventRequest {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getName() {

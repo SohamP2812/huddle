@@ -12,6 +12,7 @@ import {
 } from 'redux/slices/apiSlice';
 import {
   Center,
+  Link,
   Spinner,
   useToast,
   Heading,
@@ -54,6 +55,8 @@ export const Event = () => {
 
   const [eventFields, setEventFields] = useState<{
     name: string;
+    notes: string;
+    address: string;
     startTime: string;
     endTime: string;
     eventType: string;
@@ -62,6 +65,8 @@ export const Event = () => {
     participantIds: number[];
   }>({
     name: '',
+    notes: '',
+    address: '',
     startTime: dayjs().set('seconds', 0).format(),
     endTime: dayjs().set('seconds', 0).add(30, 'minutes').format(),
     eventType: 'GAME',
@@ -206,6 +211,8 @@ export const Event = () => {
       setEventFields((prevState) => ({
         ...prevState,
         name: event.name,
+        notes: event.notes,
+        address: event.address,
         startTime: event.startTime,
         endTime: event.endTime,
         eventType: event.eventType,
@@ -398,9 +405,21 @@ export const Event = () => {
                         overflowY={'scroll'}
                         whiteSpace={'pre-wrap'}
                       >
-                        {event?.notes}
+                        {event.notes}
                       </Text>
                     </Box>
+                  </Stack>
+                ) : null}
+                {event?.address ? (
+                  <Stack mt={6}>
+                    <Text fontWeight={'semibold'}>Address:</Text>
+                    <Link
+                      color={'blue.400'}
+                      target="_blank"
+                      href={`https://google.com/maps/place/${event.address}`}
+                    >
+                      {event.address}
+                    </Link>
                   </Stack>
                 ) : null}
               </Box>
