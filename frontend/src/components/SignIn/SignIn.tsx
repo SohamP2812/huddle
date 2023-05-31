@@ -188,7 +188,7 @@ const ForgotPassword = ({
 
   const handleForgotPassword = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    resetPassword({ email: forgotPasswordEmail });
+    resetPassword(forgotPasswordEmail);
   };
 
   useEffect(() => {

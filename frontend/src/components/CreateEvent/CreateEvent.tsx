@@ -243,6 +243,7 @@ export const CreateEvent = () => {
                   name="address"
                   onChange={handleChangeEventFields}
                   value={eventFields.address}
+                  maxLength={250}
                 />
               </FormControl>
               <FormControl id="participantIds">

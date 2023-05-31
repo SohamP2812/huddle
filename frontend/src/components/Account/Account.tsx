@@ -228,6 +228,9 @@ export const Account = () => {
                       : userResponse.profilePictureUrl ??
                         'https://res.cloudinary.com/dorjnhwzp/image/upload/v1685321543/users/profile-pictures/default.jpg'
                   }
+                  border={'1px'}
+                  borderColor={'gray.400'}
+                  background={'white'}
                   rounded={'full'}
                 />
                 <input

@@ -304,7 +304,12 @@ export const Team = () => {
                   <Heading fontSize={'lg'} fontWeight={500} fontFamily={'body'}>
                     {team?.manager.firstName} {team?.manager.lastName}
                   </Heading>
-                  <Button as={RouterLink} color={'gray.500'} variant={'link'} to={''}>
+                  <Button
+                    as={RouterLink}
+                    color={'gray.500'}
+                    variant={'link'}
+                    to={`/users/${team?.manager.id}`}
+                  >
                     @{team?.manager.username}
                   </Button>
                 </Stack>

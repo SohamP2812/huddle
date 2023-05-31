@@ -25,6 +25,9 @@ export const apiSlice = createApi({
       },
       providesTags: ['Self']
     }),
+    getUser: builder.query<User, number>({
+      query: (id) => `users/${id}`
+    }),
     login: builder.mutation<User, LoginCredentials>({
       query: (credentials) => ({ url: `session`, method: 'POST', body: credentials }),
       invalidatesTags: ['Self']
@@ -37,11 +40,11 @@ export const apiSlice = createApi({
       query: (newUser) => ({ url: `users`, method: 'POST', body: newUser }),
       invalidatesTags: ['Self']
     }),
-    resetPassword: builder.mutation<string, { email: string; }>({
-      query: ({ email }) => ({
+    resetPassword: builder.mutation<string, string>({
+      query: (email) => ({
         url: `users/password`,
         method: 'DELETE',
-        body : {email: email}
+        body : { email: email }
       }),
       invalidatesTags: ['Self', 'Teams', 'Events', 'Participants']
     }),
@@ -215,6 +218,7 @@ export const apiSlice = createApi({
 
 export const {
   useGetSelfQuery,
+  useGetUserQuery,
   useLoginMutation,
   useResetPasswordMutation,
   useUpdatePasswordMutation,
