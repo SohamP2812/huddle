@@ -26,15 +26,15 @@ export const EventCard: FC<IProps> = ({ event }) => {
 
   return (
     <Box
+      background={'gray.50'}
       height={'fit-content'}
       w={'full'}
       border={'1px'}
       borderColor={'gray.300'}
       rounded={'xl'}
-      overflow={'hidden'}
       py={7}
       px={5}
-      _hover={{ bg: 'gray.50', cursor: 'pointer' }}
+      _hover={{ bg: 'gray.100', cursor: 'pointer' }}
       onClick={goToEvent}
     >
       <Stack spacing={0} align={'center'}>

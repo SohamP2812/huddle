@@ -402,7 +402,7 @@ export const Event = () => {
                         p={2}
                         scrollPaddingY={10}
                         maxHeight={150}
-                        overflowY={'scroll'}
+                        overflowY={'auto'}
                         whiteSpace={'pre-wrap'}
                       >
                         {event.notes}

@@ -367,9 +367,15 @@ export const Team = () => {
                           direction="row"
                           key={member.id}
                         >
-                          <Text key={member.id} fontWeight={300} color={'gray.600'}>
-                            {member.username}
-                          </Text>
+                          <Button
+                            as={RouterLink}
+                            color={'gray.800'}
+                            variant={'link'}
+                            to={`/users/${member.id}`}
+                            fontWeight={'medium'}
+                          >
+                            @{member.username}
+                          </Button>
                           {member.id !== userId &&
                             members.find((member) => member.id === userId)?.isManager &&
                             (isDeleteMemberLoading ? (
@@ -425,7 +431,14 @@ export const Team = () => {
                   </Checkbox>
                 </Stack>
                 <Divider borderColor={'gray.300'} />
-                <Flex direction="column" alignItems={'center'} my={5} gap={5}>
+                <Flex
+                  maxHeight={'450px'}
+                  overflowY={'auto'}
+                  direction="column"
+                  alignItems={'center'}
+                  my={5}
+                  gap={5}
+                >
                   {isEventsLoading ? (
                     <Center height={40}>
                       <Spinner size={'xl'} />
