@@ -110,7 +110,7 @@ export const Header: FC = () => {
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
-        <MobileNav loggedIn={!!user} />
+        <MobileNav toggleNav={onToggle} loggedIn={!!user} />
       </Collapse>
     </Box>
   );
@@ -199,7 +199,13 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
   );
 };
 
-const MobileNav = ({ loggedIn }: { loggedIn: boolean | null }) => {
+const MobileNav = ({
+  toggleNav,
+  loggedIn
+}: {
+  toggleNav: () => void;
+  loggedIn: boolean | null;
+}) => {
   return (
     <Stack
       bg={useColorModeValue('white', 'gray.800')}
@@ -209,13 +215,13 @@ const MobileNav = ({ loggedIn }: { loggedIn: boolean | null }) => {
       borderColor={'black'}
     >
       {NAV_ITEMS.filter((navItem) => !navItem.protected || loggedIn).map((navItem) => (
-        <MobileNavItem key={navItem.label} {...navItem} />
+        <MobileNavItem toggleNav={toggleNav} key={navItem.label} {...navItem} />
       ))}
     </Stack>
   );
 };
 
-const MobileNavItem = ({ label, children, href }: NavItem) => {
+const MobileNavItem = ({ toggleNav, label, children, href }: NavItem) => {
   const { isOpen, onToggle } = useDisclosure();
 
   return (
@@ -229,6 +235,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
         _hover={{
           textDecoration: 'none'
         }}
+        onClick={toggleNav}
       >
         <Text fontWeight={600} color={useColorModeValue('black', 'gray.200')}>
           {label}
@@ -266,6 +273,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
 };
 
 interface NavItem {
+  toggleNav?: () => void;
   label: string;
   subLabel?: string;
   children?: Array<NavItem>;

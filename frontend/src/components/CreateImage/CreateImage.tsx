@@ -66,7 +66,7 @@ export const CreateImage = () => {
   return (
     <>
       <Flex minH={'100vh'} pt={10} justify={'center'} bg={'gray.50'}>
-        <Stack spacing={8} mx={'auto'} width={'xl'} py={12} px={6}>
+        <Stack spacing={8} mx={'auto'} width={'xl'} py={6} px={6}>
           <BackButton fallback={`/teams/${team_id}/albums/${album_id}`} />
           <Stack align={'center'}>
             <Heading fontSize={'4xl'}>Add an image</Heading>
@@ -74,16 +74,12 @@ export const CreateImage = () => {
           <form onSubmit={handleCreateAlbum}>
             <Stack spacing={4}>
               <Stack>
-                <FormLabel>Profile Picture</FormLabel>
+                <FormLabel>Image</FormLabel>
                 <Image
-                  width={'75px'}
-                  height={'75px'}
+                  width={'full'}
                   objectFit={'cover'}
                   src={selectedImage ? URL.createObjectURL(selectedImage as Blob) : undefined}
-                  border={'1px'}
-                  borderColor={'gray.400'}
                   background={'white'}
-                  rounded={'full'}
                 />
                 <input
                   type={'file'}

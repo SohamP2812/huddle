@@ -9,7 +9,6 @@ import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service
-
 public class TeamAlbumService {
     @Autowired
     TeamAlbumRepository teamAlbumRepository;
