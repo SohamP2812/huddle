@@ -3,17 +3,10 @@ import { Heading, Box, Text, Stack, Badge, Flex } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { stringToJSDate } from 'utils/misc';
 import { StatusIndicator } from 'components/StatusIndicator/StatusIndicator';
+import { Event } from 'utils/types';
 
 interface IProps {
-  event: {
-    id: number;
-    name: string;
-    startTime: string;
-    endTime: string;
-    eventType: string;
-    teamScore: number;
-    opponentScore: number;
-  };
+  event: Event;
 }
 
 export const EventCard: FC<IProps> = ({ event }) => {

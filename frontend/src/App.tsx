@@ -14,6 +14,9 @@ import { CreateEvent } from 'components/CreateEvent/CreateEvent';
 import { Event } from 'components/Event/Event';
 import { EditEvent } from 'components/EditEvent/EditEvent';
 import { User } from 'components/User/User';
+import { CreateAlbum } from 'components/CreateAlbum/CreateAlbum';
+import { CreateImage } from 'components/CreateImage/CreateImage';
+import { Album } from 'components/Album/Album';
 
 import { useAnalytics } from 'hooks/useAnalytics';
 import { TeamInvite } from 'components/TeamInvite/TeamInvite';
@@ -38,6 +41,18 @@ export const App: FC = () => {
       />
       <Route path="teams" element={<AuthComponent children={<Teams />} isProtected />} />
       <Route path="teams/:team_id" element={<AuthComponent children={<Team />} isProtected />} />
+      <Route
+        path="teams/:team_id/create-album"
+        element={<AuthComponent children={<CreateAlbum />} isProtected />}
+      />
+      <Route
+        path="teams/:team_id/albums/:album_id"
+        element={<AuthComponent children={<Album />} isProtected />}
+      />
+      <Route
+        path="teams/:team_id/albums/:album_id/create-image"
+        element={<AuthComponent children={<CreateImage />} isProtected />}
+      />
       <Route
         path="teams/:team_id/create-event"
         element={<AuthComponent children={<CreateEvent />} isProtected />}

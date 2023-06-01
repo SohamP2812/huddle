@@ -8,7 +8,8 @@ import {
   useSearchUsersQuery,
   useDeleteMemberMutation,
   useGetEventsQuery,
-  useCreateInviteMutation
+  useCreateInviteMutation,
+  useGetAlbumsQuery
 } from 'redux/slices/apiSlice';
 import {
   Spinner,
@@ -41,6 +42,7 @@ import { getErrorMessage, stringToJSDate } from 'utils/misc';
 
 import { EventCard } from 'components/EventCard/EventCard';
 import { BackButton } from 'components/BackButton/BackButton';
+import { AlbumCard } from 'components/AlbumCard/AlbumCard';
 
 export const Team = () => {
   const [usernameQuery, setUsernameQuery] = useState('');
@@ -82,6 +84,13 @@ export const Team = () => {
     }
   );
   const members = membersResponse?.members ?? [];
+  const { data: albumsResponse, isLoading: isAlbumsLoading } = useGetAlbumsQuery(
+    team_id ? parseInt(team_id) : 0,
+    {
+      skip: !team_id
+    }
+  );
+  const albums = albumsResponse?.albums ?? [];
   const { data: eventsResponse, isLoading: isEventsLoading } = useGetEventsQuery(
     team_id ? parseInt(team_id) : 0,
     {
@@ -203,6 +212,11 @@ export const Team = () => {
     navigate('create-event');
   };
 
+  const handleCreateAlbum = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.preventDefault();
+    navigate('create-album');
+  };
+
   const handleUpdateUsernameQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsernameQuery(e.target.value);
   };
@@ -321,6 +335,7 @@ export const Team = () => {
               </Box>
             </Box>
           </Flex>
+
           <Flex direction={{ base: 'column', md: 'row' }} maxW={'1000px'} w={'full'} gap={5}>
             <Box
               height={'fit-content'}
@@ -372,7 +387,6 @@ export const Team = () => {
                             color={'gray.800'}
                             variant={'link'}
                             to={`/users/${member.id}`}
-                            fontWeight={'medium'}
                           >
                             @{member.username}
                           </Button>
@@ -459,6 +473,66 @@ export const Team = () => {
               </Box>
             </Box>
           </Flex>
+
+          <Flex direction={{ base: 'column', md: 'row' }} maxW={'1000px'} w={'full'} gap={5}>
+            <Box
+              height={'fit-content'}
+              w={'full'}
+              bg={'white'}
+              boxShadow={'2xl'}
+              rounded={'xl'}
+              overflow={'hidden'}
+            >
+              <Box p={6}>
+                <Stack direction={'row'} justifyContent="right" color="blue.400" mb={'2'}>
+                  {members.find((member) => member.id === userId)?.isManager && (
+                    <Flex
+                      gap={2}
+                      alignItems={'center'}
+                      _hover={{
+                        cursor: 'pointer'
+                      }}
+                      onClick={handleCreateAlbum}
+                    >
+                      <AddIcon w={3} h={3} />
+                      <Text>Create Album</Text>
+                    </Flex>
+                  )}
+                </Stack>
+                <Stack spacing={0} align={'center'} mb={5}>
+                  <Heading fontSize={'2xl'} fontWeight={800} fontFamily={'body'}>
+                    Albums
+                  </Heading>
+                </Stack>
+                <Divider borderColor={'gray.300'} />
+                <Stack my={5} gap={2}>
+                  {isAlbumsLoading ? (
+                    <Center height={40}>
+                      <Spinner size={'xl'} />
+                    </Center>
+                  ) : (
+                    [...albums]
+                      .sort(
+                        (a, b) =>
+                          stringToJSDate(b.createdAt).getTime() -
+                          stringToJSDate(a.createdAt).getTime()
+                      )
+                      .map((album) => (
+                        <Stack
+                          justify={'space-between'}
+                          align="center"
+                          direction="row"
+                          key={album.id}
+                        >
+                          <AlbumCard album={album} />
+                        </Stack>
+                      ))
+                  )}
+                </Stack>
+              </Box>
+            </Box>
+          </Flex>
+
           {members.find((member) => member.id === userId)?.isManager ? (
             <Button
               isLoading={isDeleteTeamLoading}

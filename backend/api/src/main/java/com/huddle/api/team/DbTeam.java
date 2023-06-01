@@ -1,6 +1,7 @@
 package com.huddle.api.team;
 
 import com.huddle.api.event.DbEvent;
+import com.huddle.api.teamalbum.DbTeamAlbum;
 import com.huddle.api.teaminvite.DbTeamInvite;
 import com.huddle.api.teammember.DbTeamMember;
 import com.huddle.api.user.DbUser;
@@ -33,6 +34,9 @@ public class DbTeam extends DbTimestampedEntity {
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.REMOVE)
     private Set<DbTeamInvite> invites = new HashSet<>();
+
+    @OneToMany(mappedBy = "team", cascade = CascadeType.REMOVE)
+    private Set<DbTeamAlbum> albums = new HashSet<>();
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -77,6 +81,14 @@ public class DbTeam extends DbTimestampedEntity {
 
     public void setInvites(Set<DbTeamInvite> invites) {
         this.invites = invites;
+    }
+
+    public Set<DbTeamAlbum> getAlbums() {
+        return albums;
+    }
+
+    public void setAlbums(Set<DbTeamAlbum> albums) {
+        this.albums = albums;
     }
 
     public Set<DbEvent> getEvents() {

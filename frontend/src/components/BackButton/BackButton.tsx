@@ -23,7 +23,7 @@ export const BackButton = ({ fallback }: { fallback: string }) => {
       alignItems={'center'}
       onClick={goBack}
       bg="blue.50"
-      _hover={{ bg: 'blue.300' }}
+      _hover={{ bg: 'blue.100' }}
     >
       <ArrowBackIcon w={5} h={5} />
       Back

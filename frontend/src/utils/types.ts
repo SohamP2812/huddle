@@ -59,3 +59,15 @@ export interface TeamInvite {
   state: string;
   createdAt: string;
 }
+
+export interface TeamAlbum {
+  id: number;
+  name: string;
+  createdAt: string;
+}
+
+export interface TeamImage {
+  id: number;
+  url: string
+  createdAt: string;
+}

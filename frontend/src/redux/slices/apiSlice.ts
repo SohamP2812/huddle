@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Team, Event, Participant, User, LoginCredentials, AccountCreationInfo, TeamInvite } from 'utils/types';
+import { Team, Event, Participant, User, LoginCredentials, AccountCreationInfo, TeamInvite, TeamAlbum, TeamImage } from 'utils/types';
 
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl: '/api/' }),
-  tagTypes: ['Self', 'Invites', 'Teams', 'Members', 'Events', 'Participants'],
+  tagTypes: ['Self', 'Invites', 'Teams', 'Members', 'Events', 'Participants', 'Albums', 'Images'],
   endpoints: (builder) => ({
     getSelf: builder.query<User | null, void>({
       queryFn: async (name, api, extraOptions, baseQuery) => {
@@ -212,7 +212,56 @@ export const apiSlice = createApi({
         method: 'DELETE'
       }),
       invalidatesTags: ['Events']
-    })
+    }),
+    createAlbum: builder.mutation<
+      TeamAlbum,
+      {
+        teamId: number
+        createdAlbum: Partial<TeamAlbum>
+      }
+    >({
+      query: ({ teamId, createdAlbum }) => ({
+        url: `teams/${teamId}/albums`,
+        method: 'POST',
+        body: createdAlbum
+      }), 
+      invalidatesTags: ['Albums']
+    }),
+    getAlbums: builder.query<
+      { albums: TeamAlbum[] },
+      number
+    >({
+      query: (teamId) => ({
+        url: `teams/${teamId}/albums`,
+        method: 'GET',
+      }), 
+      providesTags: ['Albums']
+    }), 
+    createImage: builder.mutation<
+      TeamImage,
+      {
+        teamId: number,
+        albumId: number,
+        image: FormData
+      }
+    >({
+      query: ({ teamId, albumId, image }) => ({
+        url: `teams/${teamId}/albums/${albumId}/images`,
+        method: 'POST',
+        body: image
+      }), 
+      invalidatesTags: ['Images']
+    }),
+    getImages: builder.query<
+      { images: TeamImage[] },
+      { teamId: number, albumId: number }
+    >({
+      query: ({ teamId, albumId }) => ({
+        url: `teams/${teamId}/albums/${albumId}/images`,
+        method: 'GET',
+      }), 
+      providesTags: ['Images']
+    }), 
   })
 });
 
@@ -241,5 +290,9 @@ export const {
   useGetInvitesQuery, 
   useCreateInviteMutation,
   useUpdateInviteMutation,
-  useDeleteEventMutation
+  useDeleteEventMutation,
+  useCreateAlbumMutation,
+  useGetAlbumsQuery,
+  useCreateImageMutation, 
+  useGetImagesQuery
 } = apiSlice;
