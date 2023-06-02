@@ -107,6 +107,7 @@ export const Album = () => {
                 .map((image) => (
                   <Stack flex={{ base: '1 0 25%', sm: '1 0 30%', md: '1 0 25%' }} key={image.id}>
                     <Image
+                      background={'white'}
                       _hover={{ cursor: 'pointer' }}
                       onClick={(e) => handleOnImageOpen(e, image.url)}
                       width={'200px'}
@@ -125,7 +126,7 @@ export const Album = () => {
               <ModalCloseButton />
               <ModalBody>
                 <Stack align={'center'}>
-                  <Image width={'400px'} objectFit={'cover'} src={imageUrl} />
+                  <Image background={'white'} width={'400px'} objectFit={'cover'} src={imageUrl} />
                 </Stack>
               </ModalBody>
               <ModalFooter>
