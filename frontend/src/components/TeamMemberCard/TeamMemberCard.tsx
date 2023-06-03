@@ -81,7 +81,13 @@ export const TeamMemberCard: FC<IProps> = ({ member, isManager, userId, teamId, 
     >
       <Stack justify={'space-between'} align="center" direction="row" spacing={0}>
         <Stack>
-          <Button as={RouterLink} color={'gray.800'} variant={'link'} to={`/users/${member.id}`}>
+          <Button
+            justifyContent={'left'}
+            as={RouterLink}
+            color={'gray.800'}
+            variant={'link'}
+            to={`/users/${member.id}`}
+          >
             @{member.username}
           </Button>
           {member.position !== 'UNKNOWN' ? <Text>{position}</Text> : null}
