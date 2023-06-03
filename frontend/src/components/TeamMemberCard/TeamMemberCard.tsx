@@ -84,7 +84,7 @@ export const TeamMemberCard: FC<IProps> = ({ member, isManager, userId, teamId, 
           <Button as={RouterLink} color={'gray.800'} variant={'link'} to={`/users/${member.id}`}>
             @{member.username}
           </Button>
-          {position !== 'UNKNOWN' ? <Text>{position}</Text> : null}
+          {member.position !== 'UNKNOWN' ? <Text>{position}</Text> : null}
         </Stack>
         {member.id !== userId &&
           isManager &&
