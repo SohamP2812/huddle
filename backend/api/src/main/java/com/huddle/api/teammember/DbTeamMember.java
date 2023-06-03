@@ -16,7 +16,7 @@ public class DbTeamMember extends DbTimestampedEntity {
     private ERole role;
 
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("`UNKNOWN`")
+    @ColumnDefault("'UNKNOWN'")
     private EPosition position;
 
     @ManyToOne
