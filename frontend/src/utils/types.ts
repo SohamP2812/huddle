@@ -3,10 +3,19 @@ export interface User {
   username: string;
   firstName: string;
   lastName: string;
-  email: string;
-  isManager?: boolean;
+  email: string; 
   profilePictureUrl?: string;
   createdAt: string;
+}
+
+export interface Member {
+  id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  position: string;
+  isManager: boolean;  
 }
 
 export interface LoginCredentials {
@@ -57,6 +66,7 @@ export interface TeamInvite {
   team: Team;
   email: string;
   state: string;
+  position: string;
   createdAt: string;
 }
 

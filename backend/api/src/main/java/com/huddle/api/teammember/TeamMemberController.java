@@ -55,7 +55,11 @@ public class TeamMemberController {
             throw new UnauthorizedException("You do not have the authority to make this change.");
         }
 
-        DbTeamMember dbTeamMember = teamMemberService.addMember(team_id, memberRequest.getId());
+        DbTeamMember dbTeamMember = teamMemberService.addMember(
+                team_id,
+                memberRequest.getId(),
+                memberRequest.getPosition()
+        );
 
         return ResponseEntity.ok(new MemberResponse(dbTeamMember));
     }

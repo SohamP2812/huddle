@@ -9,6 +9,8 @@ public class MemberResponse {
 
     private String email;
 
+    private EPosition position;
+
     private Boolean isManager;
 
     public MemberResponse(
@@ -19,6 +21,7 @@ public class MemberResponse {
         this.lastName = member.getMember().getLastName();
         this.username = member.getMember().getUsername();
         this.email = member.getMember().getEmail();
+        this.position = member.getPosition();
         this.isManager = member.isManager();
     }
 
@@ -64,6 +67,14 @@ public class MemberResponse {
 
     public Boolean getIsManager() {
         return isManager;
+    }
+
+    public EPosition getPosition() {
+        return position;
+    }
+
+    public void setPosition(EPosition position) {
+        this.position = position;
     }
 
     public void setIsManager(Boolean isManager) {

@@ -43,7 +43,8 @@ public class TeamMemberService {
 
     public DbTeamMember addMember(
             Long teamId,
-            Long userId
+            Long userId,
+            EPosition position
     ) {
         DbTeam dbTeam = teamService.getTeam(teamId);
 
@@ -60,6 +61,7 @@ public class TeamMemberService {
 
         DbTeamMember dbTeamMember = new DbTeamMember(
                 ERole.ROLE_MEMBER,
+                position,
                 dbUserToAdd,
                 dbTeam
         );

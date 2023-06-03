@@ -114,7 +114,11 @@ public class TeamInviteService {
 
         if (updateTeamInviteRequest.getState() == EInvitation.ACCEPTED && dbTeamInvite.getState() != EInvitation.ACCEPTED) {
             DbUser dbUser = userService.getUserByEmail(dbTeamInvite.getEmail());
-            teamMemberService.addMember(dbTeamInvite.getTeam().getId(), dbUser.getId());
+            teamMemberService.addMember(
+                    dbTeamInvite.getTeam().getId(),
+                    dbUser.getId(),
+                    updateTeamInviteRequest.getPosition()
+            );
 
             Map<String, Object> variables = new HashMap<>();
             variables.put("name", dbTeamInvite.getTeam().getManager().getFirstName());

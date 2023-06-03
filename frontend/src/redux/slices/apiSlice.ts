@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Team, Event, Participant, User, LoginCredentials, AccountCreationInfo, TeamInvite, TeamAlbum, TeamImage } from 'utils/types';
+import { Team, Event, Participant, User, LoginCredentials, AccountCreationInfo, TeamInvite, TeamAlbum, TeamImage, Member } from 'utils/types';
 
 export const apiSlice = createApi({
   reducerPath: 'api',
@@ -87,11 +87,11 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Teams']
     }),
-    getMembers: builder.query<{ members: User[] }, number>({
+    getMembers: builder.query<{ members: Member[] }, number>({
       query: (id) => `teams/${id}/members`,
       providesTags: ['Members']
     }),
-    addMember: builder.mutation<User, { teamId: number; addedUserId: number }>({
+    addMember: builder.mutation<Member, { teamId: number; addedUserId: number }>({
       query: ({ teamId, addedUserId }) => ({
         url: `teams/${teamId}/members`,
         method: 'POST',
@@ -99,7 +99,7 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Members']
     }),
-    deleteMember: builder.mutation<User, { userId: number; teamId: number }>({
+    deleteMember: builder.mutation<Member, { userId: number; teamId: number }>({
       query: ({ userId, teamId }) => ({
         url: `teams/${teamId}/members/${userId}`,
         method: 'DELETE'
@@ -195,13 +195,15 @@ export const apiSlice = createApi({
       { 
         inviteToken: string,
         state: string
+        position: string
       }
     >({
-      query: ({ inviteToken, state }) => ({
+      query: ({ inviteToken, state, position }) => ({
         url: `invites/${inviteToken}`,
         method: 'PATCH',
         body: {
-          state: state
+          state: state,
+          position: position
         }
       }),
       invalidatesTags: ['Invites', 'Teams', 'Events', 'Participants']

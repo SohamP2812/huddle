@@ -1,6 +1,7 @@
 package com.huddle.api.team;
 
 import com.huddle.api.teammember.DbTeamMember;
+import com.huddle.api.teammember.EPosition;
 import com.huddle.api.teammember.ERole;
 import com.huddle.api.teammember.TeamMemberRepository;
 import com.huddle.api.user.DbUser;
@@ -22,7 +23,6 @@ public class TeamService {
     @Autowired
     TeamMemberRepository teamMemberRepository;
 
-
     public DbTeam createTeam(TeamRequest teamRequest, Long userId) {
         DbUser dbUser = userService.getUser(userId);
 
@@ -36,6 +36,7 @@ public class TeamService {
 
         DbTeamMember dbTeamMember = new DbTeamMember(
                 ERole.ROLE_MANAGER,
+                EPosition.UNKNOWN,
                 dbUser,
                 dbTeam
         );

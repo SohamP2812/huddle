@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Box,
@@ -8,7 +8,10 @@ import {
   Spinner,
   Heading,
   Flex,
-  Stack
+  Stack,
+  FormControl,
+  FormLabel,
+  Select
 } from '@chakra-ui/react';
 import {
   useUpdateInviteMutation,
@@ -19,6 +22,8 @@ import { useParams } from 'react-router-dom';
 import { getErrorMessage } from 'utils/misc';
 import { BackButton } from 'components/BackButton/BackButton';
 import { useNavigate } from 'react-router-dom';
+
+import { positions } from 'utils/consts';
 
 export const TeamInvite = () => {
   const toast = useToast();
@@ -46,6 +51,20 @@ export const TeamInvite = () => {
       isLoading: isUpdateInviteLoading
     }
   ] = useUpdateInviteMutation();
+
+  const [inviteFields, setInviteFields] = useState({
+    position: 'UNKNOWN'
+  });
+
+  const handleChangeInviteFields = (
+    e: React.ChangeEvent<HTMLSelectElement> | React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    e.preventDefault();
+    setInviteFields({
+      ...inviteFields,
+      [e.target.name]: e.target.value
+    });
+  };
 
   useEffect(() => {
     if (invitesError) {
@@ -97,18 +116,22 @@ export const TeamInvite = () => {
   const handleAcceptInvite = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     if (invite_token) {
-      updateInvite({ inviteToken: invite_token, state: 'ACCEPTED' });
+      updateInvite({
+        inviteToken: invite_token,
+        position: inviteFields.position,
+        state: 'ACCEPTED'
+      });
     }
   };
 
   const handleDeclineInvite = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     if (invite_token) {
-      updateInvite({ inviteToken: invite_token, state: 'DECLINED' });
+      updateInvite({ inviteToken: invite_token, position: 'UNKNOWN', state: 'DECLINED' });
     }
   };
 
-  if (isUserLoading || isInvitesLoading) {
+  if (isUserLoading || isInvitesLoading || !invite) {
     return (
       <Center height={'75vh'}>
         <Spinner size={'xl'} />
@@ -134,14 +157,35 @@ export const TeamInvite = () => {
               Team Invitation
             </Heading>
           </Box>
-          <Box bg="gray.100" roundedBottom="md" p={4}>
+          <Box bg="gray.100" roundedBottom="md" mb={5} p={4}>
             <Text fontSize="xl" fontWeight="bold" mb={4}>
               {invite?.team?.name}
             </Text>
             <Text>
-              Team Manager: <strong>{invite?.team?.manager?.firstName}</strong>
+              Team Manager: <strong>{invite.team?.manager?.firstName}</strong>
             </Text>
           </Box>
+          <FormControl id="position">
+            <FormLabel>Position</FormLabel>
+            <Select
+              name="position"
+              onChange={handleChangeInviteFields}
+              value={inviteFields.position}
+            >
+              {Object.keys(positions[invite.team.sport as keyof typeof positions].nameToKey).map(
+                (position) => (
+                  <option
+                    key={position}
+                    value={
+                      positions[invite.team.sport as keyof typeof positions].nameToKey[position]
+                    }
+                  >
+                    {position}
+                  </option>
+                )
+              )}
+            </Select>
+          </FormControl>
           {isUpdateInviteLoading ? (
             <Center pt={8}>
               <Spinner size={'lg'} />

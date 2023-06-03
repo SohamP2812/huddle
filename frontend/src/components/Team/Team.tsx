@@ -6,10 +6,10 @@ import {
   useGetTeamsQuery,
   useDeleteTeamMutation,
   useSearchUsersQuery,
-  useDeleteMemberMutation,
   useGetEventsQuery,
   useCreateInviteMutation,
-  useGetAlbumsQuery
+  useGetAlbumsQuery,
+  useDeleteMemberMutation
 } from 'redux/slices/apiSlice';
 import {
   Spinner,
@@ -36,13 +36,14 @@ import {
   useToast,
   Center
 } from '@chakra-ui/react';
-import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
+import { AddIcon } from '@chakra-ui/icons';
 
 import { getErrorMessage, stringToJSDate } from 'utils/misc';
 
 import { EventCard } from 'components/EventCard/EventCard';
 import { BackButton } from 'components/BackButton/BackButton';
 import { AlbumCard } from 'components/AlbumCard/AlbumCard';
+import { TeamMemberCard } from 'components/TeamMemberCard/TeamMemberCard';
 
 export const Team = () => {
   const [usernameQuery, setUsernameQuery] = useState('');
@@ -104,10 +105,6 @@ export const Team = () => {
   );
   const searchUsers = usernameQuery ? searchUsersResponse?.users ?? [] : [];
   const [
-    deleteMember,
-    { error: deleteMemberError, isSuccess: isDeleteMemberSuccess, isLoading: isDeleteMemberLoading }
-  ] = useDeleteMemberMutation();
-  const [
     deleteTeam,
     { error: deleteTeamError, isSuccess: isDeleteTeamSuccess, isLoading: isDeleteTeamLoading }
   ] = useDeleteTeamMutation();
@@ -115,6 +112,29 @@ export const Team = () => {
     createInvite,
     { error: createInviteError, isSuccess: isCreateInviteSuccess, isLoading: isCreateInviteLoading }
   ] = useCreateInviteMutation();
+  const [
+    deleteMember,
+    { error: deleteMemberError, isSuccess: isDeleteMemberSuccess, isLoading: isDeleteMemberLoading }
+  ] = useDeleteMemberMutation();
+
+  useEffect(() => {
+    if (isDeleteMemberSuccess) {
+      navigate(`/teams`);
+    }
+  }, [isDeleteMemberSuccess]);
+
+  useEffect(() => {
+    if (deleteMemberError) {
+      toast({
+        title: 'An error occurred!',
+        description: getErrorMessage(deleteMemberError),
+        status: 'error',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+    }
+  }, [deleteMemberError]);
 
   useEffect(() => {
     if (isCreateInviteSuccess) {
@@ -144,37 +164,6 @@ export const Team = () => {
       handleOnEmailInviteClose();
     }
   }, [createInviteError]);
-
-  useEffect(() => {
-    if (isDeleteMemberSuccess) {
-      if (members.find((member) => member.id === userId)?.isManager) {
-        toast({
-          title: 'Member removed successfully.',
-          status: 'success',
-          position: 'top',
-          duration: 5000,
-          isClosable: true
-        });
-      } else {
-        navigate(`/teams`);
-      }
-      onMemberListClose();
-    }
-  }, [isDeleteMemberSuccess]);
-
-  useEffect(() => {
-    if (deleteMemberError) {
-      toast({
-        title: 'An error occurred!',
-        description: getErrorMessage(deleteMemberError),
-        status: 'error',
-        position: 'top',
-        duration: 5000,
-        isClosable: true
-      });
-      onMemberListClose();
-    }
-  }, [deleteMemberError]);
 
   useEffect(() => {
     if (isDeleteTeamSuccess) {
@@ -285,7 +274,7 @@ export const Team = () => {
     }
   };
 
-  if (isTeamsLoading || isUserLoading) {
+  if (isTeamsLoading || isUserLoading || !team_id || !team) {
     return (
       <Center height={'75vh'}>
         <Spinner size={'xl'} />
@@ -310,7 +299,7 @@ export const Team = () => {
               <Box p={6}>
                 <Stack spacing={0} align={'center'} mb={5}>
                   <Heading fontSize={'2xl'} fontWeight={800} fontFamily={'body'}>
-                    {team?.name}
+                    {team.name}
                   </Heading>
                 </Stack>
                 <Divider borderColor={'gray.300'} />
@@ -367,7 +356,7 @@ export const Team = () => {
                   </Heading>
                 </Stack>
                 <Divider borderColor={'gray.300'} />
-                <Stack my={5} gap={2}>
+                <Stack maxHeight={'482px'} overflowY={'auto'} my={5} gap={3}>
                   {isMembersLoading ? (
                     <Center height={40}>
                       <Spinner size={'xl'} />
@@ -376,37 +365,16 @@ export const Team = () => {
                     members
                       .filter((member) => member.id !== userId)
                       .map((member) => (
-                        <Stack
-                          justify={'space-between'}
-                          align="center"
-                          direction="row"
+                        <TeamMemberCard
                           key={member.id}
-                        >
-                          <Button
-                            as={RouterLink}
-                            color={'gray.800'}
-                            variant={'link'}
-                            to={`/users/${member.id}`}
-                          >
-                            @{member.username}
-                          </Button>
-                          {member.id !== userId &&
-                            members.find((member) => member.id === userId)?.isManager &&
-                            (isDeleteMemberLoading ? (
-                              <Center>
-                                <Spinner />
-                              </Center>
-                            ) : (
-                              <DeleteIcon
-                                onClick={(e) => {
-                                  handleDeleteMember(e, member.id);
-                                }}
-                                _hover={{ cursor: 'pointer', color: 'red' }}
-                                w={4}
-                                h={4}
-                              />
-                            ))}
-                        </Stack>
+                          member={member}
+                          isManager={
+                            members.find((member) => member.id === userId)?.isManager || false
+                          }
+                          userId={userId}
+                          teamId={parseInt(team_id)}
+                          sport={team?.sport}
+                        />
                       ))
                   )}
                 </Stack>
