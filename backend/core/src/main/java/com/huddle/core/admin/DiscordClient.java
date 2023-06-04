@@ -4,6 +4,7 @@ import com.huddle.core.executors.ExecutorsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -25,12 +26,19 @@ public class DiscordClient {
 
     private ExecutorService discordExecutor;
 
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
+
     @PostConstruct
     void init() {
         discordExecutor = executorsService.newSingleThreadExecutor();
     }
 
     public void sendMessage(String url, String content) {
+        if (activeProfile != "prod") {
+            return;
+        }
+
         if (content == null) {
             logger.error("Content was null while sending discord notification");
             return;

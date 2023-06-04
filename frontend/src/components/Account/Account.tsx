@@ -198,6 +198,14 @@ export const Account = () => {
     deleteUser({ id: accountFields.id, password: confirmPassword });
   };
 
+  const handleOnClose = (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (e) {
+      e.preventDefault();
+    }
+    setConfirmPassword('');
+    onClose();
+  };
+
   // Need to check if !userResponse since it can be not loading but be null since we come from login
   if (isUserLoading || !userResponse) {
     return (
@@ -324,7 +332,7 @@ export const Account = () => {
         </Stack>
       </Flex>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={handleOnClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Are you sure?</ModalHeader>
@@ -343,7 +351,7 @@ export const Account = () => {
           </ModalBody>
 
           <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onClose}>
+            <Button variant="ghost" mr={3} onClick={handleOnClose}>
               Close
             </Button>
             <Button
