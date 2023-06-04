@@ -3,11 +3,13 @@ package com.huddle.api.user;
 import com.huddle.api.session.SignupRequest;
 import com.huddle.api.team.DbTeam;
 import com.huddle.api.teammember.DbTeamMember;
+import com.huddle.core.admin.DiscordClient;
 import com.huddle.core.email.EmailSender;
 import com.huddle.core.exceptions.BadRequestException;
 import com.huddle.core.exceptions.ConflictException;
 import com.huddle.core.storage.StorageProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,10 +32,16 @@ public class UserService {
     EmailSender emailSender;
 
     @Autowired
+    DiscordClient discordClient;
+
+    @Autowired
     PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Autowired
     StorageProvider storageProvider;
+
+    @Value("${discord.newUserUrl}")
+    private String discordNewUserUrl;
 
     public DbUser createUser(SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
@@ -62,6 +70,17 @@ public class UserService {
                 "CreatedAccount",
                 variables,
                 "Welcome to Huddle!"
+        );
+
+        discordClient.sendMessage(
+                discordNewUserUrl,
+                String.format(
+                        "New User Created:\nUsername: %s\nEmail: %s\nFirst Name: %s\nLast Name: %s",
+                        dbUser.getUsername(),
+                        dbUser.getEmail(),
+                        dbUser.getFirstName(),
+                        dbUser.getLastName()
+                )
         );
 
         return dbUser;
