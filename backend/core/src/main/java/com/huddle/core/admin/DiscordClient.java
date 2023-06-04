@@ -35,9 +35,7 @@ public class DiscordClient {
     }
 
     public void sendMessage(String url, String content) {
-        System.out.println(activeProfile);
-        System.out.println(activeProfile != "prod");
-        if (activeProfile != "prod") {
+        if (!activeProfile.equals("prod")) {
             return;
         }
 
