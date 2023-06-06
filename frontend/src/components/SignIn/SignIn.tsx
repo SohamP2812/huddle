@@ -136,6 +136,7 @@ export const SignIn = () => {
                   />
                 </FormControl>
                 <FormControl id="password">
+                  <FormLabel>Password</FormLabel>
                   <InputGroup>
                     <Input
                       type={showPassword ? 'text' : 'password'}
