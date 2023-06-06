@@ -13,10 +13,13 @@ import {
   Spacer,
   Center,
   Spinner,
-  useToast
+  useToast,
+  InputRightElement,
+  InputGroup
 } from '@chakra-ui/react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 
 import { allFieldsFilled, getErrorMessage } from 'utils/misc';
 
@@ -76,6 +79,7 @@ export const SignUp = () => {
     email: '',
     password: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChangeSignupFields = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setSignupFields({
@@ -148,12 +152,26 @@ export const SignUp = () => {
                 </FormControl>
                 <FormControl id="password">
                   <FormLabel>Password</FormLabel>
-                  <Input
-                    type="password"
-                    name="password"
-                    onChange={handleChangeSignupFields}
-                    value={signupFields.password}
-                  />
+                  <InputGroup>
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      name="password"
+                      onChange={handleChangeSignupFields}
+                      value={signupFields.password}
+                    />
+                    <InputRightElement h={'full'}>
+                      <Button
+                        _hover={{ bg: 'gray.100' }}
+                        color={'black'}
+                        variant={'ghost'}
+                        onClick={() => {
+                          setShowPassword(!showPassword);
+                        }}
+                      >
+                        {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+                      </Button>
+                    </InputRightElement>
+                  </InputGroup>
                 </FormControl>
                 <Spacer />
                 <Button

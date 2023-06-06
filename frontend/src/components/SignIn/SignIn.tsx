@@ -18,10 +18,13 @@ import {
   Text,
   useToast,
   Center,
-  Spinner
+  Spinner,
+  InputRightElement,
+  InputGroup
 } from '@chakra-ui/react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 
 import { allFieldsFilled, getErrorMessage } from 'utils/misc';
 
@@ -75,7 +78,7 @@ export const SignIn = () => {
     username: '',
     password: ''
   });
-
+  const [showPassword, setShowPassword] = useState(false);
   const [forgotPassword, setForgotPassword] = useState(false);
 
   const handleChangeLoginFields = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -133,13 +136,26 @@ export const SignIn = () => {
                   />
                 </FormControl>
                 <FormControl id="password">
-                  <FormLabel>Password</FormLabel>
-                  <Input
-                    type="password"
-                    name="password"
-                    onChange={handleChangeLoginFields}
-                    value={loginFields.password}
-                  />
+                  <InputGroup>
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      name="password"
+                      onChange={handleChangeLoginFields}
+                      value={loginFields.password}
+                    />
+                    <InputRightElement h={'full'}>
+                      <Button
+                        _hover={{ bg: 'gray.100' }}
+                        color={'black'}
+                        variant={'ghost'}
+                        onClick={() => {
+                          setShowPassword(!showPassword);
+                        }}
+                      >
+                        {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+                      </Button>
+                    </InputRightElement>
+                  </InputGroup>
                 </FormControl>
                 <Stack spacing={10}>
                   <Link onClick={() => setForgotPassword(true)} color={'blue.400'}>
