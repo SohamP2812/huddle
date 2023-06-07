@@ -2,19 +2,24 @@ package com.huddle.api.user;
 
 import com.huddle.core.persistence.DbTimestampedEntity;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.Date;
 
 @Entity
 @Table(name = "password_reset_tokens")
 public class DbPasswordResetToken extends DbTimestampedEntity {
+    @NotNull
     private String token;
 
-    @OneToOne(targetEntity = DbUser.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "user_id")
+    @NotNull
+    @OneToOne
     private DbUser user;
 
+    @NotNull
     private Date expiryDate;
 
     public DbPasswordResetToken() {

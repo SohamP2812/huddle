@@ -1,11 +1,13 @@
 package com.huddle.api.teamalbum;
 
 import com.huddle.api.team.DbTeam;
+import com.huddle.api.team.ESport;
 import com.huddle.api.teamimage.DbTeamImage;
 import com.huddle.core.persistence.DbTimestampedEntity;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,10 +15,12 @@ import java.util.Set;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "team_albums")
 public class DbTeamAlbum extends DbTimestampedEntity {
+    @NotNull
+    private ESport sport;
     private String name;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "team_id")
     private DbTeam team;
 
     @OneToMany(mappedBy = "teamAlbum", cascade = CascadeType.REMOVE)

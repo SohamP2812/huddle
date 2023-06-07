@@ -30,20 +30,16 @@ public class DbEvent extends DbTimestampedEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
     private EEvent eventType;
 
     @NotNull
-    @Column(name = "start_time")
     private OffsetDateTime startTime;
 
     @NotNull
-    @Column(name = "end_time")
     private OffsetDateTime endTime;
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "team_id")
     private DbTeam team;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE)

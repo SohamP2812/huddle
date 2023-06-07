@@ -4,16 +4,21 @@ import com.huddle.api.teamalbum.DbTeamAlbum;
 import com.huddle.core.persistence.DbTimestampedEntity;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "team_images")
 public class DbTeamImage extends DbTimestampedEntity {
+    @NotNull
     private String url;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "album_id")
     private DbTeamAlbum teamAlbum;
 
     public DbTeamImage() {

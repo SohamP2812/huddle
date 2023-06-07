@@ -22,9 +22,13 @@ public class DbTeam extends DbTimestampedEntity {
     @Size(max = 20)
     private String name;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "manager")
     private DbUser manager;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private ESport sport;
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.REMOVE)
     private Set<DbTeamMember> teamMembers = new HashSet<>();
@@ -37,10 +41,6 @@ public class DbTeam extends DbTimestampedEntity {
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.REMOVE)
     private Set<DbTeamAlbum> albums = new HashSet<>();
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private ESport sport;
 
     public DbTeam() {
     }

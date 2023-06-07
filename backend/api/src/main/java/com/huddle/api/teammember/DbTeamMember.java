@@ -7,24 +7,27 @@ import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "team_members")
 public class DbTeamMember extends DbTimestampedEntity {
+    @NotNull
     @Enumerated(EnumType.STRING)
     private ERole role;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'UNKNOWN'")
     private EPosition position;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "user_id")
     private DbUser member;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "team_id")
     private DbTeam team;
 
     public DbTeamMember() {

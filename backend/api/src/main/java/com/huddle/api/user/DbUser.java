@@ -5,6 +5,7 @@ import com.huddle.api.team.DbTeam;
 import com.huddle.api.teammember.DbTeamMember;
 import com.huddle.core.persistence.DbTimestampedEntity;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -44,6 +45,7 @@ public class DbUser extends DbTimestampedEntity {
     @Size(max = 120)
     private String password;
 
+    @Nullable
     private String profilePictureUrl;
 
     @OneToMany(mappedBy = "manager", cascade = CascadeType.REMOVE)

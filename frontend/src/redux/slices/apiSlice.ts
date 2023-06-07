@@ -34,7 +34,7 @@ export const apiSlice = createApi({
     }),
     logout: builder.mutation<string, void>({
       query: () => ({ url: `session`, method: 'DELETE' }),
-      invalidatesTags: ['Self']
+      invalidatesTags: ['Self', 'Invites', 'Teams', 'Members', 'Events', 'Participants', 'Albums', 'Images']
     }),
     createUser: builder.mutation<User, AccountCreationInfo>({
       query: (newUser) => ({ url: `users`, method: 'POST', body: newUser }),

@@ -4,21 +4,28 @@ import com.huddle.api.team.DbTeam;
 import com.huddle.core.persistence.DbTimestampedEntity;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "team_invites")
 public class DbTeamInvite extends DbTimestampedEntity {
+    @NotNull
     private String token;
 
+    @NotNull
     private String email;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "team_id")
     private DbTeam team;
 
+    @NotNull
     private EInvitation state;
 
     public DbTeamInvite() {

@@ -5,19 +5,21 @@ import com.huddle.api.user.DbUser;
 import com.huddle.core.persistence.DbTimestampedEntity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "event_participants")
 public class DbEventParticipant extends DbTimestampedEntity {
+    @NotNull
     @Enumerated(EnumType.STRING)
     private EAttendance attendance;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "user_id")
     private DbUser participant;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "event_id")
     private DbEvent event;
 
     public DbEventParticipant() {
