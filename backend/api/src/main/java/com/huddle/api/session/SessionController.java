@@ -4,13 +4,9 @@ import com.huddle.api.application.security.jwt.JwtUtils;
 import com.huddle.api.user.DbUser;
 import com.huddle.api.user.UserDetails;
 import com.huddle.api.user.UserResponse;
-import com.huddle.api.user.UserService;
-import com.huddle.core.payload.MessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
@@ -21,26 +17,18 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/session")
 public class SessionController {
+    @Autowired
+    SessionService sessionService;
 
     @Autowired
     JwtUtils jwtUtils;
-
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
 
     @PostMapping("")
     public ResponseEntity<?> authenticateUser(
             HttpServletResponse response,
             @Valid @RequestBody LoginRequest loginRequest
     ) {
-        DbUser dbUser = userService.getUserByEmailOrUsername(loginRequest.getUsername());
-
-        if (!this.passwordEncoder.matches(loginRequest.getPassword(), dbUser.getPassword())) {
-            throw new BadCredentialsException("Invalid credentials.");
-        }
+        DbUser dbUser = sessionService.authenticateAndRetrieveUser(loginRequest);
 
         String jwt = jwtUtils.generateJwtToken(dbUser);
 
@@ -55,8 +43,8 @@ public class SessionController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getSelfFromToken(@AuthenticationPrincipal UserDetails userDetails) {
-        DbUser dbUser = userService.getUser(userDetails.getId());
+    public ResponseEntity<?> getSelfFromId(@AuthenticationPrincipal UserDetails userDetails) {
+        DbUser dbUser = sessionService.getSelfFromId(userDetails.getId());
 
         return ResponseEntity.ok(new UserResponse(dbUser));
     }
@@ -70,6 +58,6 @@ public class SessionController {
 
         response.addCookie(jwtTokenCookie);
 
-        return ResponseEntity.ok(new MessageResponse("Logged out."));
+        return ResponseEntity.ok(null);
     }
 }
