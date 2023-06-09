@@ -45,8 +45,10 @@ public class DbEvent extends DbTimestampedEntity {
     @OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE)
     private Set<DbEventParticipant> eventParticipants = new HashSet<>();
 
+    @NotNull
     private Integer teamScore;
 
+    @NotNull
     private Integer opponentScore;
 
     public DbEvent() {

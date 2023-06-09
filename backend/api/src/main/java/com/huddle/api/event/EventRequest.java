@@ -26,6 +26,7 @@ public class EventRequest {
 
     private Integer teamScore;
 
+    @NotNull
     private Integer opponentScore;
 
     @NotNull
