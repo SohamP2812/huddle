@@ -1,14 +1,17 @@
-package com.huddle.api.security.jwt;
+package com.huddle.api.application.security.jwt;
 
-import com.huddle.api.security.services.UserDetailsImpl;
+import com.huddle.api.user.DbUser;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 
 @Component
 public class JwtUtils {
@@ -20,25 +23,38 @@ public class JwtUtils {
     @Value("${huddle.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-    public String generateJwtToken(Authentication authentication) {
-        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+    public String parseJwtFromCookie(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+        if (request.getCookies().length == 0) return null;
 
+        Optional<String> token = Arrays.stream(request.getCookies())
+                .filter(cookie -> "huddle_session".equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findAny();
+
+        return token.orElse(null);
+
+    }
+
+    public String generateJwtToken(DbUser dbUser) {
         return Jwts
                 .builder()
-                .setSubject((userPrincipal.getUsername()))
+                .setSubject(dbUser.getId().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 
-    public String getUserNameFromJwtToken(String token) {
-        return Jwts
-                .parser()
-                .setSigningKey(jwtSecret)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+    public Long getIdFromJwtToken(String token) {
+        return Long.parseLong(
+                Jwts
+                        .parser()
+                        .setSigningKey(jwtSecret)
+                        .parseClaimsJws(token)
+                        .getBody()
+                        .getSubject()
+        );
     }
 
     public boolean validateJwtToken(String authToken) {

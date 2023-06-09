@@ -6,6 +6,7 @@ import com.huddle.api.teammember.ERole;
 import com.huddle.api.teammember.TeamMemberRepository;
 import com.huddle.api.user.DbUser;
 import com.huddle.api.user.UserService;
+import com.huddle.core.exceptions.ConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +25,10 @@ public class TeamService {
     TeamMemberRepository teamMemberRepository;
 
     public DbTeam createTeam(TeamRequest teamRequest, Long userId) {
+        if (teamRepository.existsByNameAndManagerId(teamRequest.getName(), userId)) {
+            throw new ConflictException("You already have a team with this name!");
+        }
+
         DbUser dbUser = userService.getUser(userId);
 
         DbTeam dbTeam = new DbTeam(

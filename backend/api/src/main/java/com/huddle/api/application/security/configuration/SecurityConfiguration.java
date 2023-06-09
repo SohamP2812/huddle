@@ -1,8 +1,7 @@
-package com.huddle.api.security;
+package com.huddle.api.application.security.configuration;
 
-import com.huddle.api.security.jwt.AuthEntryPointJwt;
-import com.huddle.api.security.jwt.AuthTokenFilter;
-import com.huddle.api.security.services.UserDetailsServiceImpl;
+import com.huddle.api.application.security.filter.AuthTokenFilter;
+import com.huddle.api.application.security.filter.StaticContentFilter;
 import io.micrometer.core.aop.TimedAspect;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.catalina.Context;
@@ -18,9 +17,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,33 +34,20 @@ import java.util.Optional;
 
 @Configuration
 @EnableJpaAuditing(dateTimeProviderRef = "auditingDateTimeProvider")
-@EnableGlobalMethodSecurity(
-        // securedEnabled = true,
-        // jsr250Enabled = true,
-        prePostEnabled = true
-)
-public class WebSecurityConfig {
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class SecurityConfiguration {
     @Autowired
     Environment environment;
-    @Autowired
-    UserDetailsServiceImpl userDetailsService;
 
     @Autowired
-    private AuthEntryPointJwt unauthorizedHandler;
+    StaticContentFilter staticContentFilter;
+
+    @Autowired
+    AuthTokenFilter authTokenFilter;
 
     @Bean
     public TimedAspect timedAspect(MeterRegistry registry) {
         return new TimedAspect(registry);
-    }
-
-    @Bean
-    public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
-    }
-
-    @Bean
-    public StaticContentFilter staticContentFilterBean() {
-        return new StaticContentFilter();
     }
 
     @Bean(name = "auditingDateTimeProvider")
@@ -71,20 +56,9 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-
-        return authProvider;
-    }
-
-    @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authConfig
-    )
-            throws Exception {
+    ) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
@@ -94,46 +68,30 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain configure(final HttpSecurity httpSecurity) throws Exception {
         if (Arrays.toString(environment.getActiveProfiles()).contains("prod")) {
-            http.requiresChannel().anyRequest().requiresSecure();
+            httpSecurity.requiresChannel().anyRequest().requiresSecure();
         }
 
-        http
-                .cors()
-                .and()
-                .csrf()
-                .disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(unauthorizedHandler)
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/users")
-                .permitAll()
-                .antMatchers(HttpMethod.POST, "/api/session")
-                .permitAll()
-                .antMatchers(HttpMethod.DELETE, "/api/users/password")
-                .permitAll()
-                .antMatchers(HttpMethod.POST, "/api/users/password")
-                .permitAll()
-                .antMatchers(HttpMethod.GET, "/actuator/**")
-                .permitAll()
-                .anyRequest()
-                .authenticated();
+        return httpSecurity
+                .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorize -> {
+                    for (Endpoint e : SecurityProperties.doNotAuthenticate()) {
+                        authorize.antMatchers(e.method(), e.path()).permitAll();
+                    }
 
-        http.authenticationProvider(authenticationProvider());
-
-        http.addFilterBefore(
-                authenticationJwtTokenFilter(),
-                UsernamePasswordAuthenticationFilter.class
-        );
-
-        http.addFilterBefore(staticContentFilterBean(), UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
+                    authorize.anyRequest().authenticated();
+                })
+                .addFilterBefore(authTokenFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
+                .addFilterBefore(
+                        staticContentFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
+                .build();
     }
 
     @Bean

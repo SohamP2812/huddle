@@ -4,7 +4,30 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c81295fc-1b7e-4917-831a-4e2025b39f16" name="Changes" comment="" />
+    <list default="true" id="c81295fc-1b7e-4917-831a-4e2025b39f16" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/startup/BackendApplication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/user/UserDetails.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/BackendApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/event/EventController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/event/EventController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/eventparticipant/EventParticipantController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/eventparticipant/EventParticipantController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/security/StaticContentFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/startup/security/filter/StaticContentFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/security/WebSecurityConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/security/jwt/AuthEntryPointJwt.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/security/jwt/AuthTokenFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/startup/security/filter/AuthTokenFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/security/jwt/JwtUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/startup/security/jwt/JwtUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/security/services/UserDetailsImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/security/services/UserDetailsServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/session/SessionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/session/SessionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/team/TeamController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/team/TeamController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/team/TeamRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/team/TeamRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/team/TeamService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/team/TeamService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/teammember/TeamMemberController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/teammember/TeamMemberController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/user/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/user/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/user/UserResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/user/UserResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/user/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/src/main/java/com/huddle/api/user/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

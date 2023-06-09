@@ -1,5 +1,7 @@
 package com.huddle.api.user;
 
+import org.springframework.lang.Nullable;
+
 public class UserResponse {
     private Long id;
     private String username;
@@ -8,6 +10,7 @@ public class UserResponse {
     private String lastName;
     private String email;
 
+    @Nullable
     private String profilePictureUrl;
 
     public UserResponse(DbUser dbUser) {

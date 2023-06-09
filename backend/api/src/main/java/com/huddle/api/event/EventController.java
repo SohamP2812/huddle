@@ -1,15 +1,15 @@
 package com.huddle.api.event;
 
-import com.huddle.api.security.services.UserDetailsImpl;
 import com.huddle.api.team.DbTeam;
 import com.huddle.api.team.TeamService;
 import com.huddle.api.teammember.DbTeamMember;
 import com.huddle.api.teammember.TeamMemberService;
+import com.huddle.api.user.UserDetails;
 import com.huddle.core.exceptions.UnauthorizedException;
 import com.huddle.core.payload.MessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,9 +30,10 @@ public class EventController {
     EventService eventService;
 
     @GetMapping("")
-    public ResponseEntity<?> getEvents(Authentication authentication, @PathVariable Long team_id) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
+    public ResponseEntity<?> getEvents(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long team_id
+    ) {
         List<DbTeamMember> dbTeamMembers = teamMemberService.getMembers(team_id);
 
         if (!dbTeamMembers.stream().map(dbTeamMember -> dbTeamMember.getMember().getId()).toList().contains(userDetails.getId())) {
@@ -51,12 +52,10 @@ public class EventController {
 
     @PostMapping("")
     public ResponseEntity<?> createEvent(
-            Authentication authentication,
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody EventRequest eventRequest,
             @PathVariable Long team_id
     ) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         DbTeam dbTeam = teamService.getTeam(team_id);
 
         if (dbTeam.getManager().getId() != userDetails.getId()) {
@@ -70,12 +69,10 @@ public class EventController {
 
     @GetMapping("/{event_id}")
     public ResponseEntity<?> getEvent(
-            Authentication authentication,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long team_id,
             @PathVariable Long event_id
     ) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         DbEvent dbEvent = eventService.getEvent(team_id, event_id);
 
         if (!dbEvent.getEventParticipants().stream().map(dbEventParticipant -> dbEventParticipant.getParticipant().getId()).toList().contains(userDetails.getId())) {
@@ -88,12 +85,10 @@ public class EventController {
     @DeleteMapping("{event_id}")
     @Transactional
     public ResponseEntity<?> deleteEvent(
-            Authentication authentication,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long team_id,
             @PathVariable Long event_id
     ) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         DbTeam dbTeam = teamService.getTeam(team_id);
 
         if (dbTeam.getManager().getId() != userDetails.getId()) {
@@ -107,13 +102,11 @@ public class EventController {
 
     @PatchMapping("/{event_id}")
     public ResponseEntity<?> updateEvent(
-            Authentication authentication,
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody EventRequest eventRequest,
             @PathVariable Long team_id,
             @PathVariable Long event_id
     ) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         DbTeam dbTeam = teamService.getTeam(team_id);
 
         if (dbTeam.getManager().getId() != userDetails.getId()) {

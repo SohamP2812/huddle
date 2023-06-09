@@ -1,4 +1,4 @@
-package com.huddle.api.security;
+package com.huddle.api.application.security.filter;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -18,9 +18,9 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @Component
 public class StaticContentFilter extends OncePerRequestFilter {
 
-    private List<String> fileExtensions = Arrays.asList("html", "js", "json", "csv", "css", "png", "svg", "eot", "ttf", "woff", "jpg", "jpeg", "gif", "ico");
+    private final List<String> fileExtensions = Arrays.asList("html", "js", "json", "csv", "css", "png", "svg", "eot", "ttf", "woff", "jpg", "jpeg", "gif", "ico");
 
-    private HashMap<String, String> mimeTypes = new HashMap<String, String>() {{
+    private final HashMap<String, String> mimeTypes = new HashMap<String, String>() {{
         put("html", "text/html");
         put("js", "text/javascript");
         put("json", "application/json");
@@ -51,7 +51,11 @@ public class StaticContentFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
         String path = request.getServletPath();
 
         boolean isApi = path.startsWith("/api") || path.startsWith("/actuator");

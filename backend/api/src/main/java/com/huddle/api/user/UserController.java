@@ -1,8 +1,7 @@
 package com.huddle.api.user;
 
-import com.huddle.api.security.jwt.JwtUtils;
-import com.huddle.api.security.services.UserDetailsImpl;
 import com.huddle.api.session.SignupRequest;
+import com.huddle.api.application.security.jwt.JwtUtils;
 import com.huddle.api.team.DbTeam;
 import com.huddle.api.team.TeamResponse;
 import com.huddle.api.team.TeamsResponse;
@@ -11,9 +10,9 @@ import com.huddle.core.payload.MessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,6 +37,9 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @PostMapping("")
     public ResponseEntity<?> createUser(
             HttpServletResponse response,
@@ -45,15 +47,7 @@ public class UserController {
     ) {
         DbUser dbUser = userService.createUser(signUpRequest);
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        signUpRequest.getUsername(),
-                        signUpRequest.getPassword()
-                )
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+        String jwt = jwtUtils.generateJwtToken(dbUser);
 
         Cookie jwtTokenCookie = new Cookie("huddle_session", jwt);
 
@@ -107,13 +101,11 @@ public class UserController {
 
     @PatchMapping("/{user_id}")
     public ResponseEntity<?> updateUser(
-            Authentication authentication,
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestPart UserRequest user,
             @RequestPart(required = false) MultipartFile profilePictureImage,
             @PathVariable Long user_id
     ) throws IOException {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         if (userDetails.getId() != user_id) {
             throw new UnauthorizedException("You do not have the authority to make this change.");
         }
@@ -127,21 +119,13 @@ public class UserController {
     @Transactional
     public ResponseEntity<?> deleteUser(
             HttpServletResponse response,
-            Authentication authentication,
             @Valid @RequestBody DeleteUserRequest deleteUserRequest,
             @PathVariable Long user_id
     ) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        DbUser dbUser = userService.getUser(user_id);
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        userDetails.getUsername(),
-                        deleteUserRequest.getPassword()
-                )
-        );
-
-        if (userDetails.getId() != user_id) {
-            throw new UnauthorizedException("You do not have the authority to make this change.");
+        if (!this.passwordEncoder.matches(deleteUserRequest.getPassword(), dbUser.getPassword())) {
+            throw new BadCredentialsException("Invalid credentials.");
         }
 
         userService.deleteUser(user_id);
@@ -157,10 +141,7 @@ public class UserController {
     }
 
     @GetMapping("/{user_id}/teams")
-    public ResponseEntity<?> getTeams(
-            Authentication authentication,
-            @PathVariable Long user_id
-    ) {
+    public ResponseEntity<?> getTeams(@PathVariable Long user_id) {
         List<DbTeam> dbTeams = userService.getTeams(user_id);
 
         List<TeamResponse> responseTeams = dbTeams

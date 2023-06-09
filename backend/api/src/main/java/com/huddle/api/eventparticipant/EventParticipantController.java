@@ -1,10 +1,10 @@
 package com.huddle.api.eventparticipant;
 
-import com.huddle.api.security.services.UserDetailsImpl;
+import com.huddle.api.user.UserDetails;
 import com.huddle.core.exceptions.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -32,13 +32,11 @@ public class EventParticipantController {
 
     @PatchMapping("/{user_id}")
     public ResponseEntity<?> updateEventParticipant(
-            Authentication authentication,
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody EventParticipantRequest eventParticipantRequest,
             @PathVariable Long event_id,
             @PathVariable Long user_id
     ) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         if (userDetails.getId() != user_id) {
             throw new UnauthorizedException("You do not have the authority to make this change.");
         }

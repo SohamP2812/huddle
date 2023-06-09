@@ -19,6 +19,8 @@ import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class UserService {
@@ -26,7 +28,7 @@ public class UserService {
     UserRepository userRepository;
 
     @Autowired
-    PasswordEncoder encoder;
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     EmailSender emailSender;
@@ -57,7 +59,7 @@ public class UserService {
                 signUpRequest.getLastName(),
                 signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword())
+                passwordEncoder.encode(signUpRequest.getPassword())
         );
 
         userRepository.save(dbUser);
@@ -129,7 +131,7 @@ public class UserService {
 
         DbUser dbUser = dbPasswordResetToken.getUser();
 
-        dbUser.setPassword(encoder.encode(newPasswordRequest.getPassword()));
+        dbUser.setPassword(passwordEncoder.encode(newPasswordRequest.getPassword()));
 
         userRepository.save(dbUser);
 
@@ -144,6 +146,18 @@ public class UserService {
     public DbUser getUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
+    }
+
+    public DbUser getUserByEmailOrUsername(String identifier) {
+        Pattern pattern = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}");
+        Matcher matcher = pattern.matcher(identifier);
+
+        return matcher.matches() ? getUserByEmail(identifier) : getUserByUsername(identifier);
+    }
+
+    public DbUser getUserByUsername(String email) {
+        return userRepository.findByUsername(email)
+                .orElseThrow(() -> new EntityNotFoundException("No user exists with this username."));
     }
 
     public DbUser getUserByEmail(String email) {

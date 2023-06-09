@@ -1,17 +1,16 @@
 package com.huddle.api.session;
 
-import com.huddle.core.payload.MessageResponse;
-import com.huddle.api.security.jwt.JwtUtils;
-import com.huddle.api.security.services.UserDetailsImpl;
+import com.huddle.api.application.security.jwt.JwtUtils;
 import com.huddle.api.user.DbUser;
+import com.huddle.api.user.UserDetails;
 import com.huddle.api.user.UserResponse;
 import com.huddle.api.user.UserService;
+import com.huddle.core.payload.MessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
@@ -22,8 +21,6 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/session")
 public class SessionController {
-    @Autowired
-    AuthenticationManager authenticationManager;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -31,22 +28,21 @@ public class SessionController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @PostMapping("")
     public ResponseEntity<?> authenticateUser(
             HttpServletResponse response,
             @Valid @RequestBody LoginRequest loginRequest
     ) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
+        DbUser dbUser = userService.getUserByEmailOrUsername(loginRequest.getUsername());
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+        if (!this.passwordEncoder.matches(loginRequest.getPassword(), dbUser.getPassword())) {
+            throw new BadCredentialsException("Invalid credentials.");
+        }
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        String jwt = jwtUtils.generateJwtToken(dbUser);
 
         Cookie jwtTokenCookie = new Cookie("huddle_session", jwt);
 
@@ -55,22 +51,11 @@ public class SessionController {
 
         response.addCookie(jwtTokenCookie);
 
-        return ResponseEntity.ok(
-                new JwtResponse(
-                        jwt,
-                        userDetails.getId(),
-                        userDetails.getFirstName(),
-                        userDetails.getLastName(),
-                        userDetails.getUsername(),
-                        userDetails.getEmail()
-                )
-        );
+        return ResponseEntity.ok(null);
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getSelfFromToken(Authentication authentication) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
+    public ResponseEntity<?> getSelfFromToken(@AuthenticationPrincipal UserDetails userDetails) {
         DbUser dbUser = userService.getUser(userDetails.getId());
 
         return ResponseEntity.ok(new UserResponse(dbUser));

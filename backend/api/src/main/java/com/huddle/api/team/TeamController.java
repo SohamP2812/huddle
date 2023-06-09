@@ -1,13 +1,13 @@
 package com.huddle.api.team;
 
-import com.huddle.api.security.services.UserDetailsImpl;
 import com.huddle.api.teammember.DbTeamMember;
 import com.huddle.api.teammember.TeamMemberService;
+import com.huddle.api.user.UserDetails;
 import com.huddle.core.exceptions.UnauthorizedException;
 import com.huddle.core.payload.MessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,20 +29,19 @@ public class TeamController {
 
     @PostMapping("")
     public ResponseEntity<?> createTeam(
-            Authentication authentication,
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody TeamRequest teamRequest
     ) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         DbTeam dbTeam = teamService.createTeam(teamRequest, userDetails.getId());
 
         return ResponseEntity.ok(new TeamResponse(dbTeam));
     }
 
     @GetMapping("/{team_id}")
-    public ResponseEntity<?> getTeam(Authentication authentication, @PathVariable Long team_id) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
+    public ResponseEntity<?> getTeam(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long team_id
+    ) {
         List<DbTeamMember> dbTeamMembers = teamMemberService.getMembers(team_id);
 
         if (!dbTeamMembers.stream().map(dbTeamMember -> dbTeamMember.getMember().getId()).toList().contains(userDetails.getId())) {
@@ -56,9 +55,10 @@ public class TeamController {
 
     @DeleteMapping("/{team_id}")
     @Transactional
-    public ResponseEntity<?> deleteTeam(Authentication authentication, @PathVariable Long team_id) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
+    public ResponseEntity<?> deleteTeam(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long team_id
+    ) {
         DbTeam dbTeam = teamService.getTeam(team_id);
 
         if (dbTeam.getManager().getId() != userDetails.getId()) {

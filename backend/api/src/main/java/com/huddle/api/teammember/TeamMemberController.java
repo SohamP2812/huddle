@@ -1,13 +1,13 @@
 package com.huddle.api.teammember;
 
-import com.huddle.api.security.services.UserDetailsImpl;
 import com.huddle.api.team.DbTeam;
 import com.huddle.api.team.TeamService;
+import com.huddle.api.user.UserDetails;
 import com.huddle.core.exceptions.UnauthorizedException;
 import com.huddle.core.payload.MessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,9 +25,10 @@ public class TeamMemberController {
     TeamService teamService;
 
     @GetMapping("")
-    public ResponseEntity<?> getMembers(Authentication authentication, @PathVariable Long team_id) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
+    public ResponseEntity<?> getMembers(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long team_id
+    ) {
         List<DbTeamMember> dbTeamMembers = teamMemberService.getMembers(team_id);
 
         if (!dbTeamMembers.stream().map(dbTeamMember -> dbTeamMember.getMember().getId()).toList().contains(userDetails.getId())) {
@@ -43,12 +44,10 @@ public class TeamMemberController {
 
     @PostMapping("")
     public ResponseEntity<?> addMember(
-            Authentication authentication,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long team_id,
             @Valid @RequestBody MemberRequest memberRequest
     ) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         DbTeam dbTeam = teamService.getTeam(team_id);
 
         if (dbTeam.getManager().getId() != userDetails.getId()) {
@@ -66,12 +65,10 @@ public class TeamMemberController {
 
     @GetMapping("/{user_id}")
     public ResponseEntity<?> getMember(
-            Authentication authentication,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long team_id,
             @PathVariable Long user_id
     ) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         List<DbTeamMember> dbTeamMembers = teamMemberService.getMembers(team_id);
 
         if (!dbTeamMembers.stream().map(dbTeamMember -> dbTeamMember.getMember().getId()).toList().contains(userDetails.getId())) {
@@ -86,12 +83,10 @@ public class TeamMemberController {
     @DeleteMapping("/{user_id}")
     @Transactional
     public ResponseEntity<?> deleteMember(
-            Authentication authentication,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long team_id,
             @PathVariable Long user_id
     ) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         DbTeam dbTeam = teamService.getTeam(team_id);
 
         if (dbTeam.getManager().getId() != userDetails.getId() && user_id != userDetails.getId()) {
