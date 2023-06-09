@@ -4,7 +4,7 @@ import javax.persistence.MappedSuperclass;
 
 
 @MappedSuperclass
-public abstract class DbSoftDeletionEntity extends DbEntity {
+public abstract class DbSoftDeletionEntity extends DbTimestampedEntity {
     private boolean deleted = false;
 
     public boolean isDeleted() {

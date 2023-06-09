@@ -24,7 +24,10 @@ public class TeamService {
     @Autowired
     TeamMemberRepository teamMemberRepository;
 
-    public DbTeam createTeam(TeamRequest teamRequest, Long userId) {
+    public DbTeam createTeam(
+            TeamRequest teamRequest,
+            Long userId
+    ) {
         if (teamRepository.existsByNameAndManagerId(teamRequest.getName(), userId)) {
             throw new ConflictException("You already have a team with this name!");
         }
