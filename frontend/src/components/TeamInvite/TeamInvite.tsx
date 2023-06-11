@@ -133,7 +133,7 @@ export const TeamInvite = () => {
 
   if (isUserLoading || isInvitesLoading || !invite) {
     return (
-      <Center height={'75vh'}>
+      <Center height={'84vh'}>
         <Spinner size={'xl'} />
       </Center>
     );

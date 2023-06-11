@@ -276,7 +276,7 @@ export const Team = () => {
 
   if (isTeamsLoading || isUserLoading || !team_id || !team) {
     return (
-      <Center height={'75vh'}>
+      <Center height={'84vh'}>
         <Spinner size={'xl'} />
       </Center>
     );

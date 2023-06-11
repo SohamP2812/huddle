@@ -209,7 +209,7 @@ export const Account = () => {
   // Need to check if !userResponse since it can be not loading but be null since we come from login
   if (isUserLoading || !userResponse) {
     return (
-      <Center height={'75vh'}>
+      <Center height={'84vh'}>
         <Spinner size={'xl'} />
       </Center>
     );

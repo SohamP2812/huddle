@@ -185,7 +185,7 @@ export const CreateEvent = () => {
 
   if (isUserLoading || isMembersLoading) {
     return (
-      <Center height={'75vh'}>
+      <Center height={'84vh'}>
         <Spinner size={'xl'} />
       </Center>
     );

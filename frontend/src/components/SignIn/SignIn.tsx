@@ -99,7 +99,7 @@ export const SignIn = () => {
 
   if (isUserLoading) {
     return (
-      <Center height={'75vh'}>
+      <Center height={'84vh'}>
         <Spinner size={'xl'} />
       </Center>
     );

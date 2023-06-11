@@ -62,7 +62,7 @@ export const TeamInvites = () => {
 
   if (isUserLoading || isInvitesLoading) {
     return (
-      <Center height={'75vh'}>
+      <Center height={'84vh'}>
         <Spinner size={'xl'} />
       </Center>
     );

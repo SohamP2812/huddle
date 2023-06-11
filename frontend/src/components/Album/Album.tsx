@@ -64,7 +64,7 @@ export const Album = () => {
 
   if (isImagesLoading) {
     return (
-      <Center height={'75vh'}>
+      <Center height={'84vh'}>
         <Spinner size={'xl'} />
       </Center>
     );

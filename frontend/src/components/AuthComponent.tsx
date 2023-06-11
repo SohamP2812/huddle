@@ -24,7 +24,7 @@ export const AuthComponent: FC<IProps> = ({ children, isProtected = false }) => 
 
   if (!user && isProtected) {
     return (
-      <Center height={'75vh'}>
+      <Center height={'84vh'}>
         <Spinner size={'xl'} />
       </Center>
     );
