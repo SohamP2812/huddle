@@ -16,6 +16,7 @@ import { App } from 'App';
 
 import { theme as baseTheme } from 'theme';
 import { Header } from 'components/Header/Header';
+import { Footer } from 'components/Footer/Footer';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -38,6 +39,7 @@ root.render(
           <BrowserRouter>
             <Header />
             <App />
+            <Footer />
           </BrowserRouter>
         </Provider>
       </ChakraProvider>
