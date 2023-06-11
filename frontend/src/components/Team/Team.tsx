@@ -363,7 +363,16 @@ export const Team = () => {
                     </Center>
                   ) : (
                     members
-                      .filter((member) => member.id !== userId)
+                      .slice()
+                      .sort((a, b) => {
+                        if (a.id === userId) {
+                          return -1;
+                        } else if (b.id === userId) {
+                          return 1;
+                        } else {
+                          return 0;
+                        }
+                      })
                       .map((member) => (
                         <TeamMemberCard
                           key={member.id}
@@ -583,7 +592,7 @@ export const Team = () => {
             </ModalContent>
           </Modal>
 
-          <Modal isOpen={isMemberListOpen} onClose={onMemberListClose}>
+          <Modal isOpen={isMemberListOpen} onClose={handleOnMemberListClose}>
             <ModalOverlay />
             <ModalContent>
               <ModalHeader>Update Member List</ModalHeader>
@@ -643,7 +652,7 @@ export const Team = () => {
             </ModalContent>
           </Modal>
 
-          <Modal isOpen={isEmailInviteOpen} onClose={onEmailInviteClose}>
+          <Modal isOpen={isEmailInviteOpen} onClose={handleOnEmailInviteClose}>
             <ModalOverlay />
             <ModalContent>
               <ModalHeader>Send an email invite</ModalHeader>

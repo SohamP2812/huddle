@@ -29,7 +29,7 @@ export const Teams = () => {
       <Flex
         flexDirection={'column'}
         minH={'100vh'}
-        pt={10}
+        py={10}
         px={10}
         bg={'gray.50'}
         alignItems={'center'}
