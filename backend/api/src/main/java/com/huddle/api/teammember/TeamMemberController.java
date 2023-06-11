@@ -93,8 +93,33 @@ public class TeamMemberController {
             throw new UnauthorizedException("You do not have the authority to make this change.");
         }
 
-        teamMemberService.deleteMember(team_id, user_id);
+        teamMemberService.deleteMember(
+                team_id,
+                user_id
+        );
 
         return ResponseEntity.ok(new MessageResponse("Member deleted successfully!"));
+    }
+
+    @PatchMapping("/{user_id}")
+    public ResponseEntity<?> updateMember(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long team_id,
+            @PathVariable Long user_id,
+            @Valid @RequestBody UpdateMemberRequest updateMemberRequest
+    ) {
+        DbTeam dbTeam = teamService.getTeam(team_id);
+
+        if (dbTeam.getManager().getId() != userDetails.getId() && user_id != userDetails.getId()) {
+            throw new UnauthorizedException("You do not have the authority to make this change.");
+        }
+
+        DbTeamMember dbTeamMember = teamMemberService.updateMember(
+                team_id,
+                user_id,
+                updateMemberRequest
+        );
+
+        return ResponseEntity.ok(new MemberResponse(dbTeamMember));
     }
 }

@@ -125,4 +125,19 @@ public class TeamMemberService {
                 String.format("You've Been Removed from the %s Team", dbTeam.getName())
         );
     }
+
+    public DbTeamMember updateMember(
+            Long teamId,
+            Long userId,
+            UpdateMemberRequest updateMemberRequest
+    ) {
+        DbTeamMember dbTeamMember = getMember(
+                teamId,
+                userId
+        );
+
+        dbTeamMember.setPosition(updateMemberRequest.getPosition());
+
+        return teamMemberRepository.save(dbTeamMember);
+    }
 }

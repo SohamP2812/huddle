@@ -13,8 +13,6 @@ export const apiSlice = createApi({
           method: 'GET'
         });
 
-        console.log(result)
-
         if (result.error?.status === 403) {
           return { data: null };
         }
@@ -50,7 +48,7 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Self', 'Teams', 'Events', 'Participants']
     }),
-    updatePassword: builder.mutation<string, {token: string, password: string}>({
+    updatePassword: builder.mutation<string, { token: string, password: string }>({
       query: (resetDetails) => ({ url: `users/password`, method: 'POST', body: resetDetails }),
       invalidatesTags: ['Self']
     }),
@@ -107,6 +105,14 @@ export const apiSlice = createApi({
         method: 'DELETE'
       }),
       invalidatesTags: ['Members', 'Teams']
+    }),
+    updateMember: builder.mutation<Member, { userId: number; teamId: number, updatedMember: Partial<Member> }>({
+      query: ({ userId, teamId, updatedMember }) => ({
+        url: `teams/${teamId}/members/${userId}`,
+        method: 'PATCH',
+        body: updatedMember
+      }),
+      invalidatesTags: ['Members']
     }),
     createTeam: builder.mutation<Team, Partial<Team>>({
       query: (createdTeam) => ({
@@ -284,6 +290,7 @@ export const {
   useGetMembersQuery,
   useAddMemberMutation,
   useDeleteMemberMutation,
+  useUpdateMemberMutation,
   useCreateTeamMutation,
   useGetTeamsQuery,
   useDeleteTeamMutation,
