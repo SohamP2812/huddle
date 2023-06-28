@@ -7,6 +7,7 @@ import com.huddle.core.admin.DiscordClient;
 import com.huddle.core.email.EmailSender;
 import com.huddle.core.exceptions.BadRequestException;
 import com.huddle.core.exceptions.ConflictException;
+import com.huddle.core.persistence.Transactor;
 import com.huddle.core.storage.StorageProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,6 +42,9 @@ public class UserService {
 
     @Autowired
     StorageProvider storageProvider;
+
+    @Autowired
+    Transactor transactor;
 
     @Value("${discord.newUserUrl}")
     private String discordNewUserUrl;
@@ -144,8 +148,11 @@ public class UserService {
     }
 
     public DbUser getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("No user exists with this id."));
+        return transactor.call(session ->
+                session.createCriteria(DbUser.class)
+                        .addEq("id", userId)
+                        .uniqueResult()
+        );
     }
 
     public DbUser getUserByEmailOrUsername(String identifier) {
@@ -170,17 +177,19 @@ public class UserService {
             MultipartFile profilePictureImage,
             Long userId
     ) throws IOException {
-        DbUser dbUser = getUser(userId);
+        return transactor.call(session -> {
+            DbUser dbUser = getUser(userId);
 
-        dbUser.setFirstName(userRequest.getFirstName());
-        dbUser.setLastName(userRequest.getLastName());
+            dbUser.setFirstName(userRequest.getFirstName());
+            dbUser.setLastName(userRequest.getLastName());
 
-        if (profilePictureImage != null) {
-            String profilePicUrl = uploadImage(profilePictureImage);
-            dbUser.setProfilePictureUrl(profilePicUrl);
-        }
+            if (profilePictureImage != null) {
+                String profilePicUrl = uploadImage(profilePictureImage);
+                dbUser.setProfilePictureUrl(profilePicUrl);
+            }
 
-        return userRepository.save(dbUser);
+            return session.update(dbUser);
+        });
     }
 
     public void deleteUser(Long userId) {
@@ -198,7 +207,7 @@ public class UserService {
                 .toList();
     }
 
-    public String uploadImage(MultipartFile file) throws IOException {
-        return storageProvider.putImage("users/profile-pictures", file.getBytes());
+    public String uploadImage(MultipartFile file) {
+        return storageProvider.putImage("users/profile-pictures", file);
     }
 }

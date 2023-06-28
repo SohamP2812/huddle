@@ -1,7 +1,7 @@
 package com.huddle.core.storage;
 
-import java.io.IOException;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface StorageProvider {
-    public String putImage(String folder, byte[] byteArray) throws IOException;
+    public String putImage(String folder, MultipartFile file);
 }

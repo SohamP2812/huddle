@@ -2,14 +2,15 @@ package com.huddle.core.storage;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.huddle.core.exceptions.FileException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 import java.util.Map;
 
 @Primary
@@ -40,17 +41,22 @@ public class RealStorageProvider implements StorageProvider {
     }
 
     @Override
-    public String putImage(String folder, byte[] byteArray) throws IOException {
-        Map uploadResult = cloudinary.uploader().upload(
-                byteArray,
-                ObjectUtils.asMap(
-                        "folder", folder,
-                        "resource_type", "image"
-                )
-        );
+    public String putImage(String folder, MultipartFile file) {
+        try {
+            Map uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap(
+                            "folder", folder,
+                            "resource_type", "image"
+                    )
+            );
 
-        logger.info("Image uploaded to cloudinary: {}", uploadResult.get("public_id"));
+            logger.info("Image uploaded to cloudinary: {}", uploadResult.get("public_id"));
 
-        return (String) uploadResult.get("secure_url");
+            return (String) uploadResult.get("secure_url");
+        } catch (Exception e) {
+            logger.error("Unable to upload image to cloudinary", e);
+            throw new FileException("Unable to upload image. Please try again");
+        }
     }
 }

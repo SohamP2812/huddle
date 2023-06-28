@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -29,11 +28,11 @@ public class TeamImageService {
                 .toList();
     }
 
-    public DbTeamImage addImage(MultipartFile image, Long teamId, Long albumId) throws IOException {
+    public DbTeamImage addImage(MultipartFile image, Long teamId, Long albumId) {
         DbTeamAlbum dbTeamAlbum = teamAlbumService.getAlbum(albumId);
         String url = storageProvider.putImage(
                 String.format("teams/%s/albums/%s", teamId, albumId),
-                image.getBytes()
+                image
         );
 
         DbTeamImage dbTeamImage = new DbTeamImage(
