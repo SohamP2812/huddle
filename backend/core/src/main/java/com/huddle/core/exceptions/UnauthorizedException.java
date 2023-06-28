@@ -1,6 +1,6 @@
 package com.huddle.core.exceptions;
 
-public class UnauthorizedException extends RuntimeException {
+public class UnauthorizedException extends ApiException {
     public UnauthorizedException(String message) {
         super(message);
     }

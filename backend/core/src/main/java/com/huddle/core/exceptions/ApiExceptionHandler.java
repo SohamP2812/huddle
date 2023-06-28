@@ -17,45 +17,54 @@ public class ApiExceptionHandler {
     public ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException e) {
         HttpStatus notFound = HttpStatus.NOT_FOUND;
 
-        ApiException apiException = new ApiException(e.getMessage(), notFound, ZonedDateTime.now(ZoneId.of("Z")));
+        ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(e.getMessage(), notFound, ZonedDateTime.now(ZoneId.of("Z")));
 
-        return new ResponseEntity<>(apiException, notFound);
+        return new ResponseEntity<>(apiExceptionResponse, notFound);
+    }
+
+    @ExceptionHandler(value = {NotFoundException.class})
+    public ResponseEntity<Object> handleNotFound(NotFoundException e) {
+        HttpStatus notFound = HttpStatus.NOT_FOUND;
+
+        ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(e.getMessage(), notFound, ZonedDateTime.now(ZoneId.of("Z")));
+
+        return new ResponseEntity<>(apiExceptionResponse, notFound);
     }
 
     @ExceptionHandler(value = {BadCredentialsException.class})
     public ResponseEntity<Object> handleBadCredentials(BadCredentialsException e) {
         HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
 
-        ApiException apiException = new ApiException(e.getMessage(), unauthorized, ZonedDateTime.now(ZoneId.of("Z")));
+        ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(e.getMessage(), unauthorized, ZonedDateTime.now(ZoneId.of("Z")));
 
-        return new ResponseEntity<>(apiException, unauthorized);
+        return new ResponseEntity<>(apiExceptionResponse, unauthorized);
     }
 
     @ExceptionHandler(value = {UnauthorizedException.class})
     public ResponseEntity<Object> handleUnauthorized(UnauthorizedException e) {
         HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
 
-        ApiException apiException = new ApiException(e.getMessage(), unauthorized, ZonedDateTime.now(ZoneId.of("Z")));
+        ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(e.getMessage(), unauthorized, ZonedDateTime.now(ZoneId.of("Z")));
 
-        return new ResponseEntity<>(apiException, unauthorized);
+        return new ResponseEntity<>(apiExceptionResponse, unauthorized);
     }
 
     @ExceptionHandler(value = {ConflictException.class})
     public ResponseEntity<Object> handleConflict(ConflictException e) {
         HttpStatus conflict = HttpStatus.CONFLICT;
 
-        ApiException apiException = new ApiException(e.getMessage(), conflict, ZonedDateTime.now(ZoneId.of("Z")));
+        ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(e.getMessage(), conflict, ZonedDateTime.now(ZoneId.of("Z")));
 
-        return new ResponseEntity<>(apiException, conflict);
+        return new ResponseEntity<>(apiExceptionResponse, conflict);
     }
 
     @ExceptionHandler(value = {BadRequestException.class})
     public ResponseEntity<Object> handleBadRequest(BadRequestException e) {
         HttpStatus badRequest = HttpStatus.BAD_REQUEST;
 
-        ApiException apiException = new ApiException(e.getMessage(), badRequest, ZonedDateTime.now(ZoneId.of("Z")));
+        ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(e.getMessage(), badRequest, ZonedDateTime.now(ZoneId.of("Z")));
 
-        return new ResponseEntity<>(apiException, badRequest);
+        return new ResponseEntity<>(apiExceptionResponse, badRequest);
     }
 
     @ExceptionHandler(value = {BindException.class})
@@ -79,8 +88,26 @@ public class ApiExceptionHandler {
             message = e.getFieldError().getDefaultMessage();
         }
 
-        ApiException apiException = new ApiException(message, badRequest, ZonedDateTime.now(ZoneId.of("Z")));
+        ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(message, badRequest, ZonedDateTime.now(ZoneId.of("Z")));
 
-        return new ResponseEntity<>(apiException, badRequest);
+        return new ResponseEntity<>(apiExceptionResponse, badRequest);
+    }
+
+    @ExceptionHandler(value = {DatabaseException.class})
+    public ResponseEntity<Object> handleDatabaseException(DatabaseException e) {
+        HttpStatus internalServerError = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(e.getMessage(), internalServerError, ZonedDateTime.now(ZoneId.of("Z")));
+
+        return new ResponseEntity<>(apiExceptionResponse, internalServerError);
+    }
+
+    @ExceptionHandler(value = {FileException.class})
+    public ResponseEntity<Object> handleFileException(FileException e) {
+        HttpStatus internalServerError = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(e.getMessage(), internalServerError, ZonedDateTime.now(ZoneId.of("Z")));
+
+        return new ResponseEntity<>(apiExceptionResponse, internalServerError);
     }
 }
