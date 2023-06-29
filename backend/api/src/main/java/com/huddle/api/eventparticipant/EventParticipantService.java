@@ -1,26 +1,46 @@
 package com.huddle.api.eventparticipant;
 
+import com.huddle.core.persistence.SessionWrapper;
+import com.huddle.core.persistence.Transactor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service
 public class EventParticipantService {
     @Autowired
-    EventParticipantRepository eventParticipantRepository;
+    Transactor transactor;
 
     public List<DbEventParticipant> getEventParticipants(Long eventId) {
-        return eventParticipantRepository.findAllByEventId(eventId);
+        return transactor.call(session ->
+                session.createCriteria(DbEventParticipant.class)
+                        .addEq("event.id", eventId)
+                        .list()
+        );
     }
 
     public DbEventParticipant getEventParticipantByUserAndEvent(
-            Long userId,
+            SessionWrapper session,
+            Long eventId,
+            Long userId
+    ) {
+        return session.createCriteria(DbEventParticipant.class)
+                .addEq("participant.id", userId)
+                .addEq("event.id", eventId)
+                .uniqueResult();
+    }
+
+    public void deleteByParticipantIdAndEventId(
+            SessionWrapper session,
+            Long participantId,
             Long eventId
     ) {
-        return eventParticipantRepository.findByParticipantIdAndEventId(userId, eventId)
-                .orElseThrow(() -> new EntityNotFoundException("No participant exists with this id."));
+        DbEventParticipant dbEventParticipant = session.createCriteria(DbEventParticipant.class)
+                .addEq("participant.id", participantId)
+                .addEq("event.id", eventId)
+                .uniqueResult();
+        session.delete(dbEventParticipant);
     }
 
     public DbEventParticipant updateEventParticipant(
@@ -28,11 +48,17 @@ public class EventParticipantService {
             Long eventId,
             Long userId
     ) {
-        DbEventParticipant dbEventParticipant = eventParticipantRepository.findByParticipantIdAndEventId(userId, eventId)
-                .orElseThrow(() -> new EntityNotFoundException("No participant exists with this id."));
+        return transactor.call(session -> {
+                    DbEventParticipant dbEventParticipant = getEventParticipantByUserAndEvent(
+                            session,
+                            userId,
+                            eventId
+                    );
 
-        dbEventParticipant.setAttendance(eventParticipantRequest.getAttendance());
+                    dbEventParticipant.setAttendance(eventParticipantRequest.getAttendance());
 
-        return eventParticipantRepository.save(dbEventParticipant);
+                    return session.save(dbEventParticipant);
+                }
+        );
     }
 }
