@@ -26,8 +26,6 @@ import java.util.regex.Pattern;
 
 @Service
 public class UserService {
-    @Autowired
-    UserRepository userRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -37,9 +35,6 @@ public class UserService {
 
     @Autowired
     DiscordClient discordClient;
-
-    @Autowired
-    PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Autowired
     StorageProvider storageProvider;
@@ -125,7 +120,6 @@ public class UserService {
             HttpServletRequest request,
             ResetPasswordRequest resetPasswordRequest
     ) {
-
         transactor.call(session -> {
                     DbUser dbUser = getUserByEmail(resetPasswordRequest.getEmail());
 
@@ -195,9 +189,7 @@ public class UserService {
 
     public DbUser getUser(Long userId) {
         return transactor.call(session ->
-                session.createCriteria(DbUser.class)
-                        .addEq("id", userId)
-                        .uniqueResult()
+                session.get(DbUser.class, userId)
         );
     }
 
