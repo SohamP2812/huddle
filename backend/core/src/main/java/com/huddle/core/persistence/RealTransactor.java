@@ -1,5 +1,6 @@
 package com.huddle.core.persistence;
 
+import com.huddle.core.exceptions.ApiException;
 import com.huddle.core.exceptions.DatabaseException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -66,7 +67,9 @@ public class RealTransactor implements Transactor {
                 transaction.rollback();
             }
 
-            logger.error("Transaction failed", e);
+            if (!(e instanceof ApiException)) {
+                logger.error("Transaction failed", e);
+            }
 
             return new TransactionResult.Failure<>(e);
         }
