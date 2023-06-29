@@ -18,8 +18,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/teams")
 public class TeamController {
-    @Autowired
-    TeamRepository teamRepository;
 
     @Autowired
     TeamService teamService;
@@ -65,7 +63,7 @@ public class TeamController {
             throw new UnauthorizedException("You do not have the authority to make this change.");
         }
 
-        teamRepository.delete(dbTeam);
+        teamService.deleteTeam(team_id);
 
         return ResponseEntity.ok(new MessageResponse("Team deleted successfully!"));
     }
