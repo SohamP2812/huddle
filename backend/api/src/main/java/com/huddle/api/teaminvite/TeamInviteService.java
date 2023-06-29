@@ -8,10 +8,12 @@ import com.huddle.api.user.DbUser;
 import com.huddle.api.user.UserService;
 import com.huddle.core.email.EmailSender;
 import com.huddle.core.exceptions.BadRequestException;
+import com.huddle.core.exceptions.NotFoundException;
+import com.huddle.core.persistence.SessionWrapper;
+import com.huddle.core.persistence.Transactor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,112 +33,130 @@ public class TeamInviteService {
     EmailSender emailSender;
 
     @Autowired
-    TeamInviteRepository teamInviteRepository;
+    Transactor transactor;
 
     public List<DbTeamInvite> getInvitesForEmail(String email) {
-        return teamInviteRepository.findAllByEmailAndState(email, EInvitation.PENDING);
+        return transactor.call(session ->
+                session.createCriteria(DbTeamInvite.class)
+                        .addEq("email", email)
+                        .addEq("state", EInvitation.PENDING)
+                        .list()
+        );
     }
 
     public DbTeamInvite getInviteByToken(String inviteToken) {
-        return teamInviteRepository.findByToken(inviteToken)
-                .orElseThrow(() -> new EntityNotFoundException("No invite exists with this token."));
+        return transactor.call(session ->
+                session.createCriteria(DbTeamInvite.class)
+                        .addEq("token", inviteToken)
+                        .uniqueResult()
+        );
     }
 
     public DbTeamInvite getInviteByEmailAndTeamId(
+            SessionWrapper session,
             String email,
             Long teamId
     ) {
-        return teamInviteRepository.findByEmailAndTeamId(email, teamId)
-                .orElseThrow(() -> new EntityNotFoundException("No invite exists with this token."));
+        return session.createCriteria(DbTeamInvite.class)
+                .addEq("email", email)
+                .addEq("teamId", teamId)
+                .uniqueResult();
     }
 
     public DbTeamInvite createInvite(TeamInviteRequest teamInviteRequest) {
-        DbTeam dbTeam = teamService.getTeam(teamInviteRequest.getTeamId());
+        return transactor.call(session -> {
+                    DbTeam dbTeam = teamService.getTeam(teamInviteRequest.getTeamId());
 
-        try {
-            DbUser dbUserToAdd = userService.getUserByEmail(teamInviteRequest.getEmail());
+                    try {
+                        DbUser dbUserToAdd = userService.getUserByEmail(teamInviteRequest.getEmail());
 
-            List<DbTeam> dbTeams = dbUserToAdd.getMemberTeams()
-                    .stream()
-                    .map(DbTeamMember::getTeam)
-                    .toList();
+                        List<DbTeam> dbTeams = dbUserToAdd.getMemberTeams()
+                                .stream()
+                                .map(DbTeamMember::getTeam)
+                                .toList();
 
-            if (dbTeams.contains(dbTeam)) {
-                throw new BadRequestException("User is already a member of this team.");
-            }
-        } catch (EntityNotFoundException ignored) {
-        }
+                        if (dbTeams.contains(dbTeam)) {
+                            throw new BadRequestException("User is already a member of this team.");
+                        }
+                    } catch (NotFoundException ignored) {
+                    }
 
-        try {
-            DbTeamInvite dbTeamInvite = getInviteByEmailAndTeamId(
-                    teamInviteRequest.getEmail(),
-                    teamInviteRequest.getTeamId()
-            );
+                    try {
+                        DbTeamInvite dbTeamInvite = getInviteByEmailAndTeamId(
+                                session,
+                                teamInviteRequest.getEmail(),
+                                teamInviteRequest.getTeamId()
+                        );
 
-            teamInviteRepository.delete(dbTeamInvite);
-        } catch (EntityNotFoundException ignored) {
-        }
+                        session.delete(dbTeamInvite);
+                    } catch (NotFoundException ignored) {
+                    }
 
-        DbTeamInvite dbTeamInvite = new DbTeamInvite(
-                teamInviteRequest.getEmail(),
-                dbTeam
+                    DbTeamInvite dbTeamInvite = new DbTeamInvite(
+                            teamInviteRequest.getEmail(),
+                            dbTeam
+                    );
+
+                    session.save(dbTeamInvite);
+
+                    Map<String, Object> variables = new HashMap<>();
+                    variables.put("teamName", dbTeam.getName());
+                    variables.put("managerName",
+                            String.format(
+                                    "%s %s",
+                                    dbTeam.getManager().getFirstName(),
+                                    dbTeam.getManager().getLastName()
+                            )
+                    );
+                    variables.put("managerEmail", dbTeam.getManager().getEmail());
+                    variables.put("invitationUrl", String.format("https://huddlesports.ca/invites/%s", dbTeamInvite.getToken()));
+
+                    emailSender.sendNow(
+                            teamInviteRequest.getEmail(),
+                            "InvitedToTeam",
+                            variables,
+                            "You've Been Invited to a Team!"
+                    );
+
+                    return dbTeamInvite;
+                }
         );
-
-        teamInviteRepository.save(dbTeamInvite);
-
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("teamName", dbTeam.getName());
-        variables.put("managerName",
-                String.format(
-                        "%s %s",
-                        dbTeam.getManager().getFirstName(),
-                        dbTeam.getManager().getLastName()
-                )
-        );
-        variables.put("managerEmail", dbTeam.getManager().getEmail());
-        variables.put("invitationUrl", String.format("https://huddlesports.ca/invites/%s", dbTeamInvite.getToken()));
-
-        emailSender.sendNow(
-                teamInviteRequest.getEmail(),
-                "InvitedToTeam",
-                variables,
-                "You've Been Invited to a Team!"
-        );
-
-        return dbTeamInvite;
     }
 
     public DbTeamInvite updateInvite(
             String inviteToken,
             UpdateTeamInviteRequest updateTeamInviteRequest
     ) {
-        DbTeamInvite dbTeamInvite = getInviteByToken(inviteToken);
+        return transactor.call(session -> {
+                    DbTeamInvite dbTeamInvite = getInviteByToken(inviteToken);
 
-        if (updateTeamInviteRequest.getState() == EInvitation.ACCEPTED && dbTeamInvite.getState() != EInvitation.ACCEPTED) {
-            DbUser dbUser = userService.getUserByEmail(dbTeamInvite.getEmail());
-            teamMemberService.addMember(
-                    dbTeamInvite.getTeam().getId(),
-                    dbUser.getId(),
-                    updateTeamInviteRequest.getPosition()
-            );
+                    if (updateTeamInviteRequest.getState() == EInvitation.ACCEPTED && dbTeamInvite.getState() != EInvitation.ACCEPTED) {
+                        DbUser dbUser = userService.getUserByEmail(dbTeamInvite.getEmail());
+                        teamMemberService.addMember(
+                                dbTeamInvite.getTeam().getId(),
+                                dbUser.getId(),
+                                updateTeamInviteRequest.getPosition()
+                        );
 
-            Map<String, Object> variables = new HashMap<>();
-            variables.put("name", dbTeamInvite.getTeam().getManager().getFirstName());
-            variables.put("acceptedUserName", String.format("%s %s", dbUser.getFirstName(), dbUser.getLastName()));
-            variables.put("acceptedUserEmail", dbUser.getEmail());
-            variables.put("joinedTeamName", dbTeamInvite.getTeam().getName());
+                        Map<String, Object> variables = new HashMap<>();
+                        variables.put("name", dbTeamInvite.getTeam().getManager().getFirstName());
+                        variables.put("acceptedUserName", String.format("%s %s", dbUser.getFirstName(), dbUser.getLastName()));
+                        variables.put("acceptedUserEmail", dbUser.getEmail());
+                        variables.put("joinedTeamName", dbTeamInvite.getTeam().getName());
 
-            emailSender.sendNow(
-                    dbTeamInvite.getTeam().getManager().getEmail(),
-                    "InvitationAccepted",
-                    variables,
-                    "Your Invite was Accepted!"
-            );
+                        emailSender.sendNow(
+                                dbTeamInvite.getTeam().getManager().getEmail(),
+                                "InvitationAccepted",
+                                variables,
+                                "Your Invite was Accepted!"
+                        );
 
-        }
+                    }
 
-        dbTeamInvite.setState(updateTeamInviteRequest.getState());
+                    dbTeamInvite.setState(updateTeamInviteRequest.getState());
 
-        return teamInviteRepository.save(dbTeamInvite);
+                    return session.update(dbTeamInvite);
+                }
+        );
     }
 }
