@@ -10,7 +10,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @ComponentScan({"com.huddle.api", "com.huddle.core"})
-@EnableJpaRepositories({"com.huddle.api", "com.huddle.core"})
+@EnableJpaRepositories(
+        basePackages = {"com.huddle.api", "com.huddle.core"},
+        enableDefaultTransactions = false
+)
 @EntityScan({"com.huddle.api", "com.huddle.core"})
 public class BackendApplication {
     private static final Logger logger = LoggerFactory.getLogger(BackendApplication.class);
