@@ -15,16 +15,16 @@ import org.springframework.stereotype.Component;
 public class RealTransactor implements Transactor {
     private static final Logger logger = LoggerFactory.getLogger(RealTransactor.class);
 
-    private SessionWrapper activeSession;
+    private final ThreadLocal<SessionWrapper> activeSession = new ThreadLocal<>();
 
     @Autowired
     SessionFactoryWrapper sessionFactoryWrapper;
 
     @Override
     public <T> T call(TransactionCallback<T> callback) {
-        boolean sessionAlreadyExists = activeSession != null;
-        SessionWrapper session = sessionAlreadyExists ? activeSession : getSession();
-        activeSession = session;
+        boolean sessionAlreadyExists = activeSession.get() != null;
+        SessionWrapper session = sessionAlreadyExists ? activeSession.get() : getSession();
+        activeSession.set(session);
 
         TransactionResult<T> result = executeCallback(session, !sessionAlreadyExists, callback);
 
@@ -34,9 +34,9 @@ public class RealTransactor implements Transactor {
             } catch (Exception e) {
                 logger.error("Error closing session", e);
                 throw new DatabaseException("An error occurred. Please try again.");
+            } finally {
+                activeSession.remove();
             }
-
-            activeSession = null;
         }
 
         return result.getOrThrow();
@@ -51,19 +51,22 @@ public class RealTransactor implements Transactor {
 
         try {
             if (openTransaction) {
+                System.out.println("Begin transaction " + Thread.currentThread());
                 transaction = session.beginTransaction();
             }
 
             T result = callback.callback(session);
 
-            session.flush();
             if (transaction != null) {
+                System.out.println("Commit transaction " + Thread.currentThread());
+                session.flush();
                 transaction.commit();
             }
 
             return new TransactionResult.Success<>(result);
         } catch (Exception e) {
             if (transaction != null) {
+                System.out.println("Rollback transaction");
                 transaction.rollback();
             }
 
