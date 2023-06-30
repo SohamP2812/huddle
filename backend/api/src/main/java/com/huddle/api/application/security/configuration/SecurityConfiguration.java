@@ -88,6 +88,10 @@ public class SecurityConfiguration {
                         authTokenFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
+                .addFilterBefore(
+                        staticContentFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
                 .build();
     }
 
