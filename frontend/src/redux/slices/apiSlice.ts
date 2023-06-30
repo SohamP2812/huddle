@@ -13,7 +13,7 @@ export const apiSlice = createApi({
           method: 'GET'
         });
 
-        if (result.error?.status === 404) {
+        if (result.error?.status === 404 || result.error?.status === 403) {
           return { data: null };
         }
 

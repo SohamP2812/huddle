@@ -105,7 +105,11 @@ export const Album = () => {
                     stringToJSDate(b.createdAt).getTime() - stringToJSDate(a.createdAt).getTime()
                 )
                 .map((image) => (
-                  <Stack flex={{ base: '1 0 25%', sm: '1 0 30%', md: '1 0 25%' }} key={image.id}>
+                  <Stack
+                    m={'0 !important'}
+                    flex={{ base: '1 0 25%', sm: '1 0 30%', md: '1 0 25%' }}
+                    key={image.id}
+                  >
                     <Image
                       background={'white'}
                       _hover={{ cursor: 'pointer' }}
