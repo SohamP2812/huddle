@@ -51,8 +51,8 @@ public class EventParticipantService {
         return transactor.call(session -> {
                     DbEventParticipant dbEventParticipant = getEventParticipantByUserAndEvent(
                             session,
-                            userId,
-                            eventId
+                            eventId,
+                            userId
                     );
 
                     dbEventParticipant.setAttendance(eventParticipantRequest.getAttendance());

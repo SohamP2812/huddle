@@ -84,11 +84,8 @@ public class SecurityConfiguration {
 
                     authorize.anyRequest().authenticated();
                 })
-                .addFilterBefore(authTokenFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                )
                 .addFilterBefore(
-                        staticContentFilter,
+                        authTokenFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .build();

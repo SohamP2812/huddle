@@ -1,7 +1,7 @@
 package com.huddle.api.user;
 
-import com.huddle.api.session.SignupRequest;
 import com.huddle.api.application.security.jwt.JwtUtils;
+import com.huddle.api.session.SignupRequest;
 import com.huddle.api.team.DbTeam;
 import com.huddle.api.team.TeamResponse;
 import com.huddle.api.team.TeamsResponse;
@@ -9,7 +9,6 @@ import com.huddle.core.exceptions.UnauthorizedException;
 import com.huddle.core.payload.MessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,9 +27,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-    @Autowired
-    AuthenticationManager authenticationManager;
-
     @Autowired
     JwtUtils jwtUtils;
 

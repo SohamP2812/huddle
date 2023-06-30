@@ -51,14 +51,12 @@ public class RealTransactor implements Transactor {
 
         try {
             if (openTransaction) {
-                System.out.println("Begin transaction " + Thread.currentThread());
                 transaction = session.beginTransaction();
             }
 
             T result = callback.callback(session);
 
             if (transaction != null) {
-                System.out.println("Commit transaction " + Thread.currentThread());
                 session.flush();
                 transaction.commit();
             }
@@ -66,7 +64,6 @@ public class RealTransactor implements Transactor {
             return new TransactionResult.Success<>(result);
         } catch (Exception e) {
             if (transaction != null) {
-                System.out.println("Rollback transaction");
                 transaction.rollback();
             }
 

@@ -27,24 +27,22 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        try {
-            String jwt = jwtUtils.parseJwtFromCookie(request);
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                Long userId = jwtUtils.getIdFromJwtToken(jwt);
+        String jwt = jwtUtils.parseJwtFromCookie(request);
+        if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+            Long userId = jwtUtils.getIdFromJwtToken(jwt);
 
-                UserDetails userDetails = new UserDetails(userId);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        jwt,
-                        null
-                );
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+            UserDetails userDetails = new UserDetails(userId);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails,
+                    jwt,
+                    null
+            );
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
+            );
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        } catch (Exception e) {
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } else {
             Cookie jwtTokenCookie = new Cookie("huddle_session", null);
 
             jwtTokenCookie.setMaxAge(0);
@@ -52,8 +50,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             jwtTokenCookie.setHttpOnly(true);
 
             response.addCookie(jwtTokenCookie);
-
-            return;
         }
 
         filterChain.doFilter(request, response);

@@ -34,12 +34,13 @@ public class TeamImageService {
     }
 
     public DbTeamImage addImage(MultipartFile image, Long teamId, Long albumId) {
+        String url = storageProvider.putImage(
+                String.format("teams/%s/albums/%s", teamId, albumId),
+                image
+        );
+
         return transactor.call(session -> {
                     DbTeamAlbum dbTeamAlbum = teamAlbumService.getAlbum(albumId);
-                    String url = storageProvider.putImage(
-                            String.format("teams/%s/albums/%s", teamId, albumId),
-                            image
-                    );
 
                     return session.save(
                             new DbTeamImage(
