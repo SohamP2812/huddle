@@ -24,6 +24,8 @@ public class ExecutorsService {
     }
 
     public MdcThreadPoolExecutor newSingleThreadExecutor() {
+        logger.info("Going to copy context: {}", MDC.getCopyOfContextMap());
+
         MdcThreadPoolExecutor executor = MdcThreadPoolExecutor.newSingleThreadExecutor();
 
         logger.info("Copied Context: {}", MDC.getCopyOfContextMap());
