@@ -1,7 +1,5 @@
 package com.huddle.core.executors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.util.Map;
@@ -11,8 +9,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 class MdcThreadPoolExecutor extends ThreadPoolExecutor {
-    private static final Logger logger = LoggerFactory.getLogger(MdcThreadPoolExecutor.class);
-
     public Map<String, String> mdcContext;
 
     public static MdcThreadPoolExecutor newSingleThreadExecutor() {
@@ -57,7 +53,6 @@ class MdcThreadPoolExecutor extends ThreadPoolExecutor {
     ) {
         return () -> {
             try {
-                logger.info("Context in runnable: {}", mdcContext);
                 MDC.setContextMap(mdcContext);
                 runnable.run();
             } finally {
