@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.UUID;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -33,6 +34,8 @@ public class AccessLoggingFilter implements Filter {
         }
 
         long startTimeNs = System.nanoTime();
+
+        MDC.put("http.request_id", UUID.randomUUID().toString());
 
         filterChain.doFilter(request, response);
 
