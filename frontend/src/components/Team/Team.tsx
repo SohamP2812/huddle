@@ -618,7 +618,7 @@ export const Team = () => {
                   px={5}
                   py={2}
                 >
-                  {isSearchUsersLoading ? (
+                  {isSearchUsersLoading || isCreateInviteLoading ? (
                     <Center height={'full'}>
                       <Spinner size={'lg'} />
                     </Center>
