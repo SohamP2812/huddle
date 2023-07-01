@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 class MdcThreadPoolExecutor extends ThreadPoolExecutor {
     private static final Logger logger = LoggerFactory.getLogger(MdcThreadPoolExecutor.class);
 
-    final private Map<String, String> mdcContext;
+    public Map<String, String> mdcContext;
 
     public static MdcThreadPoolExecutor newSingleThreadExecutor() {
         return new MdcThreadPoolExecutor(
@@ -25,7 +25,7 @@ class MdcThreadPoolExecutor extends ThreadPoolExecutor {
         );
     }
 
-    public MdcThreadPoolExecutor(
+    private MdcThreadPoolExecutor(
             int corePoolSize,
             int maximumPoolSize,
             long keepAliveTime,
@@ -54,9 +54,13 @@ class MdcThreadPoolExecutor extends ThreadPoolExecutor {
             Map<String, String> mdcContext
     ) {
         return () -> {
-            logger.info("Context: {}", mdcContext);
-            MDC.setContextMap(mdcContext);
-            runnable.run();
+            try {
+                logger.info("Context: {}", mdcContext);
+                MDC.setContextMap(mdcContext);
+                runnable.run();
+            } finally {
+                MDC.clear();
+            }
         };
     }
 }
