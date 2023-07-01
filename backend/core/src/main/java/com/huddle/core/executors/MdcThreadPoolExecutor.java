@@ -55,7 +55,7 @@ class MdcThreadPoolExecutor extends ThreadPoolExecutor {
     ) {
         return () -> {
             try {
-                logger.info("Context: {}", mdcContext);
+                logger.info("Context in runnable: {}", mdcContext);
                 MDC.setContextMap(mdcContext);
                 runnable.run();
             } finally {
