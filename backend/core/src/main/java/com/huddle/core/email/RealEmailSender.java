@@ -44,6 +44,8 @@ public class RealEmailSender implements EmailSender {
     @Override
     public void sendNow(String recipient, String htmlFileName, Map<String, Object> data, String subject) {
         try {
+            logger.info("test log here");
+
             String html = this.templateEngine.process(htmlFileName, new Context(Locale.getDefault(), data));
 
             EmailDetails emailDetails = new EmailDetails(

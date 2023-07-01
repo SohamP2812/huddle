@@ -11,7 +11,6 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.UUID;
 
 @Component
@@ -27,11 +26,6 @@ public class AccessLoggingFilter implements Filter {
     ) throws ServletException, IOException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
-
-        Enumeration<String> headerNames = req.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            System.out.println(headerNames.nextElement());
-        }
 
         long startTimeNs = System.nanoTime();
 
