@@ -39,14 +39,16 @@ class MdcThreadPoolExecutor extends ThreadPoolExecutor {
                 unit,
                 workQueue
         );
-        logger.info("Copied Context: {}", MDC.getCopyOfContextMap());
-        this.mdcContext = MDC.getCopyOfContextMap();
-        logger.info("Set Context: {}", this.mdcContext);
     }
 
     @Override
     public void execute(Runnable command) {
-        super.execute(runWithContext(command, mdcContext));
+        super.execute(
+                runWithContext(
+                        command,
+                        MDC.getCopyOfContextMap()
+                )
+        );
     }
 
     public static Runnable runWithContext(
