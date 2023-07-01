@@ -59,7 +59,7 @@ public class TeamInviteService {
     ) {
         return session.createCriteria(DbTeamInvite.class)
                 .addEq("email", email)
-                .addEq("teamId", teamId)
+                .addEq("team.id", teamId)
                 .uniqueResult();
     }
 

@@ -48,7 +48,6 @@ public class AccessLoggingFilter implements Filter {
         MDC.put("http.response.duration.ms", durationMs.toString());
         MDC.put("http.response.status_code", String.valueOf(res.getStatus()));
 
-
         logger.info(
                 "RESPONSE: {} {}{} status={} duration={}ms",
                 req.getMethod(),
