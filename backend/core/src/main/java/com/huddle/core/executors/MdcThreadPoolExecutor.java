@@ -32,8 +32,16 @@ class MdcThreadPoolExecutor extends ThreadPoolExecutor {
             TimeUnit unit,
             BlockingQueue<Runnable> workQueue
     ) {
-        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
+        super(
+                corePoolSize,
+                maximumPoolSize,
+                keepAliveTime,
+                unit,
+                workQueue
+        );
+        logger.info("Copied Context: {}", MDC.getCopyOfContextMap());
         this.mdcContext = MDC.getCopyOfContextMap();
+        logger.info("Set Context: {}", this.mdcContext);
     }
 
     @Override

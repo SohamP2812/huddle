@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class ExecutorsService {
-    private final List<MdcThreadPoolExecutor> executors = new ArrayList<>();
+    private final List<ExecutorService> executors = new ArrayList<>();
 
     public void close() throws InterruptedException {
         for (ExecutorService executor : executors) {
@@ -19,7 +19,7 @@ public class ExecutorsService {
     }
 
     public ExecutorService newSingleThreadExecutor() {
-        MdcThreadPoolExecutor executor = MdcThreadPoolExecutor.newSingleThreadExecutor();
+        ExecutorService executor = MdcThreadPoolExecutor.newSingleThreadExecutor();
 
         executors.add(executor);
 
