@@ -29,11 +29,14 @@ public class AccessLoggingFilter implements Filter {
     ) throws ServletException, IOException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
+        boolean isApi = req.getServletPath().startsWith("/api");
         boolean isRequestBodyJson = Objects.equals(req.getContentType(), "application/json");
 
         long startTimeNs = System.nanoTime();
 
-        MDC.put("http.request_id", UUID.randomUUID().toString());
+        if (isApi) {
+            MDC.put("http.request_id", UUID.randomUUID().toString());
+        }
 
         CachedRequestBodyWrapper requestWrapper = isRequestBodyJson ?
                 new CachedRequestBodyWrapper(req) : null;
@@ -50,20 +53,22 @@ public class AccessLoggingFilter implements Filter {
 
         Long durationMs = (System.nanoTime() - startTimeNs) / 1_000_000;
 
-        MDC.put("http.request.referer", req.getHeader("referer"));
-        MDC.put("http.request.method", req.getMethod());
-        MDC.put("http.request.pathname", req.getRequestURI());
-        MDC.put("http.request.url",
-                req.getRequestURL().toString() +
-                        (req.getQueryString() != null ? "?" + req.getQueryString() : "")
-        );
-        if (isRequestBodyJson) {
-            MDC.put("http.request.body", requestBody);
-        }
+        if (isApi) {
+            MDC.put("http.request.referer", req.getHeader("referer"));
+            MDC.put("http.request.method", req.getMethod());
+            MDC.put("http.request.pathname", req.getRequestURI());
+            MDC.put("http.request.url",
+                    req.getRequestURL().toString() +
+                            (req.getQueryString() != null ? "?" + req.getQueryString() : "")
+            );
+            if (isRequestBodyJson) {
+                MDC.put("http.request.body", requestBody);
+            }
 
-        MDC.put("http.response.duration.ms", durationMs.toString());
-        MDC.put("http.response.status_code", String.valueOf(res.getStatus()));
-        MDC.put("http.response.body", responseBody);
+            MDC.put("http.response.duration.ms", durationMs.toString());
+            MDC.put("http.response.status_code", String.valueOf(res.getStatus()));
+            MDC.put("http.response.body", responseBody);
+        }
 
         logger.info(
                 "RESPONSE: {} {}{} status={} duration={}ms",
