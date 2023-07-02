@@ -9,8 +9,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 class MdcThreadPoolExecutor extends ThreadPoolExecutor {
-    public Map<String, String> mdcContext;
-
     public static MdcThreadPoolExecutor newSingleThreadExecutor() {
         return new MdcThreadPoolExecutor(
                 1,
@@ -42,7 +40,7 @@ class MdcThreadPoolExecutor extends ThreadPoolExecutor {
         super.execute(
                 runWithContext(
                         command,
-                        MDC.getCopyOfContextMap()
+                        Map.of("http.request_id", MDC.get("http.request_id"))
                 )
         );
     }
