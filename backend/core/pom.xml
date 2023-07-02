@@ -54,6 +54,12 @@
             <artifactId>cloudinary-http44</artifactId>
             <version>1.33.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>9.0.65</version>
+        </dependency>
     </dependencies>
     <version>0.0.1-SNAPSHOT</version>
 
