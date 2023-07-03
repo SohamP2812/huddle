@@ -4,6 +4,8 @@ import com.huddle.api.eventparticipant.DbEventParticipant;
 import com.huddle.api.team.DbTeam;
 import com.huddle.api.teammember.DbTeamMember;
 import com.huddle.core.persistence.DbTimestampedEntity;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.lang.Nullable;
 
@@ -15,6 +17,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @EntityListeners(AuditingEntityListener.class)
 @Table(
         name = "users",

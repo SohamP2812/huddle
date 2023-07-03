@@ -112,6 +112,8 @@ public class UserService {
         return transactor.call(session ->
                 session.createCriteria(DbUser.class)
                         .addLike("username", username, MatchMode.START)
+                        .setCacheable(true)
+                        .setMaxResults(10)
                         .list()
         );
     }
@@ -204,6 +206,7 @@ public class UserService {
         return transactor.call(session ->
                 session.createCriteria(DbUser.class)
                         .addEq("username", username)
+                        .setCacheable(true)
                         .uniqueResult()
         );
     }
@@ -212,6 +215,7 @@ public class UserService {
         return transactor.call(session ->
                 session.createCriteria(DbUser.class)
                         .addEq("email", email)
+                        .setCacheable(true)
                         .uniqueResult()
         );
     }
