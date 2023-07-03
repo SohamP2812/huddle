@@ -46,4 +46,14 @@ public class CriteriaWrapper<T> {
         return criteria.setProjection(Projections.property("id"))
                 .uniqueResult() != null;
     }
+
+    public CriteriaWrapper<T> setMaxResults(int maxResults) {
+        criteria.setMaxResults(maxResults);
+        return this;
+    }
+
+    public CriteriaWrapper<T> setCacheable(boolean cacheable) {
+        criteria.setCacheable(cacheable);
+        return this;
+    }
 }
