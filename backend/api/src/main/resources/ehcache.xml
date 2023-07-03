@@ -5,11 +5,4 @@
             overflowToDisk="false"
             memoryStoreEvictionPolicy="LRU"
     />
-    <cache
-            name="com.huddle.api.user.DbUser"
-            maxElementsInMemory="50"
-            eternal="false" timeToLiveSeconds="600"
-            overflowToDisk="false"
-            memoryStoreEvictionPolicy="LRU"
-    />
 </ehcache>

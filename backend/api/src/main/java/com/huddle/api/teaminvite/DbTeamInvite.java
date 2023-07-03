@@ -2,16 +2,17 @@ package com.huddle.api.teaminvite;
 
 import com.huddle.api.team.DbTeam;
 import com.huddle.core.persistence.DbTimestampedEntity;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.hibernate.annotations.Cache;
 
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "team_invites")
 public class DbTeamInvite extends DbTimestampedEntity {
