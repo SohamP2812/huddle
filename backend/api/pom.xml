@@ -117,6 +117,12 @@
             <artifactId>junit-dep</artifactId>
             <version>4.8.2</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-ehcache</artifactId>
+            <version>5.6.10.final</version>
+        </dependency>
     </dependencies>
 
     <build>
