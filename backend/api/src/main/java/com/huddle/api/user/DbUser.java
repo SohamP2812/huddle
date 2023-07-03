@@ -52,6 +52,7 @@ public class DbUser extends DbTimestampedEntity {
     @Nullable
     private String profilePictureUrl;
 
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @OneToMany(mappedBy = "manager", cascade = CascadeType.REMOVE)
     private Set<DbTeam> teams = new HashSet<>();
 

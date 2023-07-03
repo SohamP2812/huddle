@@ -6,6 +6,8 @@ import com.huddle.api.teaminvite.DbTeamInvite;
 import com.huddle.api.teammember.DbTeamMember;
 import com.huddle.api.user.DbUser;
 import com.huddle.core.persistence.DbTimestampedEntity;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -15,6 +17,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "teams")
 public class DbTeam extends DbTimestampedEntity {
@@ -39,6 +43,8 @@ public class DbTeam extends DbTimestampedEntity {
     @OneToMany(mappedBy = "team", cascade = CascadeType.REMOVE)
     private Set<DbTeamInvite> invites = new HashSet<>();
 
+
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @OneToMany(mappedBy = "team", cascade = CascadeType.REMOVE)
     private Set<DbTeamAlbum> albums = new HashSet<>();
 
