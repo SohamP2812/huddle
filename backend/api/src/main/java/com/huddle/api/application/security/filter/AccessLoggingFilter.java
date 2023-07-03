@@ -78,6 +78,8 @@ public class AccessLoggingFilter implements Filter {
                 res.getStatus(),
                 durationMs
         );
+
+        MDC.clear();
     }
 }
 
