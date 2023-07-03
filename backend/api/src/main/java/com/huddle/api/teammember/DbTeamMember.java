@@ -3,6 +3,8 @@ package com.huddle.api.teammember;
 import com.huddle.api.team.DbTeam;
 import com.huddle.api.user.DbUser;
 import com.huddle.core.persistence.DbTimestampedEntity;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -10,6 +12,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "team_members")
 public class DbTeamMember extends DbTimestampedEntity {

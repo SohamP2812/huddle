@@ -56,6 +56,7 @@ public class DbUser extends DbTimestampedEntity {
     @OneToMany(mappedBy = "manager", cascade = CascadeType.REMOVE)
     private Set<DbTeam> teams = new HashSet<>();
 
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private Set<DbTeamMember> memberTeams = new HashSet<>();
 
