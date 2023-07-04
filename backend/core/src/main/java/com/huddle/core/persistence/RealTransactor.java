@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Primary
 @Component
 public class RealTransactor implements Transactor {
-    private static final Logger logger = LoggerFactory.getLogger(RealTransactor.class);
+    private static final Logger logger = LoggerFactory.getLogger(Transactor.class);
 
     private final ThreadLocal<SessionWrapper> activeSession = new ThreadLocal<>();
 

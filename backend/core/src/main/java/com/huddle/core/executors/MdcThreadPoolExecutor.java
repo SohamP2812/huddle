@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 class MdcThreadPoolExecutor extends ThreadPoolExecutor {
+    // Spin up a new thread pool with one thread
     public static MdcThreadPoolExecutor newSingleThreadExecutor() {
         return new MdcThreadPoolExecutor(
                 1,

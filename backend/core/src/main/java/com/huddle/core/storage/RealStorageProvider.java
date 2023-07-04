@@ -16,7 +16,7 @@ import java.util.Map;
 @Primary
 @Component
 public class RealStorageProvider implements StorageProvider {
-    private static final Logger logger = LoggerFactory.getLogger(RealStorageProvider.class);
+    private static final Logger logger = LoggerFactory.getLogger(StorageProvider.class);
 
     private Cloudinary cloudinary;
 
