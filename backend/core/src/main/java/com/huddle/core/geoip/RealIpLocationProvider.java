@@ -7,14 +7,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.InputStream;
 import java.net.InetAddress;
 
 @Primary
-@Component
+//@Component
 public class RealIpLocationProvider implements IpLocationProvider {
     private static final Logger logger = LoggerFactory.getLogger(IpLocationProvider.class);
 

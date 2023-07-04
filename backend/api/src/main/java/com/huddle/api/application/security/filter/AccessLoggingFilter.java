@@ -1,13 +1,10 @@
 package com.huddle.api.application.security.filter;
 
-import com.huddle.core.geoip.IpLocation;
-import com.huddle.core.geoip.IpLocationProvider;
 import com.huddle.core.http.CachedRequestBodyWrapper;
 import com.huddle.core.http.CachedResponseBodyWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -24,8 +21,8 @@ import java.util.UUID;
 public class AccessLoggingFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(AccessLoggingFilter.class);
 
-    @Autowired
-    IpLocationProvider ipLocationProvider;
+//    @Autowired
+//    IpLocationProvider ipLocationProvider;
 
     @Override
     public void doFilter(
@@ -59,7 +56,7 @@ public class AccessLoggingFilter implements Filter {
 
         Long durationMs = (System.nanoTime() - startTimeNs) / 1_000_000;
 
-        IpLocation ipLocation = ipLocationProvider.getIpLocation(req.getRemoteAddr());
+//        IpLocation ipLocation = ipLocationProvider.getIpLocation(req.getRemoteAddr());
 
         if (isApi) {
             MDC.put("http.request.referer", req.getHeader("referer"));
@@ -77,9 +74,9 @@ public class AccessLoggingFilter implements Filter {
             MDC.put("http.response.status_code", String.valueOf(res.getStatus()));
             MDC.put("http.response.body", responseBody);
 
-            MDC.put("network.client.ip_address", ipLocation.ipAddress());
-            MDC.put("network.client.city", ipLocation.city());
-            MDC.put("network.client.country", ipLocation.country());
+//            MDC.put("network.client.ip_address", ipLocation.ipAddress());
+//            MDC.put("network.client.city", ipLocation.city());
+//            MDC.put("network.client.country", ipLocation.country());
         }
 
         logger.info(
