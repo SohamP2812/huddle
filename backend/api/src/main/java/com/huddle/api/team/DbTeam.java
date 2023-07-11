@@ -43,8 +43,6 @@ public class DbTeam extends DbTimestampedEntity {
     @OneToMany(mappedBy = "team", cascade = CascadeType.REMOVE)
     private Set<DbTeamInvite> invites = new HashSet<>();
 
-
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @OneToMany(mappedBy = "team", cascade = CascadeType.REMOVE)
     private Set<DbTeamAlbum> albums = new HashSet<>();
 

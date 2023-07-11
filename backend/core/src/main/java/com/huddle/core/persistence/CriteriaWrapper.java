@@ -47,6 +47,11 @@ public class CriteriaWrapper<T> {
                 .uniqueResult() != null;
     }
 
+    public Long count() {
+        return (Long) criteria.setProjection(Projections.rowCount())
+                .uniqueResult();
+    }
+
     public CriteriaWrapper<T> setMaxResults(int maxResults) {
         criteria.setMaxResults(maxResults);
         return this;

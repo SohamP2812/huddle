@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @ComponentScan({"com.huddle.api", "com.huddle.core"})
@@ -15,6 +16,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
         enableDefaultTransactions = false
 )
 @EntityScan({"com.huddle.api", "com.huddle.core"})
+@EnableScheduling
 public class BackendApplication {
     private static final Logger logger = LoggerFactory.getLogger(BackendApplication.class);
 
