@@ -9,7 +9,7 @@ import './index.css';
 import { ChakraProvider } from '@chakra-ui/react';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
-import { extendTheme } from '@chakra-ui/react';
+import { extendTheme, Spacer } from '@chakra-ui/react';
 import { BrowserRouter } from 'react-router-dom';
 
 import { App } from 'App';
@@ -38,6 +38,7 @@ root.render(
         <Provider store={store}>
           <BrowserRouter>
             <Header />
+            <Spacer h="76px" />
             <App />
             <Footer />
           </BrowserRouter>

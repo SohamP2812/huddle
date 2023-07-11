@@ -28,9 +28,10 @@ export const Header: FC = () => {
   const { isOpen, onToggle } = useDisclosure();
 
   return (
-    <Box>
+    <Box zIndex={300} h="70px" position={'fixed'} top={'0'} w="full">
       <Flex
-        bg={'white'}
+        backdropFilter={'blur(8px)'}
+        bgColor={'hsla(240,5%,96%,.5)'}
         color={'gray.600'}
         py={{ base: 4 }}
         px={{ base: 4, md: 10, lg: '10vw' }}
