@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Team, Event, Participant, User, LoginCredentials, AccountCreationInfo, TeamInvite, TeamAlbum, TeamImage, Member } from 'utils/types';
+import { Team, Event, Participant, User, LoginCredentials, AccountCreationInfo, TeamInvite, TeamAlbum, TeamImage, Member, Stat } from 'utils/types';
 
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl: '/api/' }),
-  tagTypes: ['Self', 'Invites', 'Teams', 'Members', 'Events', 'Participants', 'Albums', 'Images'],
+  tagTypes: ['Self', 'Invites', 'Teams', 'Members', 'Events', 'Participants', 'Albums', 'Images', 'Stats'],
   endpoints: (builder) => ({
     getSelf: builder.query<User | null, void>({
       queryFn: async (name, api, extraOptions, baseQuery) => {
@@ -38,7 +38,7 @@ export const apiSlice = createApi({
     }),
     createUser: builder.mutation<User, AccountCreationInfo>({
       query: (newUser) => ({ url: `users`, method: 'POST', body: newUser }),
-      invalidatesTags: ['Self']
+      invalidatesTags: ['Self', 'Stats']
     }),
     resetPassword: builder.mutation<string, string>({
       query: (email) => ({
@@ -97,7 +97,7 @@ export const apiSlice = createApi({
         method: 'POST',
         body: { id: addedUserId }
       }),
-      invalidatesTags: ['Members']
+      invalidatesTags: ['Members', 'Stats']
     }),
     deleteMember: builder.mutation<Member, { userId: number; teamId: number }>({
       query: ({ userId, teamId }) => ({
@@ -120,7 +120,7 @@ export const apiSlice = createApi({
         method: 'POST',
         body: createdTeam
       }),
-      invalidatesTags: ['Teams']
+      invalidatesTags: ['Teams', 'Stats']
     }),
     getParticipants: builder.query<
       { eventParticipants: Participant[] },
@@ -172,7 +172,7 @@ export const apiSlice = createApi({
         method: 'POST',
         body: createdEvent
       }),
-      invalidatesTags: ['Events', 'Participants']
+      invalidatesTags: ['Events', 'Participants', 'Stats']
     }),
     getInvites: builder.query<
       {invites: TeamInvite[]},
@@ -272,6 +272,16 @@ export const apiSlice = createApi({
       }), 
       providesTags: ['Images']
     }), 
+    getStats: builder.query<
+      { stats: Stat[] },
+      void
+    >({
+      query: () => ({
+        url: `stats`,
+        method: 'GET',
+      }), 
+      providesTags: ['Stats']
+    }), 
   })
 });
 
@@ -305,5 +315,6 @@ export const {
   useCreateAlbumMutation,
   useGetAlbumsQuery,
   useCreateImageMutation, 
-  useGetImagesQuery
+  useGetImagesQuery,
+  useGetStatsQuery
 } = apiSlice;

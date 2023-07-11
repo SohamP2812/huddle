@@ -2,14 +2,17 @@ import '@fontsource/plus-jakarta-sans/700.css';
 
 import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGetSelfQuery } from 'redux/slices/apiSlice';
-import { Text, Heading, Stack, useColorModeValue, Flex, Image, Button } from '@chakra-ui/react';
+import { useGetSelfQuery, useGetStatsQuery } from 'redux/slices/apiSlice';
+import { Text, Heading, Stack, Flex, Image, Button, Spacer, Box } from '@chakra-ui/react';
 import { ChevronRightIcon } from '@chakra-ui/icons';
+
+const statisticsTitlesToNames = { Teams: 'teams', Members: 'members', Events: 'events' };
 
 export const LandingPage: FC = () => {
   const navigate = useNavigate();
 
   const { data: user } = useGetSelfQuery();
+  const { data: stats } = useGetStatsQuery();
 
   return (
     <>
@@ -17,7 +20,8 @@ export const LandingPage: FC = () => {
         minH={'100vh'}
         pt={{ base: 0, md: 5 }}
         justify={'center'}
-        bg={useColorModeValue('gray.50', 'gray.800')}
+        bg={'gray.50'}
+        flexDir={'column'}
       >
         <Stack
           w="100%"
@@ -25,58 +29,144 @@ export const LandingPage: FC = () => {
           objectFit={'cover'}
           bgImage={{ base: 'url("/images/NBACourtDark.jpeg")', md: '' }}
           brightness={0.1}
+          gap={{ base: 10, lg: 60 }}
+          alignItems={'center'}
+          p={10}
+          mx={'auto'}
+          maxW={'1200px'}
+          direction={'row'}
         >
-          <Stack alignItems={'center'} p={10} mx={'auto'} w={'100%'} maxW={'1200px'}>
-            <Stack gap={60} alignItems={'center'} direction={'row'}>
-              <Flex direction="column" gap={8}>
-                <Flex direction="column">
-                  <Heading
-                    color={{ base: 'blue.400', md: 'blue.500' }}
-                    fontSize={50}
-                    fontFamily={'Plus Jakarta Sans'}
-                    fontWeight={'extrabold'}
-                  >
-                    Take control
-                  </Heading>
-                  <Heading
-                    fontSize={50}
-                    fontFamily={'Plus Jakarta Sans'}
-                    color={{ base: 'white', md: 'black' }}
-                    fontWeight={'extrabold'}
-                  >
-                    with better team management
-                  </Heading>
-                </Flex>
-                <Text fontSize={16} color={{ base: 'white', md: 'black' }}>
-                  Huddle offers a robust team management solution to ease painpoints and return the
-                  focus to good team performance.
+          <Flex direction="column" gap={8}>
+            <Flex direction="column">
+              <Heading
+                color={{ base: 'blue.400', md: 'blue.500' }}
+                fontSize={50}
+                fontFamily={'Plus Jakarta Sans'}
+                fontWeight={'extrabold'}
+              >
+                Take control
+              </Heading>
+              <Heading
+                fontSize={50}
+                fontFamily={'Plus Jakarta Sans'}
+                color={{ base: 'white', md: 'black' }}
+                fontWeight={'extrabold'}
+              >
+                with better team management
+              </Heading>
+            </Flex>
+            <Text fontSize={16} color={{ base: 'white', md: 'black' }}>
+              Huddle offers a robust team management solution to ease painpoints and return the
+              focus to good team performance.
+            </Text>
+            <Button
+              border={'1px'}
+              borderColor={'gray.300'}
+              bg={{ base: 'white', md: 'gray.300' }}
+              py={6}
+              alignItems={'center'}
+              _hover={{
+                base: { background: 'gray.300' },
+                md: { background: 'gray.100' }
+              }}
+              onClick={() => navigate(user ? `/teams` : `/sign-up`)}
+            >
+              {user ? `Your Teams` : `Get Started`} <ChevronRightIcon w={5} h={5} />
+            </Button>
+          </Flex>
+          <Image
+            maxWidth={'500px'}
+            height={'700px'}
+            rounded={'2xl'}
+            objectFit={'cover'}
+            src={'/images/NBACourt.jpeg'}
+            display={{ base: 'none', md: 'block' }}
+          />
+        </Stack>
+        <Spacer minH="200px" />
+        <Stack w="100%" alignItems={'center'} p={10} mx={'auto'} maxW={'1200px'} flexDir={'column'}>
+          <Text fontWeight={'bold'} fontSize={'5xl'}>
+            How Huddle has helped
+          </Text>
+          <Spacer minH={'20px'} />
+          <Flex gap={{ base: 20, md: 40 }} flexDir={{ base: 'column', md: 'row' }} m={0}>
+            {Object.keys(statisticsTitlesToNames).map((title) => (
+              <Flex flexDir={'column'} alignItems={'center'} key={title}>
+                <Text fontWeight={'bold'} fontSize={'5xl'}>
+                  {stats?.stats.find(
+                    (stat) =>
+                      stat.name ===
+                      statisticsTitlesToNames[title as keyof typeof statisticsTitlesToNames]
+                  )?.value ?? 0}
                 </Text>
-                <Button
-                  border={'1px'}
-                  borderColor={'gray.300'}
-                  bg={{ base: 'white', md: 'gray.300' }}
-                  py={6}
-                  alignItems={'center'}
-                  _hover={{
-                    base: { background: 'gray.300' },
-                    md: { background: 'gray.100' }
-                  }}
-                  onClick={() => navigate(user ? `/teams` : `/sign-up`)}
-                >
-                  {user ? `Your Teams` : `Get Started`} <ChevronRightIcon w={5} h={5} />
-                </Button>
+                <Text fontSize={'xl'}>{title}</Text>
               </Flex>
+            ))}
+          </Flex>
+        </Stack>
+        <Spacer minH="200px" />
+        <Stack w="100%" alignItems={'center'} p={10} mx={'auto'} maxW={'1400px'} flexDir={'column'}>
+          <Text fontWeight={'bold'} fontSize={'5xl'}>
+            Complete oversight of your team
+          </Text>
+          <Text fontSize={'xl'} color="gray.600">
+            Huddle provides team dashboards that provide detailed information regarding team
+            members, events, images, and much more.
+          </Text>
+          <Spacer minH={'50px'} />
+          <Box overflowY="hidden">
+            <Box maxW="1400px" px={10}>
               <Image
-                maxWidth={'500px'}
-                height={'700px'}
+                boxShadow={'0 25px 50px -12px rgba(0, 0, 0, .25)'}
+                border={'solid'}
+                borderRadius={'0.5rem'}
+                borderWidth={'1px'}
+                borderColor={'hsla(240,4%,46%,.3)'}
+                w={'100%'}
                 rounded={'2xl'}
                 objectFit={'cover'}
-                src={'/images/NBACourt.jpeg'}
-                display={{ base: 'none', md: 'block' }}
+                src={'/images/TeamDashboard.jpg'}
+                mx={'auto'}
               />
-            </Stack>
-          </Stack>
+            </Box>
+            <Box position={'relative'} w="100%">
+              <Box
+                w="100%"
+                pt="20%"
+                position="absolute"
+                bottom="0"
+                // backgroundImage={'linear-gradient(to top, #fff, hsla(0,0%,100%,0)'}
+                backgroundImage={
+                  'linear-gradient(to top, #F7FAFC, #F7FAFC 50%, hsla(0,0%,100%,0) 75%)'
+                }
+              />
+            </Box>
+          </Box>
         </Stack>
+        <Spacer minH="200px" />
+        <Stack w="100%" alignItems={'center'} p={10} mx={'auto'} maxW={'1400px'} flexDir={'column'}>
+          <Text fontWeight={'bold'} fontSize={'5xl'}>
+            Get started with Huddle
+          </Text>
+          <Text fontSize={'xl'} color="gray.600">
+            Simply the way your team works for good.
+          </Text>
+          <Spacer minH="30px" />
+          <Button
+            border={'1px'}
+            borderColor={'black'}
+            bg={'black'}
+            color="white"
+            py={6}
+            alignItems={'center'}
+            width="300px"
+            _hover={{ background: 'white', color: 'black' }}
+            onClick={() => navigate(user ? `/teams` : `/sign-up`)}
+          >
+            Get Started
+          </Button>
+        </Stack>
+        <Spacer minH="200px" />
       </Flex>
     </>
   );

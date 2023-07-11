@@ -81,3 +81,8 @@ export interface TeamImage {
   url: string
   createdAt: string;
 }
+
+export interface Stat {
+  name: string;
+  value: string;
+}
