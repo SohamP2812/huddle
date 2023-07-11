@@ -84,8 +84,16 @@ export const LandingPage: FC = () => {
           />
         </Stack>
         <Spacer minH="200px" />
-        <Stack w="100%" alignItems={'center'} p={10} mx={'auto'} maxW={'1200px'} flexDir={'column'}>
-          <Text fontWeight={'bold'} fontSize={'5xl'}>
+        <Stack
+          textAlign={'center'}
+          w="100%"
+          alignItems={'center'}
+          p={{ base: 2, md: 10 }}
+          mx={'auto'}
+          maxW={'1200px'}
+          flexDir={'column'}
+        >
+          <Text lineHeight={'50px'} fontWeight={'bold'} fontSize={{ base: '4xl', md: '5xl' }}>
             How Huddle has helped
           </Text>
           <Spacer minH={'20px'} />
@@ -105,17 +113,30 @@ export const LandingPage: FC = () => {
           </Flex>
         </Stack>
         <Spacer minH="200px" />
-        <Stack w="100%" alignItems={'center'} p={10} mx={'auto'} maxW={'1400px'} flexDir={'column'}>
-          <Text fontWeight={'bold'} fontSize={'5xl'}>
+        <Stack
+          textAlign={'center'}
+          w="100%"
+          alignItems={'center'}
+          p={{ base: 2, md: 10 }}
+          mx={'auto'}
+          maxW={'1200px'}
+          flexDir={'column'}
+        >
+          <Text
+            lineHeight={'50px'}
+            fontWeight={'bold'}
+            fontSize={{ base: '4xl', md: '5xl' }}
+            mb="10px"
+          >
             Complete oversight of your team
           </Text>
-          <Text fontSize={'xl'} color="gray.600">
+          <Text fontSize={{ base: 'md', md: 'xl' }} color="gray.600">
             Huddle provides team dashboards that provide detailed information regarding team
             members, events, images, and much more.
           </Text>
           <Spacer minH={'50px'} />
-          <Box overflowY="hidden">
-            <Box maxW="1400px" px={10}>
+          <Box overflowY="hidden" margin="-0.5rem">
+            <Box maxW="1400px" px={{ base: 2, md: 10 }}>
               <Image
                 boxShadow={'0 25px 50px -12px rgba(0, 0, 0, .25)'}
                 border={'solid'}
@@ -144,8 +165,16 @@ export const LandingPage: FC = () => {
           </Box>
         </Stack>
         <Spacer minH="200px" />
-        <Stack w="100%" alignItems={'center'} p={10} mx={'auto'} maxW={'1400px'} flexDir={'column'}>
-          <Text fontWeight={'bold'} fontSize={'5xl'}>
+        <Stack
+          textAlign={'center'}
+          w="100%"
+          alignItems={'center'}
+          p={{ base: 2, md: 10 }}
+          mx={'auto'}
+          maxW={'1200px'}
+          flexDir={'column'}
+        >
+          <Text lineHeight={'50px'} fontWeight={'bold'} fontSize={{ base: '4xl', md: '5xl' }}>
             Get started with Huddle
           </Text>
           <Text fontSize={'xl'} color="gray.600">
