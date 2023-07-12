@@ -12,6 +12,7 @@ public class SecurityProperties {
             add(new Endpoint(HttpMethod.POST, "/api/session"));
             add(new Endpoint(HttpMethod.POST, "/api/users/password"));
             add(new Endpoint(HttpMethod.DELETE, "/api/users/password"));
+            add(new Endpoint(HttpMethod.GET, "/api/stats"));
             add(new Endpoint(HttpMethod.POST, "/api/stats/counted/refresh"));
             add(new Endpoint(HttpMethod.GET, "/actuator/**"));
         }};
