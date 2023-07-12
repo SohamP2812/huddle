@@ -21,50 +21,56 @@ import { Album } from 'components/Album/Album';
 import { useAnalytics } from 'hooks/useAnalytics';
 import { TeamInvite } from 'components/TeamInvite/TeamInvite';
 import { TeamInvites } from 'components/TeamInvites/TeamInvites';
+import { ScrollToTop } from 'components/ScrollToTop/ScrollToTop';
 
 export const App: FC = () => {
   useAnalytics();
 
   return (
-    <Routes>
-      <Route path="/" element={<AuthComponent children={<LandingPage />} />} />
-      <Route path="sign-up" element={<AuthComponent children={<SignUp />} />} />
-      <Route path="sign-in" element={<AuthComponent children={<SignIn />} />} />
-      <Route path="account" element={<AuthComponent children={<Account />} isProtected />} />
-      <Route path="account" element={<AuthComponent children={<Account />} isProtected />} />
-      <Route path="users/:user_id" element={<AuthComponent children={<User />} isProtected />} />
-      <Route path="create-team" element={<AuthComponent children={<CreateTeam />} isProtected />} />
-      <Route path="invites" element={<AuthComponent children={<TeamInvites />} isProtected />} />
-      <Route
-        path="invites/:invite_token"
-        element={<AuthComponent children={<TeamInvite />} isProtected />}
-      />
-      <Route path="teams" element={<AuthComponent children={<Teams />} isProtected />} />
-      <Route path="teams/:team_id" element={<AuthComponent children={<Team />} isProtected />} />
-      <Route
-        path="teams/:team_id/create-album"
-        element={<AuthComponent children={<CreateAlbum />} isProtected />}
-      />
-      <Route
-        path="teams/:team_id/albums/:album_id"
-        element={<AuthComponent children={<Album />} isProtected />}
-      />
-      <Route
-        path="teams/:team_id/albums/:album_id/create-image"
-        element={<AuthComponent children={<CreateImage />} isProtected />}
-      />
-      <Route
-        path="teams/:team_id/create-event"
-        element={<AuthComponent children={<CreateEvent />} isProtected />}
-      />
-      <Route
-        path="teams/:team_id/events/:event_id"
-        element={<AuthComponent children={<Event />} isProtected />}
-      />
-      <Route
-        path="teams/:team_id/events/:event_id/edit"
-        element={<AuthComponent children={<EditEvent />} isProtected />}
-      />
-    </Routes>
+    <ScrollToTop>
+      <Routes>
+        <Route path="/" element={<AuthComponent children={<LandingPage />} />} />
+        <Route path="sign-up" element={<AuthComponent children={<SignUp />} />} />
+        <Route path="sign-in" element={<AuthComponent children={<SignIn />} />} />
+        <Route path="account" element={<AuthComponent children={<Account />} isProtected />} />
+        <Route path="account" element={<AuthComponent children={<Account />} isProtected />} />
+        <Route path="users/:user_id" element={<AuthComponent children={<User />} isProtected />} />
+        <Route
+          path="create-team"
+          element={<AuthComponent children={<CreateTeam />} isProtected />}
+        />
+        <Route path="invites" element={<AuthComponent children={<TeamInvites />} isProtected />} />
+        <Route
+          path="invites/:invite_token"
+          element={<AuthComponent children={<TeamInvite />} isProtected />}
+        />
+        <Route path="teams" element={<AuthComponent children={<Teams />} isProtected />} />
+        <Route path="teams/:team_id" element={<AuthComponent children={<Team />} isProtected />} />
+        <Route
+          path="teams/:team_id/create-album"
+          element={<AuthComponent children={<CreateAlbum />} isProtected />}
+        />
+        <Route
+          path="teams/:team_id/albums/:album_id"
+          element={<AuthComponent children={<Album />} isProtected />}
+        />
+        <Route
+          path="teams/:team_id/albums/:album_id/create-image"
+          element={<AuthComponent children={<CreateImage />} isProtected />}
+        />
+        <Route
+          path="teams/:team_id/create-event"
+          element={<AuthComponent children={<CreateEvent />} isProtected />}
+        />
+        <Route
+          path="teams/:team_id/events/:event_id"
+          element={<AuthComponent children={<Event />} isProtected />}
+        />
+        <Route
+          path="teams/:team_id/events/:event_id/edit"
+          element={<AuthComponent children={<EditEvent />} isProtected />}
+        />
+      </Routes>
+    </ScrollToTop>
   );
 };
