@@ -25,7 +25,7 @@ export const Footer = () => {
             cursor: 'pointer'
           }}
         />
-        <Text>© 2023 Huddle Sports. All rights reserved</Text>
+        <Text>© 2023 Huddle Sports. All rights reserved.</Text>
         <Stack direction={'row'} spacing={6}>
           <SocialButton label={'GitHub'} href={'https://github.com/SohamP2812/huddle'}>
             <FaGithub />

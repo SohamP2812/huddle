@@ -3,8 +3,8 @@ import '@fontsource/plus-jakarta-sans/700.css';
 import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetSelfQuery, useGetStatsQuery } from 'redux/slices/apiSlice';
-import { Text, Heading, Stack, Flex, Image, Button, Spacer, Box } from '@chakra-ui/react';
-import { ChevronRightIcon } from '@chakra-ui/icons';
+import { Text, Heading, Stack, Flex, Image, Button, Spacer, Box, Grid } from '@chakra-ui/react';
+import { ChevronRightIcon, CalendarIcon, AttachmentIcon, CheckCircleIcon } from '@chakra-ui/icons';
 
 const statisticsTitlesToNames = { Teams: 'teams', Members: 'members', Events: 'events' };
 
@@ -135,8 +135,8 @@ export const LandingPage: FC = () => {
             members, events, images, and much more.
           </Text>
           <Spacer minH={'50px'} />
-          <Box overflowY="hidden" margin="-0.5rem">
-            <Box maxW="1400px" px={{ base: 2, md: 10 }}>
+          <Box overflowY="hidden" margin="-0.5rem !important">
+            <Box maxW="100%" px={{ base: 2, md: 10 }}>
               <Image
                 boxShadow={'0 25px 50px -12px rgba(0, 0, 0, .25)'}
                 border={'solid'}
@@ -156,13 +156,44 @@ export const LandingPage: FC = () => {
                 pt="20%"
                 position="absolute"
                 bottom="0"
-                // backgroundImage={'linear-gradient(to top, #fff, hsla(0,0%,100%,0)'}
                 backgroundImage={
                   'linear-gradient(to top, #F7FAFC, #F7FAFC 50%, hsla(0,0%,100%,0) 75%)'
                 }
               />
             </Box>
           </Box>
+          <Spacer minH={'50px'} />
+          <Grid
+            rowGap={20}
+            columnGap={20}
+            templateColumns={{ base: 'repeat(1,minmax(0,1fr))', md: 'repeat(3,minmax(0,1fr))' }}
+            fontSize={'lg'}
+            textAlign={'left'}
+            lineHeight={8}
+            p={5}
+          >
+            <Stack gap={3} alignItems={'start'} flexDir={'row'}>
+              <CheckCircleIcon mt={1} w={5} h={5} />
+              <Text m={'0 !important'}>
+                <b>Manage members. </b>Invite all members of your team to Huddle and manage the
+                roster online, seamlessly.
+              </Text>
+            </Stack>
+            <Stack gap={3} alignItems={'start'} flexDir={'row'}>
+              <CalendarIcon mt={1} w={5} h={5} />
+              <Text m={'0 !important'}>
+                <b>Create events. </b>Schedule both games and practices that will be shared with
+                members of the team you choose, allowing you to record scores, locations, and more.
+              </Text>
+            </Stack>
+            <Stack gap={3} alignItems={'start'} flexDir={'row'}>
+              <AttachmentIcon mt={1} w={5} h={5} />
+              <Text m={'0 !important'}>
+                <b>Share photos. </b>Add albums and images to your dashboard, allowing photos to be
+                viewed by every member within your team.
+              </Text>
+            </Stack>
+          </Grid>
         </Stack>
         <Spacer minH="200px" />
         <Stack

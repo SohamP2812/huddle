@@ -38,7 +38,7 @@ root.render(
         <Provider store={store}>
           <BrowserRouter>
             <Header />
-            <Spacer h="76px" />
+            <Spacer h="73px" />
             <App />
             <Footer />
           </BrowserRouter>
