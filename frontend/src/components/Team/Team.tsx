@@ -34,7 +34,9 @@ import {
   Button,
   Input,
   useToast,
-  Center
+  Center,
+  Spacer,
+  Code
 } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 
@@ -48,6 +50,7 @@ import { TeamMemberCard } from 'components/TeamMemberCard/TeamMemberCard';
 export const Team = () => {
   const [usernameQuery, setUsernameQuery] = useState('');
   const [inviteEmail, setInviteEmail] = useState('');
+  const [confirmDeleteTeamText, setConfirmDeleteTeamText] = useState('');
 
   const [showPastEvents, setShowPastEvents] = useState(false);
 
@@ -66,6 +69,11 @@ export const Team = () => {
     isOpen: isEmailInviteOpen,
     onOpen: onEmailInviteOpen,
     onClose: onEmailInviteClose
+  } = useDisclosure();
+  const {
+    isOpen: isDeleteTeamOpen,
+    onOpen: onDeleteTeamOpen,
+    onClose: onDeleteTeamClose
   } = useDisclosure();
 
   const navigate = useNavigate();
@@ -191,6 +199,10 @@ export const Team = () => {
     }
   }, [deleteTeamError]);
 
+  const handleChangeConfirmDeleteTeamText = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setConfirmDeleteTeamText(e.target.value);
+  };
+
   const toggleShowPastEvents = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setShowPastEvents(!showPastEvents);
@@ -240,6 +252,14 @@ export const Team = () => {
     setInviteEmail('');
     onAddMemberChoiceClose();
     onEmailInviteOpen();
+  };
+
+  const handleOnDeleteTeamClose = (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (e) {
+      e.preventDefault();
+    }
+    setConfirmDeleteTeamText('');
+    onDeleteTeamClose();
   };
 
   const handleDeleteMember = (
@@ -518,14 +538,13 @@ export const Team = () => {
 
           {members.find((member) => member.id === userId)?.isManager ? (
             <Button
-              isLoading={isDeleteTeamLoading}
               mb={5}
               p={4}
               py={6}
               bg="red"
               color="white"
               _hover={{ bg: 'red.400' }}
-              onClick={handleDeleteTeam}
+              onClick={onDeleteTeamOpen}
               width={'fit-content'}
               alignSelf="center"
             >
@@ -686,6 +705,42 @@ export const Team = () => {
                   onClick={(e) => handleInvite(e, inviteEmail)}
                 >
                   Send
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+
+          <Modal isOpen={isDeleteTeamOpen} onClose={handleOnDeleteTeamClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Are you sure?</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                {`Deleting your team is an irreversable action. Please be certain you want to do this
+            as you won't be able to recover your team and its associated images, events, etc.`}
+                <Spacer h={'4'} />
+                <FormLabel>
+                  Type <Code fontWeight={'bold'}>DELETE</Code> to confirm
+                </FormLabel>
+                <Input
+                  name="password"
+                  type="password"
+                  onChange={handleChangeConfirmDeleteTeamText}
+                  value={confirmDeleteTeamText}
+                />
+              </ModalBody>
+
+              <ModalFooter>
+                <Button variant="ghost" mr={3} onClick={handleOnDeleteTeamClose}>
+                  Close
+                </Button>
+                <Button
+                  disabled={confirmDeleteTeamText !== 'DELETE'}
+                  isLoading={isDeleteTeamLoading}
+                  colorScheme="red"
+                  onClick={handleDeleteTeam}
+                >
+                  Delete
                 </Button>
               </ModalFooter>
             </ModalContent>
