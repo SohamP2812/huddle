@@ -9,7 +9,6 @@ import {
   Link,
   Button,
   Heading,
-  Text,
   Spacer,
   Center,
   Spinner,
@@ -107,9 +106,6 @@ export const SignUp = () => {
         <Stack spacing={8} mx={'auto'} maxW={'lg'} minW={{ md: 'lg' }} py={12} px={6}>
           <Stack align={'center'}>
             <Heading fontSize={{ base: '3xl', md: '4xl' }}>Create your account</Heading>
-            <Text fontSize={'lg'} color={'gray.600'}>
-              to make your life a little bit easier ✌️
-            </Text>
           </Stack>
           <Box rounded={'lg'} bg={'white'} boxShadow={'lg'} p={8}>
             <form onSubmit={handleSignup}>

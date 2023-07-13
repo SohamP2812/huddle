@@ -61,14 +61,13 @@ export const LandingPage: FC = () => {
             </Text>
             <Button
               border={'1px'}
-              borderColor={'gray.300'}
-              bg={{ base: 'white', md: 'gray.300' }}
+              borderColor={'black'}
+              bg={'black'}
+              color="white"
               py={6}
               alignItems={'center'}
-              _hover={{
-                base: { background: 'gray.300' },
-                md: { background: 'gray.100' }
-              }}
+              width="300px"
+              _hover={{ background: 'white', color: 'black' }}
               onClick={() => navigate(user ? `/teams` : `/sign-up`)}
             >
               {user ? `Your Teams` : `Get Started`} <ChevronRightIcon w={5} h={5} />
