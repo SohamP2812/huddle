@@ -1,5 +1,6 @@
 package com.huddle.api.teamalbum;
 
+import com.huddle.core.payload.MessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,5 +34,12 @@ public class TeamAlbumController {
                 .toList();
 
         return ResponseEntity.ok(new TeamAlbumsResponse(responseAlbums));
+    }
+
+    @DeleteMapping("/{album_id}")
+    public ResponseEntity<?> deleteAlbum(@PathVariable Long album_id) {
+        teamAlbumService.deleteAlbum(album_id);
+
+        return ResponseEntity.ok(new MessageResponse("Album deleted successfully!"));
     }
 }

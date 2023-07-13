@@ -237,6 +237,19 @@ export const apiSlice = createApi({
       }), 
       invalidatesTags: ['Albums']
     }),
+    deleteAlbum: builder.mutation<
+      void,
+      {
+        teamId: number
+        albumId: number
+      }
+    >({
+      query: ({ teamId, albumId }) => ({
+        url: `teams/${teamId}/albums/${albumId}`,
+        method: 'DELETE', 
+      }), 
+      invalidatesTags: ['Albums']
+    }),
     getAlbums: builder.query<
       { albums: TeamAlbum[] },
       number
@@ -313,6 +326,7 @@ export const {
   useUpdateInviteMutation,
   useDeleteEventMutation,
   useCreateAlbumMutation,
+  useDeleteAlbumMutation,
   useGetAlbumsQuery,
   useCreateImageMutation, 
   useGetImagesQuery,

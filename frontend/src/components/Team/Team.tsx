@@ -482,7 +482,7 @@ export const Team = () => {
                   </Heading>
                 </Stack>
                 <Divider borderColor={'gray.300'} />
-                <Stack my={5} gap={2}>
+                <Stack maxHeight={'450px'} overflowY={'auto'} my={5} gap={2}>
                   {isAlbumsLoading ? (
                     <Center height={40}>
                       <Spinner size={'xl'} />
@@ -501,7 +501,13 @@ export const Team = () => {
                           direction="row"
                           key={album.id}
                         >
-                          <AlbumCard album={album} />
+                          <AlbumCard
+                            album={album}
+                            isManager={
+                              members.find((member) => member.id === userId)?.isManager || false
+                            }
+                            teamId={parseInt(team_id)}
+                          />
                         </Stack>
                       ))
                   )}

@@ -50,4 +50,13 @@ public class TeamAlbumService {
                 session.get(DbTeamAlbum.class, albumId)
         );
     }
+
+    public void deleteAlbum(Long albumId) {
+        transactor.call(session -> {
+                    DbTeamAlbum dbTeamAlbum = getAlbum(albumId);
+                    session.delete(dbTeamAlbum);
+                    return true;
+                }
+        );
+    }
 }

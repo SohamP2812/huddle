@@ -60,7 +60,9 @@
       "@typescript-eslint/no-non-null-assertion": "off",
       "react-hooks/exhaustive-deps": "off",
       "react/react-in-jsx-scope": "off",
-      "no-constant-condition": "off"
+      "no-constant-condition": "off",
+      "no-unreachable": "warn",
+      "no-unused-vars": "warn"
     }
   },
   "eslintIgnore": [
