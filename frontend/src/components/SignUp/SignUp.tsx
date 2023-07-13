@@ -40,6 +40,7 @@ export const SignUp = () => {
 
   useEffect(() => {
     if (isCreationSuccess) {
+      toast.closeAll();
       if (redirect) {
         navigate(redirect);
       } else {

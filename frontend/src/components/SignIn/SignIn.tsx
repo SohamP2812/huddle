@@ -56,6 +56,7 @@ export const SignIn = () => {
 
   useEffect(() => {
     if (isLoginSuccess) {
+      toast.closeAll();
       if (redirect) {
         navigate(redirect);
       } else {
