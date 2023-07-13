@@ -34,6 +34,8 @@ public class StatService {
     @Scheduled(cron = "0 0 1 * * ?")
     public void syncCountedStats() {
         logger.info("Task executing: Sync counted stats table");
+        long startTimeNs = System.nanoTime();
+
         transactor.call(session -> {
                     Long userCount = session.createCriteria(DbUser.class)
                             .count();
@@ -106,6 +108,9 @@ public class StatService {
                     return true;
                 }
         );
+
+        Long durationMs = (System.nanoTime() - startTimeNs) / 1_000_000;
+        logger.info("Task completed: Sync counted stats table (duration={}ms)", durationMs);
     }
 
     public void incrementStat(SessionWrapper session, String name) {
