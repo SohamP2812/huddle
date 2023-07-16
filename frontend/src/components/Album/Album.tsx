@@ -80,7 +80,7 @@ export const Album = () => {
         bg={'gray.50'}
         alignItems={'center'}
       >
-        <Flex py={12} flexDir={'column'} maxW={'700px'} w={'full'}>
+        <Flex flexDir={'column'} maxW={'700px'} w={'full'}>
           <Stack spacing={8} mx={'auto'} width={'full'} py={12} px={6}>
             <BackButton fallback={`/teams/${team_id}`} />
             <Button
