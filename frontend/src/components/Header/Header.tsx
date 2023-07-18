@@ -27,6 +27,8 @@ export const Header: FC = () => {
 
   const { isOpen, onToggle } = useDisclosure();
 
+  const showHamburger = NAV_ITEMS.filter((navItem) => !navItem.protected || !!user).length != 0;
+
   return (
     <Box zIndex={300} h="70px" position={'fixed'} top={'0'} w="full">
       <Flex
@@ -45,12 +47,14 @@ export const Header: FC = () => {
           ml={{ base: -2 }}
           display={{ base: 'flex', md: 'none' }}
         >
-          <IconButton
-            onClick={onToggle}
-            icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
-            variant={'ghost'}
-            aria-label={'Toggle Navigation'}
-          />
+          {showHamburger ? (
+            <IconButton
+              onClick={onToggle}
+              icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
+              variant={'ghost'}
+              aria-label={'Toggle Navigation'}
+            />
+          ) : null}
         </Flex>
         <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
           <Image
@@ -110,9 +114,11 @@ export const Header: FC = () => {
         </Stack>
       </Flex>
 
-      <Collapse in={isOpen} animateOpacity>
-        <MobileNav toggleNav={onToggle} loggedIn={!!user} />
-      </Collapse>
+      {showHamburger ? (
+        <Collapse in={isOpen} animateOpacity>
+          <MobileNav toggleNav={onToggle} loggedIn={!!user} />
+        </Collapse>
+      ) : null}
     </Box>
   );
 };
@@ -208,13 +214,7 @@ const MobileNav = ({
   loggedIn: boolean | null;
 }) => {
   return (
-    <Stack
-      bg={useColorModeValue('white', 'gray.800')}
-      p={4}
-      display={{ md: 'none' }}
-      borderBottom={'1px'}
-      borderColor={'black'}
-    >
+    <Stack bg={'white'} p={4} display={{ md: 'none' }} borderBottom={'1px'} borderColor={'black'}>
       {NAV_ITEMS.filter((navItem) => !navItem.protected || loggedIn).map((navItem) => (
         <MobileNavItem toggleNav={toggleNav} key={navItem.label} {...navItem} />
       ))}
