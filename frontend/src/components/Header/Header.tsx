@@ -27,7 +27,7 @@ export const Header: FC = () => {
 
   const { isOpen, onToggle } = useDisclosure();
 
-  const showHamburger = NAV_ITEMS.filter((navItem) => !navItem.protected || !!user).length != 0;
+  const showHamburger = NAV_ITEMS.filter((navItem) => !navItem.protected || !!user).length !== 0;
 
   return (
     <Box zIndex={300} h="70px" position={'fixed'} top={'0'} w="full">
