@@ -20,6 +20,7 @@
     "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.6",
     "axios": "^0.27.2",
+    "control-boss": "^1.16.0",
     "dayjs": "^1.11.5",
     "framer-motion": "^6.5.1",
     "react": "^18.2.0",

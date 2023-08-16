@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useGetSelfQuery, useGetStatsQuery } from 'redux/slices/apiSlice';
 import { Text, Heading, Stack, Flex, Image, Button, Spacer, Box, Grid } from '@chakra-ui/react';
 import { ChevronRightIcon, CalendarIcon, AttachmentIcon, CheckCircleIcon } from '@chakra-ui/icons';
+import { HuddleShowSiteStats } from '../../generated/control-boss';
+import useControlBoss from '../../generated/useControlBoss';
 
 const statisticsTitlesToNames = { Teams: 'teams', Members: 'members', Events: 'events' };
 
@@ -13,6 +15,8 @@ export const LandingPage: FC = () => {
 
   const { data: user } = useGetSelfQuery();
   const { data: stats } = useGetStatsQuery();
+
+  const [controlBoss] = useControlBoss();
 
   return (
     <>
@@ -82,35 +86,39 @@ export const LandingPage: FC = () => {
             display={{ base: 'none', md: 'block' }}
           />
         </Stack>
-        <Spacer minH="200px" />
-        <Stack
-          textAlign={'center'}
-          w="100%"
-          alignItems={'center'}
-          p={{ base: 2, md: 10 }}
-          mx={'auto'}
-          maxW={'1200px'}
-          flexDir={'column'}
-        >
-          <Text lineHeight={'50px'} fontWeight={'bold'} fontSize={{ base: '4xl', md: '5xl' }}>
-            How Huddle has helped
-          </Text>
-          <Spacer minH={'20px'} />
-          <Flex gap={{ base: 20, md: 40 }} flexDir={{ base: 'column', md: 'row' }} m={0}>
-            {Object.keys(statisticsTitlesToNames).map((title) => (
-              <Flex flexDir={'column'} alignItems={'center'} key={title}>
-                <Text fontWeight={'bold'} fontSize={'5xl'}>
-                  {stats?.stats.find(
-                    (stat) =>
-                      stat.name ===
-                      statisticsTitlesToNames[title as keyof typeof statisticsTitlesToNames]
-                  )?.value ?? 0}
-                </Text>
-                <Text fontSize={'xl'}>{title}</Text>
+        {controlBoss.get(HuddleShowSiteStats) ? (
+          <>
+            <Spacer minH="200px" />
+            <Stack
+              textAlign={'center'}
+              w="100%"
+              alignItems={'center'}
+              p={{ base: 2, md: 10 }}
+              mx={'auto'}
+              maxW={'1200px'}
+              flexDir={'column'}
+            >
+              <Text lineHeight={'50px'} fontWeight={'bold'} fontSize={{ base: '4xl', md: '5xl' }}>
+                How Huddle has helped
+              </Text>
+              <Spacer minH={'20px'} />
+              <Flex gap={{ base: 20, md: 40 }} flexDir={{ base: 'column', md: 'row' }} m={0}>
+                {Object.keys(statisticsTitlesToNames).map((title) => (
+                  <Flex flexDir={'column'} alignItems={'center'} key={title}>
+                    <Text fontWeight={'bold'} fontSize={'5xl'}>
+                      {stats?.stats.find(
+                        (stat) =>
+                          stat.name ===
+                          statisticsTitlesToNames[title as keyof typeof statisticsTitlesToNames]
+                      )?.value ?? 0}
+                    </Text>
+                    <Text fontSize={'xl'}>{title}</Text>
+                  </Flex>
+                ))}
               </Flex>
-            ))}
-          </Flex>
-        </Stack>
+            </Stack>
+          </>
+        ) : null}
         <Spacer minH="200px" />
         <Stack
           textAlign={'center'}
