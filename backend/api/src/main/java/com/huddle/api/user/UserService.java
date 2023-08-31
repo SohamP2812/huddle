@@ -7,12 +7,14 @@ import com.huddle.core.admin.DiscordClient;
 import com.huddle.core.email.EmailSender;
 import com.huddle.core.exceptions.BadRequestException;
 import com.huddle.core.exceptions.ConflictException;
+import com.huddle.core.exceptions.NotFoundException;
 import com.huddle.core.persistence.SessionWrapper;
 import com.huddle.core.persistence.Transactor;
 import com.huddle.core.storage.StorageProvider;
 import org.hibernate.criterion.MatchMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -199,7 +201,11 @@ public class UserService {
         Pattern pattern = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}");
         Matcher matcher = pattern.matcher(identifier);
 
-        return matcher.matches() ? getUserByEmail(identifier) : getUserByUsername(identifier);
+        try {
+            return matcher.matches() ? getUserByEmail(identifier) : getUserByUsername(identifier);
+        } catch (NotFoundException ignored) {
+            throw new BadCredentialsException("Invalid credentials.");
+        }
     }
 
     public DbUser getUserByUsername(String username) {
