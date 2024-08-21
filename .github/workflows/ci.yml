@@ -63,5 +63,5 @@ jobs:
             passphrase: ${{secrets.DO_PASSPHRASE}}
             script: |
               cd /huddle/docker
-              docker-compose pull huddle
-              docker-compose up --detach --build huddle
+              docker compose pull huddle
+              docker compose up --detach --build huddle
