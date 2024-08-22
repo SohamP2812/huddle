@@ -69,9 +69,9 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain configure(final HttpSecurity httpSecurity) throws Exception {
-        if (Arrays.toString(environment.getActiveProfiles()).contains("prod")) {
-            httpSecurity.requiresChannel().anyRequest().requiresSecure();
-        }
+//        if (Arrays.toString(environment.getActiveProfiles()).contains("prod")) {
+//            httpSecurity.requiresChannel().anyRequest().requiresSecure();
+//        }
 
         return httpSecurity
                 .cors(Customizer.withDefaults())
